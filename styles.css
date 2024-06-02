@@ -1,0 +1,129 @@
+/*Imports the font used in the actual Instagram Logo*/
+@font-face {
+    font-family: Billabong;
+    src: url('fonts/billabong_regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Helvetica Neue';
+}
+
+
+.Megagram {
+    font-family: Billabong;
+    font-size: 55px;
+}
+
+
+.box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 360px;
+    height: 385px;
+    border-color: lightgray;
+    border-width: 0.2px;
+    border-style: solid;
+}
+
+.textInput {
+    width: 245px;
+    height:30px;
+    margin-top: 8px;
+    background-color: #f7f7f5;
+    border-radius: 2px;
+    border-width: 0.2px;
+    padding-left:7px;
+    padding-top:6px;
+    padding-bottom:6px;
+
+}
+
+.textInput::placeholder {
+    color: #545557;
+    opacity: 1;
+}
+
+.blueButton {
+    background-color: #669aff;
+    color: white;
+    width: 255px;
+    height: 27px;
+    border-radius: 4px;
+    border: none;
+    font-weight: bold;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 12.5px;
+    cursor: pointer;
+    margin-top: 18px;
+}
+
+.OR {
+display: inline;
+color: #696b69;
+font-weight: bold;
+font-size: 11px;
+
+}
+
+.orLine {
+    display: inline;
+    top: 10px;
+    color: lightgray;
+    margin-right:8px;
+}
+
+#facebookGoogleYouTubeLogin {
+    font-size:12px;
+    color: darkblue;
+    font-weight: bold;
+    display: inline;
+    margin-bottom:10px;
+}
+
+.facebookIcon{
+    width:4.5%;
+    height:49.5%;
+    margin-right:5px;
+}
+
+.googleIcon {
+    width:8%;
+    height:79.5%;
+}
+
+.appleIcon {
+    width:5%;
+    height:49.5%;
+}
+
+.androidIcon {
+    width: 2%;
+    height:2%;
+}
+
+.windowsIcon {
+    width:2%;
+    height:2%;
+}
+
+#forgotPassword {
+    color: gray;
+    font-size: 10.2px;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+
+.noUnderline {
+    text-decoration: none;
+}
+
+.footnote {
+    color: gray;
+    font-size: small;
+}
