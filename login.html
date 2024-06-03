@@ -10,10 +10,14 @@
 </head>
 <body>
     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+
+    <div style="display:flex; justify-content:center; align-items:center;">
+    <img style="margin-left:425px; margin-right: -500px;  margin-top: -190px; width: 535px; height: 750px; object-fit: contain;" src="images/instagramLoginPhoto.png">
+    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
     <!--The div below contains the Instagram logo, login-input-fields, log-in button, as well as options
     for selecting 'forgot password' and logging in via Facebook/Google/YouTube. This div also has a white
     background and a thin gray border.-->
-    <div class="box" style="margin-top:150px;">
+    <div class="box" style="margin-top:100px;">
         <h1 class="Megagram">Megagram</h1>
         <form>
         <input type="text" class="textInput" placeholder="Phone number, username, or email">
@@ -22,12 +26,11 @@
         <br>
         <button class="blueButton">Log in</button>
         </form>
-        <br>
         <div><p class="orLine">_____________</p><p class="OR">OR</p><p class="orLine" style="margin-left:8px;">_____________</p></div>
         <br>
         <div style="display:flex;  justify-content:center; align-items:center;">
         <img class="facebookIcon" src="images/facebookIcon.png">
-        <p id="facebookGoogleYouTubeLogin">Log in with <a href="https://www.facebook.com" class="noUnderline">Facebook</a>, <a href="https://www.google.com" class="noUnderline">Google</a>, or <a href="https://www.youtube.com" class="noUnderline">YouTube</a></p>
+        <p id="facebookGoogleYouTubeLogin">Log in with <a href="https://www.facebook.com" class="noUnderline">FB</a>, <a href="https://www.google.com" class="noUnderline">Google</a>, or <a href="https://www.apple.com" class="noUnderline">Apple</a></p>
         <img class="googleIcon" src="images/googleIcon.png">
         <img class="appleIcon" src="images/appleIcon.png">
         </div>
@@ -36,14 +39,33 @@
 
     <div class="box" style="height:50%; margin-top:8px;">
         <p style="font-size:small;">Don't have an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Sign up</a></p>
+        <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Click here</a></p>
     </div>
     <p style="font-size:13.4px;">Get the app.</p>
-    <div style="margin-bottom:250px; display: flex; justify-content:center; gap:10px;"><img style="height:1.5%; width:1.5%;" src="images/appleIcon.png">
+    <div style="margin-bottom:250px; display: flex; justify-content:center; gap:10px;"><img style="height:1.5%; width:1.5%;" src="images/appleIcon.png" class="appleIcon">
         <img class="androidIcon" src="images/androidIcon.png">
         <img class="windowsIcon" src="images/windowsIcon.webp">
     </div>
-    
-<footer class="footnote">An enhanced version of Instagram, created as a personal project powered by Rishav Ray</footer>
+</div>
+</div>
+
+<footer class="footnote" style="margin-top:-50px;">An enhanced version of Instagram, created as a personal project powered by Rishav Ray</footer>
+<div class="dropdown">
+    <button class="dropbtn">
+        <div style="display: flex; justify-content: center; align-items:center; gap: 1.6px;">
+            English <img class="dropdownV" src="images/dropdownV.png">
+        </div>
+    </button>
+    <div class="dropdown-content">
+    <a href="#">English</a>
+    <a href="#">Español</a>
+    <a href="#">Français</a>
+    <a href="#">हिंदी</a>
+    <a href="#">中国人</a>
+    <a href="#">বাংলা</a>
+    </div>
+</div>
+
 </div>
 
 
