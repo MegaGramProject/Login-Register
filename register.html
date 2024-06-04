@@ -15,25 +15,25 @@
         <p style="color:#6b6c6e; font-weight: bold; font-size: 18px; margin-top: -20px;">Sign up to see photos and videos</p>
         <p style="color:#6b6c6e; font-weight: bold; margin-top: -25px; font-size: 18px;">from your friends.</p>
         <div style="display:flex;  justify-content:center; align-items:center;">
-            <img class="facebookIcon" src="images/facebookIcon.png">
-            <p class="facebookGoogleYouTubeLogin">Continue with <a href="https://www.facebook.com" class="noUnderline">FB</a>/<a href="https://www.google.com" class="noUnderline">Google</a>/<a href="https://www.apple.com" class="noUnderline">Apple</a></p>
-            <img class="googleIcon" src="images/googleIcon.png">
-            <img class="appleIcon" src="images/appleIcon.png">
+        <img class="facebookIcon" id="facebookIcon" src="images/facebookIcon.png">
+        <p class="facebookGoogleYouTubeLogin">Continue with <a href="https://www.facebook.com" class="noUnderline">FB</a>/<a href="https://www.google.com" class="noUnderline">Google</a>/<a href="https://www.apple.com" class="noUnderline">Apple</a></p>
+        <img class="googleIcon" id="googleIcon" src="images/googleIcon.png">
+        <img class="appleIcon" id="appleIcon" src="images/appleIcon.png">
         </div>
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:8px;">_________________</p></div>
         <br>
-        <input type="text" class="textInput" placeholder="Mobile Number or Email" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px;">
-        <input type="text" class="textInput" placeholder="Full Name" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
-        <input type="text" class="textInput" placeholder="Username" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
-        <input type="password" class="textInput" placeholder="Password" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
-        <button class="blueButton">Sign up</button>
+        <input type="text" class="textInput" id="numberEmail" placeholder="Mobile Number or Email" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px;">
+        <input type="text" class="textInput" id="fullName" placeholder="Full Name" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
+        <input type="text" class="textInput" id="username" placeholder="Username" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
+        <input type="password" class="textInput" id="password" placeholder="Password" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
+        <button class="blueButton" id="signupButton">Sign up</button>
         <br>
         <br>
         
     </div>
 
     <div class="box" style="height:50%; margin-top:8px;">
-        <p style="font-size:small;">Have an account? <a href="http://127.0.0.1:5500/login.html" class="noUnderline" style="color:#2499f2; font-weight:500;">Log in</p>
+        <p style="font-size:small;">Have an account? <a href="http://127.0.0.1:5500/login.html" class="noUnderline" style="color:#2499f2; font-weight:500;">Log in</a></p>
         <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Click here</a></p>
     </div>
     <p style="font-size:15.4px;">Get the app.</p>
@@ -41,7 +41,7 @@
         <img class="androidIcon" src="images/androidIcon.png">
         <img class="windowsIcon" src="images/windowsIcon.webp">
     </div>
-    <footer class="footnote" style="margin-top:-240px;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
+    <footer class="footnote" style="margin-top:-150px;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
 <div class="dropdown">
     <button class="dropbtn">
         <div style="display: flex; justify-content: center; align-items:center; gap: 1.6px;">
@@ -58,5 +58,6 @@
     </div>
 </div>
 </div>
+<script src = "registerScript.js"></script>
 </body>
 </html>

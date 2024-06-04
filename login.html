@@ -20,19 +20,19 @@
     <div class="box" style="margin-top:100px;">
         <h1 class="Megagram">Megagram</h1>
         <form>
-        <input type="text" class="textInput" placeholder="Phone number, username, or email">
+        <input type="text" id="numberNameEmail" class="textInput" placeholder="Phone number, username, or email">
         <br>
-        <input type="password" class="textInput" placeholder="Password">
+        <input type="password" id="password" class="textInput" placeholder="Password">
         <br>
-        <button class="blueButton">Log in</button>
+        <button class="blueButton" id="loginButton">Log in</button>
         </form>
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:8px;">_________________</p></div>
         <br>
         <div style="display:flex;  justify-content:center; align-items:center;">
-        <img class="facebookIcon" src="images/facebookIcon.png">
+        <img class="facebookIcon" id="facebookIcon" src="images/facebookIcon.png">
         <p class="facebookGoogleYouTubeLogin">Log in with <a href="https://www.facebook.com" class="noUnderline">FB</a>/<a href="https://www.google.com" class="noUnderline">Google</a>/<a href="https://www.apple.com" class="noUnderline">Apple</a></p>
-        <img class="googleIcon" src="images/googleIcon.png">
-        <img class="appleIcon" src="images/appleIcon.png">
+        <img class="googleIcon" id="googleIcon" src="images/googleIcon.png">
+        <img class="appleIcon" id="appleIcon" src="images/appleIcon.png">
         </div>
         <a href="https://google.com" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
     </div>
@@ -49,7 +49,7 @@
 </div>
 </div>
 
-<footer class="footnote" style="margin-top:-50px;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
+<footer class="footnote" style="margin-top:70px;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
 <div class="dropdown">
     <button class="dropbtn">
         <div style="display: flex; justify-content: center; align-items:center; gap: 1.6px;">
@@ -68,6 +68,6 @@
 
 </div>
 
-
+<script src = "loginScript.js"></script>
 </body>
 </html>

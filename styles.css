@@ -45,6 +45,10 @@ body {
     font-family: Billabong;
     font-size: 55px;
     font-weight:100;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
 
@@ -121,36 +125,37 @@ font-size: 13px;
     width:4.5%;
     height:49.5%;
     margin-right:5px;
-    pointer-events: none;
     object-fit: contain;
+    cursor: pointer;
 }
 
 .googleIcon {
     width:8%;
     height:79.5%;
-    pointer-events: none;
     object-fit: contain;
+    cursor: pointer;
 }
 
 .appleIcon {
     width:5%;
     height:49.5%;
-    pointer-events: none;
     object-fit: contain;
+    cursor: pointer;
+    
 }
 
 .androidIcon {
     width: 2%;
     height:2%;
-    pointer-events: none;
-    object-fit: contain
+    object-fit: contain;
+    cursor: pointer;
 }
 
 .windowsIcon {
     width:2%;
     height:2%;
-    pointer-events: none;
-    object-fit: contain
+    object-fit: contain;
+    cursor: pointer;
 }
 
 #forgotPassword {
