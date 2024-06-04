@@ -14,18 +14,23 @@
     <div style="display:flex; justify-content:center; align-items:center;">
     <img style="margin-left:425px; margin-right: -500px;  margin-top: -190px; width: 535px; height: 750px; object-fit: contain;" src="images/instagramLoginPhoto.png">
     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
-    <!--The div below contains the Instagram logo, login-input-fields, log-in button, as well as options
-    for selecting 'forgot password' and logging in via Facebook/Google/YouTube. This div also has a white
-    background and a thin gray border.-->
     <div class="box" style="margin-top:100px;">
         <h1 class="Megagram">Megagram</h1>
         <form>
-        <input type="text" id="numberNameEmail" class="textInput" placeholder="Phone number, username, or email">
+        <div class="userContainer" style="position:relative;">
+        <input type="text" id="numberNameEmail" class="textInput" placeholder="Phone number, username, or email" style="font-size: 15px;">
+        <p id="userContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -2px; color: gray; display: none;">Phone number, username, or email</p>
+        </div>
         <br>
-        <input type="password" id="password" class="textInput" placeholder="Password">
+        <div class="passwordContainer" style="position:relative;">
+            <input type="password" id="password" class="textInput" placeholder="Password" style="font-size: 15px;">
+            <button id="togglePassword" class="togglePassword">Show</button>
+            <p id="passwordContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -2px; color: gray; display: none;">Password</p>
+        </div>
         <br>
         <button class="blueButton" id="loginButton">Log in</button>
         </form>
+        <br>
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:8px;">_________________</p></div>
         <br>
         <div style="display:flex;  justify-content:center; align-items:center;">
@@ -42,9 +47,26 @@
         <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Click here</a></p>
     </div>
     <p style="font-size:15.4px;">Get the app.</p>
-    <div style="margin-bottom:250px; display: flex; justify-content:center; gap:10px;"><img style="height:1.5%; width:1.5%;" src="images/appleIcon.png" class="appleIcon">
-        <img class="androidIcon" src="images/androidIcon.png">
-        <img class="windowsIcon" src="images/windowsIcon.webp">
+    <div style="margin-bottom:250px; display: flex; justify-content:center; gap:10px;">
+        <img style="height:1.5%; width:1.5%;" src="images/appleIcon.png" class="appleIcon" id="appleDropdown">
+        <div id="appleDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>iPhone-Swift</p>
+            <p>iPhone-Flutter</p>
+            <p>iPhone-React-Native</p>
+            <p>Macbook-Swift</p>
+            <p>Macbook-Flutter</p>
+            <p>Macbook-React-Native</p>
+        </div>
+        <img class="androidIcon" src="images/androidIcon.png" id="androidDropdown">
+        <div id="androidDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>Android-Flutter</p>
+            <p>Android-React-Native</p>
+        </div>
+        <img class="windowsIcon" src="images/windowsIcon.webp" id="windowsDropdown">
+        <div id="windowsDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>Windows-Flutter</p>
+            <p>Windows-React-Native</p>
+        </div>
     </div>
 </div>
 </div>
@@ -53,16 +75,16 @@
 <div class="dropdown">
     <button class="dropbtn">
         <div style="display: flex; justify-content: center; align-items:center; gap: 1.6px;">
-            English <img class="dropdownV" src="images/dropdownV.png">
+            <p id="language" style="margin-top: 0px;">English</p><img class="dropdownV" src="images/dropdownV.png" style="margin-top:-10px">
         </div>
     </button>
-    <div class="dropdown-content">
-    <a href="#">English</a>
-    <a href="#">Español</a>
-    <a href="#">Français</a>
-    <a href="#">हिंदी</a>
-    <a href="#">中国人</a>
-    <a href="#">বাংলা</a>
+    <div id="languageList" class="dropdown-content">
+        <p onclick="setLanguage('English')">English</p>
+        <p onclick="setLanguage('Español')">Español</p>
+        <p onclick="setLanguage('Français')">Français</p>
+        <p onclick="setLanguage('हिंदी')">हिंदी</p>
+        <p onclick="setLanguage('中国人')">中国人</p>
+        <p onclick="setLanguage('বাংলা')">বাংলা</p>
     </div>
 </div>
 

@@ -22,10 +22,25 @@
         </div>
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:8px;">_________________</p></div>
         <br>
-        <input type="text" class="textInput" id="numberEmail" placeholder="Mobile Number or Email" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px;">
-        <input type="text" class="textInput" id="fullName" placeholder="Full Name" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
-        <input type="text" class="textInput" id="username" placeholder="Username" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
-        <input type="password" class="textInput" id="password" placeholder="Password" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px;">
+        <div class="numberEmailContainer" style="position:relative;">
+        <input type="text" class="textInput" id="numberEmail" placeholder="Mobile Number or Email" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; font-size: 14px;">
+        <p id="numberEmailContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -2px; color: gray; display: none;">Mobile Number or Email</p>
+        </div>
+        <div class="fullNameContainer" style="position:relative;">
+            <input type="text" class="textInput" id="fullName" placeholder="Full Name" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px; font-size:14px;">
+            <p id="fullNameContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -10px; color: gray; display: none;">Full Name</p>
+
+        </div>
+        <div class="usernameContainer" style="position:relative;">
+            <input type="text" class="textInput" id="username" placeholder="Username" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px; font-size:14px;">
+            <p id="usernameContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -10px; color: gray; display: none;">Username</p>
+
+        </div>
+        <div class="passwordContainer" style="position:relative;">
+            <input type="password" class="textInput" id="password" placeholder="Password" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px; font-size: 14px;">
+            <button id="togglePassword" class="togglePassword" style="margin-top:-10px;">Show</button>
+            <p id="passwordContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -10px; color: gray; display: none;">Password</p>
+        </div>
         <button class="blueButton" id="signupButton">Sign up</button>
         <br>
         <br>
@@ -37,24 +52,42 @@
         <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Click here</a></p>
     </div>
     <p style="font-size:15.4px;">Get the app.</p>
-    <div style="display: flex; justify-content:center; gap:10px; margin-bottom: 350px;"><img style="height:1.5%; width:1.5%;" src="images/appleIcon.png" class="appleIcon">
-        <img class="androidIcon" src="images/androidIcon.png">
-        <img class="windowsIcon" src="images/windowsIcon.webp">
+    <div style="display: flex; justify-content:center; gap:10px; margin-bottom: 350px;">
+        <img style="height:1.5%; width:1.5%;" src="images/appleIcon.png" class="appleIcon" id="appleDropdown">
+        <div id="appleDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>iPhone-Swift</p>
+            <p>iPhone-Flutter</p>
+            <p>iPhone-React-Native</p>
+            <p>Macbook-Swift</p>
+            <p>Macbook-Flutter</p>
+            <p>Macbook-React-Native</p>
+        </div>
+        <img class="androidIcon" src="images/androidIcon.png" id="androidDropdown">
+        <div id="androidDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>Android-Flutter</p>
+            <p>Android-React-Native</p>
+        </div>
+        <img class="windowsIcon" src="images/windowsIcon.webp" id="windowsDropdown">
+        <div id="windowsDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>Windows-Flutter</p>
+            <p>Windows-React-Native</p>
+        </div>
+
     </div>
     <footer class="footnote" style="margin-top:-150px;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
 <div class="dropdown">
     <button class="dropbtn">
         <div style="display: flex; justify-content: center; align-items:center; gap: 1.6px;">
-            English <img class="dropdownV" src="images/dropdownV.png">
+        <p id="language" style="margin-top: 0px;">English</p> <img class="dropdownV" src="images/dropdownV.png" style="margin-top:-12px;">
         </div>
     </button>
     <div class="dropdown-content">
-    <a href="#">English</a>
-    <a href="#">Español</a>
-    <a href="#">Français</a>
-    <a href="#">हिंदी</a>
-    <a href="#">中国人</a>
-    <a href="#">বাংলা</a>
+    <p onclick="setLanguage('English')">English</p>
+    <p onclick="setLanguage('Español')">Español</p>
+    <p onclick="setLanguage('Français')">Français</p>
+    <p onclick="setLanguage('हिंदी')">हिंदी</p>
+    <p onclick="setLanguage('中国人')">中国人</p>
+    <p onclick="setLanguage('বাংলা')">বাংলা</p>
     </div>
 </div>
 </div>
