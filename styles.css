@@ -33,11 +33,17 @@ body {
     color: #2499f2 !important;
 }
 
+
+
+.textInput {
+    background-color: lightgray !important;
+}
+
 }
 
 
 body {
-    font-family: 'Helvetica Neue';
+    font-family: 'Arial';
 }
 
 
@@ -49,6 +55,7 @@ body {
     -moz-user-select: none;    /* Firefox */
     -ms-user-select: none;     /* Internet Explorer/Edge */
     user-select: none;         /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    cursor: pointer;
 }
 
 
@@ -227,7 +234,52 @@ font-size: 13px;
 }
 
 .textInput:focus {
-    outline: none; /* Ensure the outline remains removed when focused */
-    border: 1px solid gray; /* Optional: Add custom border style on focus */
+    outline: none;
+    border: 1px solid gray;
 }
 
+.checkmark {
+    height: 50%;
+    width: 50%;
+    object-fit: contain;
+    position: absolute;
+    top: 17px;
+    right: -32px;
+    display: none;
+    pointer-events: none;
+}
+
+.wrong {
+    height: 50%;
+    width: 50%;
+    object-fit: contain;
+    position: absolute;
+    top: 17px;
+    right: -32px;
+    pointer-events: none;
+    display: none;
+}
+
+.usernameSuggestion {
+    width: 147px;
+    height: 35px;
+    border-radius: 10px;
+    border: none;
+    background-color: #f2f0f0;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.usernameSuggestion:hover {
+    background-color: #d4d2d2;
+}
+
+.slide {
+    object-fit: cover;
+}
+
+/* Visited link */
+.noUnderline:visited {
+    color: darkblue;
+}

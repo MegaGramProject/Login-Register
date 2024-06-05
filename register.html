@@ -11,7 +11,7 @@
 <body>
     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
     <div class="box" style="margin-top:15px; height:700px;">
-        <h1 class="Megagram">Megagram</h1>
+        <h1 class="Megagram" style="font-size:70px;">Megagram</h1>
         <p style="color:#6b6c6e; font-weight: bold; font-size: 18px; margin-top: -20px;">Sign up to see photos and videos</p>
         <p style="color:#6b6c6e; font-weight: bold; margin-top: -25px; font-size: 18px;">from your friends.</p>
         <div style="display:flex;  justify-content:center; align-items:center;">
@@ -25,21 +25,34 @@
         <div class="numberEmailContainer" style="position:relative;">
         <input type="text" class="textInput" id="numberEmail" placeholder="Mobile Number or Email" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; font-size: 14px;">
         <p id="numberEmailContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -2px; color: gray; display: none;">Mobile Number or Email</p>
+        <img id="checkmark1" class="checkmark" src="images/checkmark.png" style="height:42%;width:42%;">
+        <img id="wrong1" class="wrong" src="images/wrong.png" style="height:42%;width:42%;">
         </div>
         <div class="fullNameContainer" style="position:relative;">
             <input type="text" class="textInput" id="fullName" placeholder="Full Name" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px; font-size:14px;">
             <p id="fullNameContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -10px; color: gray; display: none;">Full Name</p>
-
+            <img id="checkmark2" class="checkmark" src="images/checkmark.png" style="right:-43px; top: 10px;">
+            <img id="wrong2" class="wrong" src="images/wrong.png" style="right:-43px; top: 10px;">
         </div>
         <div class="usernameContainer" style="position:relative;">
             <input type="text" class="textInput" id="username" placeholder="Username" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px; font-size:14px;">
             <p id="usernameContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -10px; color: gray; display: none;">Username</p>
-
+            <img id="checkmark3" class="checkmark" src="images/checkmark.png" style="right:-43px; top: 10px;">
+            <img id="wrong3" class="wrong" src="images/wrong.png" style="right:-43px; top: 10px;">
+        </div>
+        <div id="usernameSuggestions" style="display:none;">
+            <button id="usernameSuggestion1" class="usernameSuggestion">user1</button>
+            <button id="usernameSuggestion2" class="usernameSuggestion">user2</button>
         </div>
         <div class="passwordContainer" style="position:relative;">
             <input type="password" class="textInput" id="password" placeholder="Password" style="padding-left:12px; padding-top: 7.5px; padding-bottom: 7.5px; margin-top: -1.5px; font-size: 14px;">
             <button id="togglePassword" class="togglePassword" style="margin-top:-10px;">Show</button>
             <p id="passwordContainerInfo" style="font-size: 10px; display: inline; position: absolute; left: 6px; top: -10px; color: gray; display: none;">Password</p>
+            <img id="checkmark4" class="checkmark" src="images/checkmark.png" style="right:17px; top: 10px;">
+            <img id="wrong4" class="wrong" src="images/wrong.png" style="right:17px; top: 10px;">
+        </div>
+        <div id="passwordStrengthContainer" style="width:300px; height:7px; background-color: lightgray; display:none;">
+            <div id="passwordStrength" style="width:0px; height:7px;"></div>
         </div>
         <button class="blueButton" id="signupButton">Sign up</button>
         <br>
@@ -74,6 +87,7 @@
         </div>
 
     </div>
+    <img src="images/instagramGif.webp" style="height:3%; width:3%; margin-top: -300px; margin-bottom: 250px; object-fit: contain; pointer-events: none;">
     <footer class="footnote" style="margin-top:-150px;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
 <div class="dropdown">
     <button class="dropbtn">
@@ -82,12 +96,12 @@
         </div>
     </button>
     <div class="dropdown-content">
-    <p onclick="setLanguage('English')">English</p>
-    <p onclick="setLanguage('Español')">Español</p>
-    <p onclick="setLanguage('Français')">Français</p>
-    <p onclick="setLanguage('हिंदी')">हिंदी</p>
-    <p onclick="setLanguage('中国人')">中国人</p>
-    <p onclick="setLanguage('বাংলা')">বাংলা</p>
+        <p class="lang" onclick="setLanguage('English')">English</p>
+        <p class="lang" onclick="setLanguage('Español')">Español</p>
+        <p class="lang" onclick="setLanguage('Français')">Français</p>
+        <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+        <p class="lang" onclick="setLanguage('中国人')">中国人</p>
+        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
     </div>
 </div>
 </div>

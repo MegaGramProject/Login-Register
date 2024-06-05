@@ -12,10 +12,15 @@
     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
 
     <div style="display:flex; justify-content:center; align-items:center;">
-    <img style="margin-left:425px; margin-right: -500px;  margin-top: -190px; width: 535px; height: 750px; object-fit: contain;" src="images/instagramLoginPhoto.png">
-    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <div id="loginPhotoSlideshow" style="position: relative;">
+        <img class="slide" style="position: absolute; top: -460px; right: -1000px; width: 535px; height: 800px; object-fit: contain; display: true;" src="images/instagramLoginPhoto.png">
+        <img class="slide" style="position: absolute; top: -460px; right: -1000px; width: 535px; height: 800px; object-fit: contain; display: none;" src="images/instagramLoginPhoto2.png">
+        <img class="slide" style="position: absolute; top: -460px; right: -1000px; width: 535px; height: 800px; object-fit: contain; display: none;" src="images/instagramLoginPhoto3.png">
+        <img class="slide" style="position: absolute; top: -460px; right: -1000px; width: 535px; height: 800px; object-fit: contain; display: none;" src="images/instagramLoginPhoto4.png">
+    </div>
+    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; margin-left: 500px">
     <div class="box" style="margin-top:100px;">
-        <h1 class="Megagram">Megagram</h1>
+        <h1 class="Megagram" style="font-size: 69px;">Megagram</h1>
         <form>
         <div class="userContainer" style="position:relative;">
         <input type="text" id="numberNameEmail" class="textInput" placeholder="Phone number, username, or email" style="font-size: 15px;">
@@ -39,6 +44,8 @@
         <img class="googleIcon" id="googleIcon" src="images/googleIcon.png">
         <img class="appleIcon" id="appleIcon" src="images/appleIcon.png">
         </div>
+        <p style="font-size:13; color: red; display:none;">Your username or password</p>
+        <p style="font-size:13; color: red; margin-top: -15px; display:none;">was incorrect</p>
         <a href="https://google.com" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
     </div>
 
@@ -79,12 +86,12 @@
         </div>
     </button>
     <div id="languageList" class="dropdown-content">
-        <p onclick="setLanguage('English')">English</p>
-        <p onclick="setLanguage('Español')">Español</p>
-        <p onclick="setLanguage('Français')">Français</p>
-        <p onclick="setLanguage('हिंदी')">हिंदी</p>
-        <p onclick="setLanguage('中国人')">中国人</p>
-        <p onclick="setLanguage('বাংলা')">বাংলা</p>
+        <p class="lang" onclick="setLanguage('English')">English</p>
+        <p class="lang" onclick="setLanguage('Español')">Español</p>
+        <p class="lang" onclick="setLanguage('Français')">Français</p>
+        <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+        <p class="lang" onclick="setLanguage('中国人')">中国人</p>
+        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
     </div>
 </div>
 
