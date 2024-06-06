@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newLanguage = "es";
         }
         else if(lang==="Français") {
-            newLanguage = "de";
+            newLanguage = "fr";
         }
         else if(lang==="हिंदी") {
             newLanguage = "hi";

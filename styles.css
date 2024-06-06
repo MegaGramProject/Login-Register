@@ -283,3 +283,21 @@ font-size: 13px;
 .noUnderline:visited {
     color: darkblue;
 }
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 7px 8px;
+    background-color: #fff;
+    border: 0.6px solid #caced1;
+    border-radius: 0.25rem;
+    color: gray;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+select:focus {
+    outline: none;
+    border-color: red;
+}
+

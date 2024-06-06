@@ -75,10 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && getPasswordValidity(password.value) > 0.65){
             signupButton.style.backgroundColor = '#347aeb';
             signupButton.style.cursor = 'pointer';
+            signupButton.onclick = takeUserToBday;
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
             signupButton.style.cursor = 'initial';
+            signupButton.onclick = null;
         }
 
     
@@ -101,12 +103,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && getPasswordValidity(password.value) > 0.65){
             signupButton.style.backgroundColor = '#347aeb';
             signupButton.style.cursor = 'pointer';
+            signupButton.onclick = takeUserToBday;
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
             signupButton.style.cursor = 'initial';
+            signupButton.onclick = null;
         }
-
 
     })
 
@@ -131,10 +134,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && getPasswordValidity(password.value) > 0.65){
             signupButton.style.backgroundColor = '#347aeb';
             signupButton.style.cursor = 'pointer';
+            signupButton.onclick = takeUserToBday;
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
             signupButton.style.cursor = 'initial';
+            signupButton.onclick = null;
         }
 
 
@@ -182,10 +187,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && passwordScore > 0.65){
             signupButton.style.backgroundColor = '#347aeb';
             signupButton.style.cursor = 'pointer';
+            signupButton.onclick = takeUserToBday;
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
             signupButton.style.cursor = 'initial';
+            signupButton.onclick = null;
         }
 
 
@@ -201,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
             newLanguage = "es";
         }
         else if(lang==="Français") {
-            newLanguage = "de";
+            newLanguage = "fr";
         }
         else if(lang==="हिंदी") {
             newLanguage = "hi";
@@ -380,6 +387,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     fullNameIsValid = function(fullNameInput) {
+        if(fullNameInput.length > 30) {
+            return false;
+        }
         if (fullNameInput.indexOf(' ') === -1) {
             return false;
         }
@@ -437,7 +447,9 @@ document.addEventListener('DOMContentLoaded', function() {
         usernameSuggestions.style.display = 'none';
     })
 
-    usernameSuggestion2
+    takeUserToBday = function() {
+        window.location.href = "http://127.0.0.1:5500/bday.html";
+    }
         
 
     document.addEventListener('click', function (event) {
