@@ -101,10 +101,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if(confirmCode.value.length > 5) {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
+            nextButton.onclick = function() {
+                window.location.href = 'https://www.google.com';
+            }
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';
             nextButton.style.cursor = 'initial';
+            nextButton.onclick = null;
         }
     });
 

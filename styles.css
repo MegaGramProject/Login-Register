@@ -151,15 +151,15 @@ font-size: 13px;
 }
 
 .androidIcon {
-    width: 2%;
-    height:2%;
+    width: 3%;
+    height:3%;
     object-fit: contain;
     cursor: pointer;
 }
 
 .windowsIcon {
-    width:2%;
-    height:2%;
+    width:3%;
+    height:3%;
     object-fit: contain;
     cursor: pointer;
 }
