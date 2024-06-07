@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const appleDevices = document.getElementById("appleDevices");
     const androidDevices = document.getElementById("androidDevices");
     const windowsDevices = document.getElementById("windowsDevices");
-    const whyBday = document.getElementById("whyBday");
     const language = document.getElementById("language");
     const lang = document.getElementById("lang");
     let currLanguage = "en";
@@ -20,13 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: null
     };
-    const whyBdayPopup = document.getElementById("whyBdayPopup");
-    const main = document.getElementById("main");
-    const exitPopup = document.getElementById("exitPopup");
-    const birthMonth = document.getElementById("birthMonth");
-    const birthDay = document.getElementById("birthDay");
-    const birthYear = document.getElementById("birthYear");
+
     const nextButton = document.getElementById("nextButton");
+    const confirmCode = document.getElementById("confirmCode");
 
 
     setLanguage = function (lang) {
@@ -102,87 +97,17 @@ document.addEventListener('DOMContentLoaded', function() {
         windowsDevices.style.display = 'inline-block';
     });
 
-    
-    whyBday.addEventListener('click', function(event) {
-        main.style.opacity = '0.25';
-        whyBdayPopup.style.display = 'flex';
-
-    });
-
-    exitPopup.addEventListener('click', function(event) {
-        main.style.opacity = '1';
-        whyBdayPopup.style.display = 'none';
-
-    });
-
-
-    birthMonth.addEventListener('input', function() {
-        birthMonth.style.borderColor = "#caced1";
-        if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
+    confirmCode.addEventListener('input', function() {
+        if(confirmCode.value.length > 5) {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
-            nextButton.onclick = function() {
-                window.location.href = "http://127.0.0.1:5500/emailCheck.html";
-            }
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';
             nextButton.style.cursor = 'initial';
-            nextButton.onclick = null;
         }
     });
 
-    birthDay.addEventListener('input', function() {
-        birthDay.style.borderColor = "#caced1";
-        if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
-            nextButton.style.backgroundColor = '#347aeb';
-            nextButton.style.cursor = 'pointer';
-            nextButton.onclick = function() {
-                window.location.href = "http://127.0.0.1:5500/emailCheck.html";
-            }
-        }
-        else {
-            nextButton.style.backgroundColor =  '#82bbf5';
-            nextButton.style.cursor = 'initial';
-            nextButton.onclick = null;
-        }
-    });
-    
-    birthYear.addEventListener('input', function() {
-        birthYear.style.borderColor = "#caced1";
-        if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
-            nextButton.style.backgroundColor = '#347aeb';
-            nextButton.style.cursor = 'pointer';
-            nextButton.onclick = function() {
-                window.location.href = "http://127.0.0.1:5500/emailCheck.html";
-            }
-        }
-        else {
-            nextButton.style.backgroundColor =  '#82bbf5';
-            nextButton.style.cursor = 'initial';
-            nextButton.onclick = null;
-        }
-    });
-
-
-    isValidDate = function(month, day, year) {
-        if (2024-year<10) {
-            return false;
-        }
-        if (day>29 && month==='feb') {
-            return false;
-        }
-        if (day == 31 && (month==='apr' || month==='jun' || month==='sep' || month==='nov' || month==='feb')) {
-            return false;
-        }
-        if(day== 29 && month==='feb' && year%4!== 0) {
-            return false;
-        }
-        return true;
-        
-    }
-    
-    
 
     document.addEventListener('click', function (event) {
         if (!appleDevices.contains(event.target) && appleDevices.style.display !== 'none') {

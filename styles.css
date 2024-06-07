@@ -287,6 +287,8 @@ font-size: 13px;
 select {
     appearance: none;
     -webkit-appearance: none;
+    background: white url('images/dropdownV.png') no-repeat right 10px center;
+    background-size: 16px 16px;
     padding: 7px 8px;
     background-color: #fff;
     border: 0.6px solid #caced1;
@@ -301,3 +303,14 @@ select:focus {
     border-color: red;
 }
 
+#whyBdayPopup {
+    position: absolute;
+    margin-top: -1100px;
+    margin-left: 905px;
+    width: 400px;
+    height: 400px;
+    background-color: white;
+    padding: 35px 35px;
+    border-radius: 15px;
+    display: none;
+}

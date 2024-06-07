@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;" id="main">
     <div class="box" style="margin-top:15px; height:700px;">
         <img src="images/cakeAndBalloons.jpeg" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:-40px; pointer-events: none;">
         <p style="font-weight: bold; font-size: 17px; margin-top: -40px;">Add Your birthday</p>
         <p>This won't be a part of your public profile.</p>
         <p id="whyBday" style="color:#2499f2; margin-top: -29px; cursor: pointer;">Why do I need to provide my birthday?</p>
         <form>
-        <select class="birthMonth" name="month" style="width:120px;">
+        <select id="birthMonth" name="month" style="width:120px;">
             <option value="">Month</option>
             <option value="jan">January</option>
             <option value="feb">February</option>
@@ -31,7 +31,7 @@
             <option value="nov">November</option>
             <option value="dec">December</option>
         </select>
-        <select class="birthDay" name="day" style="width: 55px;">
+        <select id="birthDay" name="day" style="width: 80px;">
             <option value="">Day</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -65,7 +65,7 @@
             <option value="30">30</option>
             <option value="31">31</option>
         </select>
-        <select class="birthYear" name="year" style="width:75px;">
+        <select id="birthYear" name="year" style="width:100px;">
             <option value="">Year</option>
             <option value="2024">2024</option>
             <option value="2023">2023</option>
@@ -178,8 +178,8 @@
         <p style="color:gray; font-size:14.5px;">You need to enter the date you were born</p>
         <p style="color:gray; font-size:14.5px;">Use your own birthday, even if this account is for a</p> 
         <p style="color:gray; font-size:14.5px; margin-top:-25px;">business, a pet, or something else</p>
-        <button class="blueButton" style="font-size:14px;">Next</button>
-        <a href="http://127.0.0.1:5500/register.html" style="color:#2499f2; font-weight:bold; text-decoration: none;">Go Back</>
+        <button id="nextButton" class="blueButton" style="font-size:14px;">Next</button>
+        <a href="http://127.0.0.1:5500/register.html" style="color:#2499f2; font-weight:bold; text-decoration: none;">Go Back<a/>
         
     </div>
 
@@ -210,6 +210,8 @@
         </div>
 
     </div>
+
+
     <footer class="footnote" style="margin-top:-150px;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
 <div class="dropdown">
     <button class="dropbtn">
@@ -226,6 +228,19 @@
         <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
     </div>
 </div>
+</div>
+
+<div id="whyBdayPopup" class="box">
+    <div style="display: flex; margin-left: 140px;">
+        <p style="font-weight: bold; display: inline; font-size: 19px;">Birthdays</p>
+        <img id="exitPopup" src="images/clearBlackX.png" style="display: inline-block; height: 44%; width: 13%; object-fit: contain; margin-left: 120px; margin-top: 15px; background-color: lightgray; border-radius: 20px;">
+    </div>
+    <p style="margin-top: -10px; color: lightgray;">________________________________________________</p>
+    <img src="images/cakeAndBalloons.jpeg" style="height:60%; width:60%; object-fit:contain; margin-top:10px; pointer-events: none;">
+    <p style="font-weight:600; font-size:17px; margin-top: 0px;">Birthdays on Instagram</p>
+    <br>
+    <p style="font-size: 14px; text-align: center; margin-top: 0px; line-height: 1.5;">Providing your birthday improves the features and ads you see, and helps us keep the Megagram community safe. You can find your birthday in your personal information account settings.</p>
+
 </div>
 <script src = "bdayScript.js"></script>
 </body>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Rishav Ray">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/megagramFavicon.png">
+    <title>Email Check</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div class="box" style="margin-top:105px; height:470px; width: 450px;">
+        <img src="images/emailIcon.png" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:10px; pointer-events: none;">
+        <p style="font-weight: bold; font-size: 17px; margin-top: 30px;">Enter Confirmation Code</p>
+        <p style="font-size: 17px; text-align: center; display: inline; margin-top:15px; line-height: 1.5;">Enter the confirmation code we sent to ws@gm.co.
+        <a href="#" class="noUnderline" style="font-weight:bold; color:#2499f2;">Resend Code.</a></p>
+        <input id = "confirmCode" type="text" class="textInput" placeholder="Confirmation Code" style="font-size: 17px; border-radius: 7px; padding: 15px 17px;">
+        <button id="nextButton" class="blueButton" style="font-size:14px; width: 327px;">Next</button>
+        <a href="http://127.0.0.1:5500/bday.html" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 20px; margin-bottom: 35px;">Go Back<a/>
+    </div>
+
+    <div class="box" style="height:50%; margin-top:8px; width: 450px;">
+        <p style="font-size:small; color: black;">Have an account? <a href="http://127.0.0.1:5500/login.html" class="noUnderline" style="color:#2499f2; font-weight:bold;">Log in</a></p>
+        <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:bold;">Click here</a></p>
+    </div>
+    <p style="font-size:15.4px;">Get the app.</p>
+    <div style="display: flex; justify-content:center; gap:10px; margin-bottom: 350px;">
+        <img style="height:1.5%; width:1.5%;" src="images/appleIcon.png" class="appleIcon" id="appleDropdown">
+        <div id="appleDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>iPhone-Swift</p>
+            <p>iPhone-Flutter</p>
+            <p>iPhone-React-Native</p>
+            <p>Macbook-Swift</p>
+            <p>Macbook-Flutter</p>
+            <p>Macbook-React-Native</p>
+        </div>
+        <img class="androidIcon" src="images/androidIcon.png" id="androidDropdown">
+        <div id="androidDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>Android-Flutter</p>
+            <p>Android-React-Native</p>
+        </div>
+        <img class="windowsIcon" src="images/windowsIcon.webp" id="windowsDropdown">
+        <div id="windowsDevices" class="dropdown-content" style="margin-left: -70px; margin-top: 0px;">
+            <p>Windows-Flutter</p>
+            <p>Windows-React-Native</p>
+        </div>
+
+    </div>
+
+
+    <footer class="footnote">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
+<div class="dropdown">
+    <button class="dropbtn">
+        <div style="display: flex; justify-content: center; align-items:center; gap: 1.6px;">
+        <p id="language" style="margin-top: 0px;">English</p> <img class="dropdownV" src="images/dropdownV.png" style="margin-top:-12px;">
+        </div>
+    </button>
+    <div class="dropdown-content">
+        <p class="lang" onclick="setLanguage('English')">English</p>
+        <p class="lang" onclick="setLanguage('Español')">Español</p>
+        <p class="lang" onclick="setLanguage('Français')">Français</p>
+        <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+        <p class="lang" onclick="setLanguage('中国人')">中国人</p>
+        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+    </div>
+</div>
+</div>
+
+<div id="whyBdayPopup" class="box">
+    <div style="display: flex; margin-left: 140px;">
+        <p style="font-weight: bold; display: inline; font-size: 19px;">Birthdays</p>
+        <img id="exitPopup" src="images/clearBlackX.png" style="display: inline-block; height: 44%; width: 13%; object-fit: contain; margin-left: 120px; margin-top: 15px; background-color: lightgray; border-radius: 20px;">
+    </div>
+    <p style="margin-top: -10px; color: lightgray;">________________________________________________</p>
+    <img src="images/cakeAndBalloons.jpeg" style="height:60%; width:60%; object-fit:contain; margin-top:10px; pointer-events: none;">
+    <p style="font-weight:600; font-size:17px; margin-top: 0px;">Birthdays on Instagram</p>
+    <br>
+    <p style="font-size: 14px; text-align: center; margin-top: 0px; line-height: 1.5;">Providing your birthday improves the features and ads you see, and helps us keep the Megagram community safe. You can find your birthday in your personal information account settings.</p>
+
+</div>
+<script src = "emailCheckScript.js"></script>
+</body>
+</html>
