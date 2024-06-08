@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="author" content="Rishav Ray">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/megagramFavicon.png">
+    {% load static %}
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
     <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
 
     <div style="display:flex; justify-content:center; align-items:center;">
     <div id="loginPhotoSlideshow" style="position: relative;">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: true;" src="images/instagramLoginPhoto.png">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="images/instagramLoginPhoto2.png">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="images/instagramLoginPhoto3.png">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="images/instagramLoginPhoto4.png">
+        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: true;" src="{% static 'images/instagramLoginPhoto.png' %}">
+        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="{% static 'images/instagramLoginPhoto2.png' %}">
+        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="{% static 'images/instagramLoginPhoto3.png' %}">
+        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="{% static 'images/instagramLoginPhoto4.png' %}">
     </div>
     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; margin-left: 31.25em">
     <div class="box" style="margin-top:6.25em;">
@@ -39,10 +40,10 @@
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:0.5em;">_________________</p></div>
         <br>
         <div style="display:flex;  justify-content:center; align-items:center;">
-        <img class="facebookIcon" id="facebookIcon" src="images/facebookIcon.png">
+        <img class="facebookIcon" id="facebookIcon" src="{% static 'images/facebookIcon.png' %}">
         <p class="facebookGoogleYouTubeLogin">Log in with <a href="https://www.facebook.com" class="noUnderline">FB</a>/<a href="https://www.google.com" class="noUnderline">Google</a>/<a href="https://www.apple.com" class="noUnderline">Apple</a></p>
-        <img class="googleIcon" id="googleIcon" src="images/googleIcon.png">
-        <img class="appleIcon" id="appleIcon" src="images/appleIcon.png">
+        <img class="googleIcon" id="googleIcon" src="{% static 'images/googleIcon.png' %}">
+        <img class="appleIcon" id="appleIcon" src="{% static 'images/appleIcon.png' %}">
         </div>
         <p style="font-size:0.81em; color: red; display:none;">Your username or password</p>
         <p style="font-size:0.81em; color: red; margin-top: -0.94em; display:none;">was incorrect</p>
@@ -50,12 +51,12 @@
     </div>
 
     <div class="box" style="height:50%; margin-top:0.5em;">
-        <p style="font-size:small;">Don't have an account? <a href="http://127.0.0.1:5500/register.html" class="noUnderline" style="color:#2499f2; font-weight:500;">Sign up</a></p>
+        <p style="font-size:small;">Don't have an account? <a href="{% url 'Sign Up' %}" class="noUnderline" style="color:#2499f2; font-weight:500;">Sign up</a></p>
         <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Click here</a></p>
     </div>
     <p style="font-size:0.96em;">Get the app.</p>
     <div style="margin-bottom:15.63em; display: flex; justify-content:center; gap:0.63em;">
-        <img style="height:1.5em; width:1.5em;" src="images/appleIcon.png" class="appleIcon" id="appleDropdown">
+        <img style="height:1.5em; width:1.5em;" src="{% static 'images/appleIcon.png' %}" class="appleIcon" id="appleDropdown">
         <div id="appleDevices" class="dropdown-content" style="margin-left: -4.38em; margin-top: 0em;">
             <p>iPhone-Swift</p>
             <p>iPhone-Flutter</p>
@@ -64,12 +65,12 @@
             <p>Macbook-Flutter</p>
             <p>Macbook-React-Native</p>
         </div>
-        <img class="androidIcon" src="images/androidIcon.png" id="androidDropdown">
+        <img class="androidIcon" src="{% static 'images/androidIcon.png' %}" id="androidDropdown">
         <div id="androidDevices" class="dropdown-content" style="margin-left: -4.38em; margin-top: 0em;">
             <p>Android-Flutter</p>
             <p>Android-React-Native</p>
         </div>
-        <img class="windowsIcon" src="images/windowsIcon.webp" id="windowsDropdown">
+        <img class="windowsIcon" src="{% static 'images/windowsIcon.webp' %}" id="windowsDropdown">
         <div id="windowsDevices" class="dropdown-content" style="margin-left: -4.38em; margin-top: 0em;">
             <p>Windows-Flutter</p>
             <p>Windows-React-Native</p>
@@ -82,7 +83,7 @@
 <div class="dropdown">
     <button class="dropbtn">
     <div style="display: flex; justify-content: center; align-items:center; gap: 0.1em;">
-        <p id="language" style="margin-top: 0em;">English</p><img class="dropdownV" src="images/dropdownV.png" style="margin-top:-0.63em">
+        <p id="language" style="margin-top: 0em;">English</p><img class="dropdownV" src="{% static 'images/dropdownV.png' %}" style="margin-top:-0.63em">
     </div>
 </button>
 <div id="languageList" class="dropdown-content">
@@ -97,7 +98,7 @@
 
 </div>
 
-<script src="loginScript.js"></script>
+<script src="{% static 'loginScript.js' %}"></script>
 </body>
 </html>
 

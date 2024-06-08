@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                window.location.href = "http://127.0.0.1:5500/emailCheck.html";
+                window.location.href = "http://localhost:8000/emailCheck";
             }
         }
         else {
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                window.location.href = "http://127.0.0.1:5500/emailCheck.html";
+                window.location.href = "http://localhost:8000/emailCheck";
             }
         }
         else {
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                window.location.href = "http://127.0.0.1:5500/emailCheck.html";
+                window.location.href = "http://localhost:8000/emailCheck";
             }
         }
         else {

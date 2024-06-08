@@ -4,29 +4,30 @@
     <meta charset="UTF-8">
     <meta name="author" content="Rishav Ray">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/megagramFavicon.png">
+    {% load static %}
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
     <title>Email Check</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
     <div class="box" style="margin-top:6.5625em; height:29.375em; width: 28.125em; padding-bottom: 1.5em;">
-        <img src="images/emailIcon.png" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:0.625em; pointer-events: none;">
+        <img src="{% static 'images/emailIcon.png' %}" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:0.625em; pointer-events: none;">
         <p style="font-weight: bold; font-size: 1.0625em; margin-top: 1.875em;">Enter Confirmation Code</p>
-        <p style="font-size: 1.0625em; text-align: center; display: inline; margin-top:0.9375em; line-height: 1.5;">Enter the confirmation code we sent to ws@gm.co.
+        <p style="font-size: 1.0625em; text-align: center; display: inline; margin-top:0.9375em; line-height: 1.5;">Enter the confirmation code we sent to {{ email }}.
         <a href="#" class="noUnderline" style="font-weight:bold; color:#2499f2;">Resend Code.</a></p>
         <input id="confirmCode" type="text" class="textInput" placeholder="Confirmation Code" style="font-size: 1.0625em; border-radius: 0.4375em; padding: 0.9375em 1.0625em;">
         <button id="nextButton" class="blueButton" style="font-size:0.875em; width: 23.5em;">Next</button>
-        <a href="http://127.0.0.1:5500/bday.html" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 1.25em; margin-bottom: 2.1875em;">Go Back<a/>
+        <a href="{% url 'Age Check' %}" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 1.25em; margin-bottom: 2.1875em;">Go Back<a/>
     </div>
 
     <div class="box" style="height:50%; margin-top:0.5em; width: 28.125em;">
-        <p style="font-size:small; color: black;">Have an account? <a href="http://127.0.0.1:5500/login.html" class="noUnderline" style="color:#2499f2; font-weight:bold;">Log in</a></p>
+        <p style="font-size:small; color: black;">Have an account? <a href="{% url 'Log In' %}" class="noUnderline" style="color:#2499f2; font-weight:bold;">Log in</a></p>
         <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:bold;">Click here</a></p>
     </div>
     <p style="font-size:0.9625em;">Get the app.</p>
     <div style="display: flex; justify-content:center; gap:0.625em; margin-bottom: 21.875em;">
-        <img style="height:1.5em; width:1.5em;" src="images/appleIcon.png" class="appleIcon" id="appleDropdown">
+        <img style="height:1.5em; width:1.5em;" src="{% static 'images/appleIcon.png' %}" class="appleIcon" id="appleDropdown">
         <div id="appleDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0em;">
             <p>iPhone-Swift</p>
             <p>iPhone-Flutter</p>
@@ -35,12 +36,12 @@
             <p>Macbook-Flutter</p>
             <p>Macbook-React-Native</p>
         </div>
-        <img style="height:1.5em; width:1.5em;" class="androidIcon" src="images/androidIcon.png" id="androidDropdown">
+        <img style="height:1.5em; width:1.5em;" class="androidIcon" src="{% static 'images/androidIcon.png' %}" id="androidDropdown">
         <div id="androidDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0em;">
             <p>Android-Flutter</p>
             <p>Android-React-Native</p>
         </div>
-        <img style="height:1.5em; width:1.5em;" class="windowsIcon" src="images/windowsIcon.webp" id="windowsDropdown">
+        <img style="height:1.5em; width:1.5em;" class="windowsIcon" src="{% static 'images/windowsIcon.webp' %}" id="windowsDropdown">
         <div id="windowsDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0em;">
             <p>Windows-Flutter</p>
             <p>Windows-React-Native</p>
@@ -53,7 +54,7 @@
 <div class="dropdown">
     <button class="dropbtn">
         <div style="display: flex; justify-content: center; align-items:center; gap: 0.1em;">
-        <p id="language" style="margin-top: 0em;">English</p> <img class="dropdownV" src="images/dropdownV.png" style="margin-top:-0.75em;">
+        <p id="language" style="margin-top: 0em;">English</p> <img class="dropdownV" src="{% static 'images/dropdownV.png' %}" style="margin-top:-0.75em;">
         </div>
     </button>
     <div class="dropdown-content">
@@ -70,14 +71,14 @@
 <div id="whyBdayPopup" class="box">
     <div style="display: flex; margin-left: 8.75em;">
         <p style="font-weight: bold; display: inline; font-size: 1.1875em;">Birthdays</p>
-        <img id="exitPopup" src="images/clearBlackX.png" style="display: inline-block; height: 44%; width: 13%; object-fit: contain; margin-left: 7.5em; margin-top: 0.9375em; background-color: lightgray; border-radius: 1.25em;">
+        <img id="exitPopup" src="{% static 'images/clearBlackX.png' %}" style="display: inline-block; height: 44%; width: 13%; object-fit: contain; margin-left: 7.5em; margin-top: 0.9375em; background-color: lightgray; border-radius: 1.25em;">
     </div>
     <p style="margin-top: -0.625em; color: lightgray;">________________________________________________</p>
-    <img src="images/cakeAndBalloons.jpeg" style="height:60%; width:60%; object-fit:contain; margin-top:0.625em; pointer-events: none;">
+    <img src="{% static 'images/cakeAndBalloons.jpeg' %}" style="height:60%; width:60%; object-fit:contain; margin-top:0.625em; pointer-events: none;">
     <p style="font-weight:600; font-size:1.0625em; margin-top: 0em;">Birthdays on Instagram</p>
     <br>
     <p style="font-size: 0.875em; text-align: center; margin-top: 0em; line-height: 1.5;">Providing your birthday improves the features and ads you see, and helps us keep the Megagram community safe. You can find your birthday in your personal information account settings.</p>
 </div>
-<script src="emailCheckScript.js"></script>
+<script src="{% static 'emailCheckScript.js' %}"></script>
 </body>
 </html>
