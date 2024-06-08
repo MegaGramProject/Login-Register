@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentInput;
     const language = document.getElementById("language");
     const lang = document.getElementById("lang");
-    let currLanguage = "en";
+    const loginText = document.getElementById("loginText");
+    let currLanguage;
     const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
     const data = {"q":"","source":"","target":""};
     const options = {
@@ -44,6 +45,30 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: null
     };
+
+    loginText.addEventListener("click", function() {
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        window.location.href = "http://localhost:8000/login?language=" + currentLanguageLongForm;
+
+    });
 
 
     facebookIcon.onclick = function() {
@@ -219,8 +244,14 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(lang==="বাংলা"){
             newLanguage = "bn";
         }
+        else {
+            return;
+        }
         if (currLanguage === newLanguage) {
             return;
+        }
+        if (!currLanguage) {
+            currLanguage = "en";
         }
         data["source"] = currLanguage;
         data["target"] = newLanguage;
@@ -310,6 +341,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         currLanguage = newLanguage;
+    }
+
+    const queryString = window.location.search.substring(1);
+    const params = new URLSearchParams(queryString);
+    let lingo = params.get("language");
+    console.log(lingo);
+    if (lingo) {
+        setLanguage(lingo);
+    } else {
+        setLanguage("English");
     }
 
     togglePassword.addEventListener("click", function(event) {
@@ -447,8 +488,33 @@ document.addEventListener('DOMContentLoaded', function() {
         usernameSuggestions.style.display = 'none';
     })
 
+
     takeUserToBday = function() {
-        window.location.href = "http://localhost:8000/ageCheck";
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        if (isValidEmail(numberEmail.value)) {
+            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + numberEmail.value;
+        }
+        else {
+            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + numberEmail.value;
+        }
     }
         
 

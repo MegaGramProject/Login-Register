@@ -27,6 +27,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const birthDay = document.getElementById("birthDay");
     const birthYear = document.getElementById("birthYear");
     const nextButton = document.getElementById("nextButton");
+    const goBackText = document.getElementById("goBackText");
+    const loginText = document.getElementById("loginText");
+
+    loginText.addEventListener("click", function() {
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        window.location.href = "http://localhost:8000/login?language=" + currentLanguageLongForm;
+
+    });
 
 
     setLanguage = function (lang) {
@@ -51,6 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (currLanguage === newLanguage) {
             return;
+        }
+        if (!currLanguage) {
+            currLanguage = "en";
         }
         data["source"] = currLanguage;
         data["target"] = newLanguage;
@@ -85,6 +114,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         currLanguage = newLanguage;
     }
+
+    const queryString = window.location.search.substring(1);
+    const params = new URLSearchParams(queryString);
+    let lingo = params.get("language");
+    if (lingo) {
+        setLanguage(lingo);
+    } else {
+        setLanguage("English");
+    }
+
+    goBackText.addEventListener("click", function() {
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        window.location.href = "http://localhost:8000/signUp?language=" + currentLanguageLongForm;
+    });
 
 
     appleDropdown.addEventListener("click", function(event) {
@@ -122,7 +183,33 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                window.location.href = "http://localhost:8000/emailCheck";
+                let l;
+                if (currLanguage==="en") {
+                l = "language=English";
+                }
+                else if (currLanguage==="es") {
+                l = "language=Español";
+                }
+                else if(currLanguage==="fr") {
+                l = "language=Français";
+                }
+                else if(currLanguage==="hi") {
+                l = "language=हिंदी";
+                }
+                else if(currLanguage==="bn") {
+                l = "language=বাংলা";
+                }
+                else {
+                l = "language=中国人";
+                }
+                const queryString = window.location.search.substring(1);
+                const params = new URLSearchParams(queryString);
+                if (params.get("email")) {
+                    window.location.href = "http://localhost:8000/confirmCode?email=" + params.get("email") + "&" + l ;
+                }
+                else if(params.get("number")){
+                    window.location.href = "http://localhost:8000/confirmCode?number=" + params.get("number") + "&" + l;
+                }
             }
         }
         else {
@@ -138,7 +225,33 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                window.location.href = "http://localhost:8000/emailCheck";
+                let l;
+                if (currLanguage==="en") {
+                l = "language=English";
+                }
+                else if (currLanguage==="es") {
+                l = "language=Español";
+                }
+                else if(currLanguage==="fr") {
+                l = "language=Français";
+                }
+                else if(currLanguage==="hi") {
+                l = "language=हिंदी";
+                }
+                else if(currLanguage==="bn") {
+                l = "language=বাংলা";
+                }
+                else {
+                l = "language=中国人";
+                }
+                const queryString = window.location.search.substring(1);
+                const params = new URLSearchParams(queryString);
+                if (params.get("email")) {
+                    window.location.href = "http://localhost:8000/confirmCode?email=" + params.get("email") + "&" + l ;
+                }
+                else if(params.get("number")){
+                    window.location.href = "http://localhost:8000/confirmCode?number=" + params.get("number") + "&" + l;
+                }
             }
         }
         else {
@@ -154,7 +267,33 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                window.location.href = "http://localhost:8000/emailCheck";
+                let l;
+                if (currLanguage==="en") {
+                l = "language=English";
+                }
+                else if (currLanguage==="es") {
+                l = "language=Español";
+                }
+                else if(currLanguage==="fr") {
+                l = "language=Français";
+                }
+                else if(currLanguage==="hi") {
+                l = "language=हिंदी";
+                }
+                else if(currLanguage==="bn") {
+                l = "language=বাংলা";
+                }
+                else {
+                l = "language=中国人";
+                }
+                const queryString = window.location.search.substring(1);
+                const params = new URLSearchParams(queryString);
+                if (params.get("email")) {
+                    window.location.href = "http://localhost:8000/confirmCode?email=" + params.get("email") + "&" + l ;
+                }
+                else if(params.get("number")){
+                    window.location.href = "http://localhost:8000/confirmCode?number=" + params.get("number") + "&" + l;
+                }
             }
         }
         else {

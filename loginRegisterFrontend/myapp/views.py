@@ -1,35 +1,24 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render
 
 def login(request):
-    language = request.GET.get('language', 'English')
-    context = {
-        'language': language
-    }
-    return render(request, "login.html", context)
+    return render(request, "login.html")
 
 def signUp(request):
-    language = request.GET.get('language', 'English')
-    context = {
-        'language': language
-    }
-    return render(request, "register.html", context)
+    return render(request, "register.html")
 
 
 def ageCheck(request):
-    email = request.GET.get('email', 'N/A')
-    number = request.GET.get('number', 'N/A')
-    context = {
-        'email': email,
-        'number': number
-    }
-    return render(request, "bday.html", context)
+    return render(request, "bday.html")
 
-def emailCheck(request):
+def confirmCode(request):
     email = request.GET.get('email', 'N/A')
     number = request.GET.get('number', 'N/A')
     context = {
         'email': email,
         'number': number
     }
-    #add code for sending the confirmation-code
-    return render(request, "emailCheck.html", context)
+    '''
+    Code for sending confirmation code
+    
+    '''
+    return render(request, "confirmCode.html", context)

@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const windowsDevices = document.getElementById("windowsDevices");
     const language = document.getElementById("language");
     const lang = document.getElementById("lang");
+    const loginText = document.getElementById("loginText");
     let currLanguage = "en";
+    const goBackButton = document.getElementById("goBackButton");
     const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
     const data = {"q":"","source":"","target":""};
     const options = {
@@ -22,6 +24,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const nextButton = document.getElementById("nextButton");
     const confirmCode = document.getElementById("confirmCode");
+
+    loginText.addEventListener("click", function() {
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        window.location.href = "http://localhost:8000/login?language=" + currentLanguageLongForm;
+    });
 
 
     setLanguage = function (lang) {
@@ -46,6 +71,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (currLanguage === newLanguage) {
             return;
+        }
+        if(!currLanguage) {
+            currLanguage = "en";
         }
         data["source"] = currLanguage;
         data["target"] = newLanguage;
@@ -80,6 +108,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
         currLanguage = newLanguage;
     }
+
+    const queryString = window.location.search.substring(1);
+    const params = new URLSearchParams(queryString);
+    const lingo = params.get("language");
+    if (lingo) {
+        setLanguage(lingo);
+    } else {
+        setLanguage("English");
+    }
+
+    goBackButton.addEventListener("click", function() {
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        if (params.get("email")) {
+            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + params.get("email");
+        }
+        else {
+            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + params.get("number");
+        }
+    });
 
 
     appleDropdown.addEventListener("click", function(event) {

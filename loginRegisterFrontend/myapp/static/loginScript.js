@@ -17,9 +17,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const androidDevices = document.getElementById("androidDevices");
     const windowsDevices = document.getElementById("windowsDevices");
     const loginPhotos = document.getElementsByClassName("slide");
+    const signupButton = document.getElementById("signupButton");
     let slideIdx = 0;
     const lang = document.getElementById("lang");
-    let currLanguage = "en";
+    let currLanguage;
     const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
     const data = {"q":"","source":"","target":""};
     const options = {
@@ -31,6 +32,130 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: null
     };
+
+    signupButton.addEventListener("click", function() {
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        window.location.href = "http://localhost:8000/signUp?language=" + currentLanguageLongForm;
+    });
+
+    setLanguage = function (lang) {
+        newLanguage = "";
+        if (lang==="English"){
+            newLanguage = "en";
+        }
+        else if(lang==="Español") {
+            newLanguage = "es";
+        }
+        else if(lang==="Français") {
+            newLanguage = "fr";
+        }
+        else if(lang==="हिंदी") {
+            newLanguage = "hi";
+        }
+        else if(lang==="中国人") {
+            newLanguage = "zh-CN";
+        }
+        else if(lang==="বাংলা"){
+            newLanguage = "bn";
+        }
+        else {
+            return;
+        }
+        if (currLanguage === newLanguage) {
+            return;
+        }
+        if (!currLanguage) {
+            currLanguage = "en";
+        }
+        data["source"] = currLanguage;
+        data["target"] = newLanguage;
+
+        const allElements = document.querySelectorAll('*');
+        language.innerText = lang;
+        const elementsText = [];
+        allElements.forEach(element => {
+            const text = element.innerText.trim();
+            if (text !== '' && (element.className !=="lang" && element.id!=="language") && (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
+            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button") &&
+            element.className!=="orLine" || element.tagName.toLowerCase()=="a") {
+                for (let node of element.childNodes) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        data["q"] = node.textContent;
+                        options.body = JSON.stringify(data);
+                        fetch(apiUrl, options)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        }).then(data => {
+                            node.textContent = data['data']['translations']['translatedText'];
+                        }).catch(error => {
+                            console.error('Error:', error);
+                        });
+                    }
+                }
+            }
+        });
+
+        data["q"] = numberNameEmail.placeholder;
+        options.body = JSON.stringify(data);
+        fetch(apiUrl, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        }).then(data => {
+            numberNameEmail.placeholder = data['data']['translations']['translatedText'];
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+
+        data["q"] = password.placeholder;
+        options.body = JSON.stringify(data);
+        fetch(apiUrl, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        }).then(data => {
+            password.placeholder = data['data']['translations']['translatedText'];
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+
+        currLanguage = newLanguage;
+
+    }
+
+    const queryString = window.location.search.substring(1);
+    const params = new URLSearchParams(queryString);
+    let lingo = params.get("language");
+    if (lingo) {
+        setLanguage(lingo);
+    } else {
+        setLanguage("English");
+    }
 
 
     facebookIcon.onclick = function() {
@@ -157,92 +282,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })
 
-
-    setLanguage = function (lang) {
-        newLanguage = "";
-        if (lang==="English"){
-            newLanguage = "en";
-        }
-        else if(lang==="Español") {
-            newLanguage = "es";
-        }
-        else if(lang==="Français") {
-            newLanguage = "fr";
-        }
-        else if(lang==="हिंदी") {
-            newLanguage = "hi";
-        }
-        else if(lang==="中国人") {
-            newLanguage = "zh-CN";
-        }
-        else if(lang==="বাংলা"){
-            newLanguage = "bn";
-        }
-        if (currLanguage === newLanguage) {
-            return;
-        }
-        data["source"] = currLanguage;
-        data["target"] = newLanguage;
-
-        const allElements = document.querySelectorAll('*');
-        language.innerText = lang;
-        const elementsText = [];
-        allElements.forEach(element => {
-            const text = element.innerText.trim();
-            if (text !== '' && (element.className !=="lang" && element.id!=="language") && (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
-            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button") &&
-            element.className!=="orLine" || element.tagName.toLowerCase()=="a") {
-                for (let node of element.childNodes) {
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        data["q"] = node.textContent;
-                        options.body = JSON.stringify(data);
-                        fetch(apiUrl, options)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        }).then(data => {
-                            node.textContent = data['data']['translations']['translatedText'];
-                        }).catch(error => {
-                            console.error('Error:', error);
-                        });
-                    }
-                }
-            }
-        });
-
-        data["q"] = numberNameEmail.placeholder;
-        options.body = JSON.stringify(data);
-        fetch(apiUrl, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        }).then(data => {
-            numberNameEmail.placeholder = data['data']['translations']['translatedText'];
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-
-        data["q"] = password.placeholder;
-        options.body = JSON.stringify(data);
-        fetch(apiUrl, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        }).then(data => {
-            password.placeholder = data['data']['translations']['translatedText'];
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-
-        currLanguage = newLanguage;
-
-    }
 
     appleDropdown.addEventListener("click", function(event) {
         event.stopPropagation();

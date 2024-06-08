@@ -6,23 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
-    <title>Email Check</title>
+    <title>Confirm Code</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
     <div class="box" style="margin-top:6.5625em; height:29.375em; width: 28.125em; padding-bottom: 1.5em;">
-        <img src="{% static 'images/emailIcon.png' %}" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:0.625em; pointer-events: none;">
+        {% if email != "N/A" %}
+            <img src="{% static 'images/emailIcon.png' %}" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:0.625em; pointer-events: none;">
+        {% else %}
+            <img src="{% static 'images/phoneIcon.png' %}" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:0.625em; pointer-events: none;">
+            {% endif %}
         <p style="font-weight: bold; font-size: 1.0625em; margin-top: 1.875em;">Enter Confirmation Code</p>
-        <p style="font-size: 1.0625em; text-align: center; display: inline; margin-top:0.9375em; line-height: 1.5;">Enter the confirmation code we sent to {{ email }}.
-        <a href="#" class="noUnderline" style="font-weight:bold; color:#2499f2;">Resend Code.</a></p>
+        <p style="font-size: 1.0625em; text-align: center; display: inline; margin-top:0.9375em; line-height: 1.5;">Enter the confirmation code we sent to
+        {% if email != "N/A" %}
+            {{ email }}.
+        {% else %}
+            {{ number }}.
+        {% endif %}
+        
+        <a href="#" class="noUnderline" style="font-weight:bold; color:#2499f2;">Resend Code</a></p>
         <input id="confirmCode" type="text" class="textInput" placeholder="Confirmation Code" style="font-size: 1.0625em; border-radius: 0.4375em; padding: 0.9375em 1.0625em;">
         <button id="nextButton" class="blueButton" style="font-size:0.875em; width: 23.5em;">Next</button>
-        <a href="{% url 'Age Check' %}" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 1.25em; margin-bottom: 2.1875em;">Go Back<a/>
+        <a href="#" id="goBackButton" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 1.25em; margin-bottom: 2.1875em;">Go Back<a/>
     </div>
 
     <div class="box" style="height:50%; margin-top:0.5em; width: 28.125em;">
-        <p style="font-size:small; color: black;">Have an account? <a href="{% url 'Log In' %}" class="noUnderline" style="color:#2499f2; font-weight:bold;">Log in</a></p>
+        <p style="font-size:small; color: black;">Have an account? <a href="#" id="loginText" class="noUnderline" style="color:#2499f2; font-weight:bold;">Log in</a></p>
         <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:bold;">Click here</a></p>
     </div>
     <p style="font-size:0.9625em;">Get the app.</p>
@@ -79,6 +89,6 @@
     <br>
     <p style="font-size: 0.875em; text-align: center; margin-top: 0em; line-height: 1.5;">Providing your birthday improves the features and ads you see, and helps us keep the Megagram community safe. You can find your birthday in your personal information account settings.</p>
 </div>
-<script src="{% static 'emailCheckScript.js' %}"></script>
+<script src="{% static 'confirmCode.js' %}"></script>
 </body>
 </html>
