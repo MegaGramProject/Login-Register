@@ -7,20 +7,20 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from twilio.rest import Client
-from . import keys
 import ssl
 import random
-
+import os
 
 
 @api_view(['POST'])
 def createUser(request):
-        #username, fullName, salt, hashedPassword, contactInfo, dateOfBirth
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #username, fullName, salt, hashedPassword, contactInfo, dateOfBirth
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['PATCH'])
 def updateUser(request, username):
@@ -37,15 +37,20 @@ def updateUser(request, username):
 
 
 
+
+
+
 @api_view(['DELETE'])
 def removeUser(request, username):
     try:
         user = User.objects.get(username = username)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
+    
     user.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 
 @api_view(['POST'])
@@ -78,8 +83,9 @@ def sendEmail(request):
     message.attach(part1)
     message.attach(part2)
 
+
     context = ssl.create_default_context()
-    
+
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login("megagram664@gmail.com", "daqr zlkq vvil exfi")
@@ -88,21 +94,33 @@ def sendEmail(request):
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 def sendText(request, number):
-        confirmationCode = random.randint(100000, 999999)
-        accountSid = keys.accountSid
-        authToken = keys.authToken
-        client = Client(accountSid, authToken)
-        to = number
-        messageBody = f"{confirmationCode}\n\nHi, Someone tried to sign up for a Megagram account with {to}. If it was you, enter the confirmation code mentioned at the start: {confirmationCode}"
+    confirmationCode = random.randint(100000, 999999)
+    accountSid = os.getenv('accountSid')
+    authToken = os.getenv('authToken')
+    client = Client(accountSid, authToken)
+    to = number
+    messageBody = f"{confirmationCode}\n\nHi, Someone tried to sign up for a Megagram account with {to}. If it was you, enter the confirmation code mentioned at the start: {confirmationCode}"
 
-        try:
-            message = client.messages.create(
-            body=messageBody,
-            from_=keys.myPhoneNumber,
-            to=to)
-            return Response({"confirmationCode": confirmationCode}, status=status.HTTP_201_CREATED)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        message = client.messages.create(
+        body=messageBody,
+        from_= os.getenv('twilioPhoneNumber'),
+        to=to)
+        return Response({"confirmationCode": confirmationCode}, status=status.HTTP_201_CREATED)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
 
