@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextButton = document.getElementById("nextButton");
     const goBackText = document.getElementById("goBackText");
     const loginText = document.getElementById("loginText");
+    const postedUsername = document.getElementById("postedUsername").textContent;
+    const postedSalt = document.getElementById("postedSalt").textContent;
+    const postedHashedPassword = document.getElementById("postedHashedPassword").textContent;
+    const postedFullName = document.getElementById("postedFullName").textContent;
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -176,41 +180,66 @@ document.addEventListener('DOMContentLoaded', function() {
 
     });
 
+    takeUserToConfirm = function() {
+        let currentLanguageLongForm;
+        if (currLanguage==="en") {
+            currentLanguageLongForm = "English";
+        }
+        else if (currLanguage==="es") {
+            currentLanguageLongForm = "Español";
+        }
+        else if(currLanguage==="fr") {
+            currentLanguageLongForm = "Français";
+        }
+        else if(currLanguage==="hi") {
+            currentLanguageLongForm = "हिंदी";
+        }
+        else if(currLanguage==="bn") {
+            currentLanguageLongForm = "বাংলা";
+        }
+        else {
+            currentLanguageLongForm = "中国人";
+        }
+        let confirmCodeUrl;
+        const queryString = window.location.search.substring(1);
+        const params = new URLSearchParams(queryString);
+        if (params.get("email")) {
+            confirmCodeUrl= "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&email=" + params.get("email");
+        }
+        else {
+            confirmCodeUrl = "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&number=" + params.get("number");
+        }
+        const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
+        userData["dateOfBirth"] = birthMonth.value + birthDay.value + birthYear.value;
+        const postOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        };
+        fetch(confirmCodeUrl, postOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); })
+        .then(html => {
+            history.pushState(null, '', confirmCodeUrl.substring(22));
+            document.open();
+            document.write(html);
+            document.close();
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
 
     birthMonth.addEventListener('input', function() {
         birthMonth.style.borderColor = "#caced1";
         if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
-            nextButton.onclick = function() {
-                let l;
-                if (currLanguage==="en") {
-                l = "language=English";
-                }
-                else if (currLanguage==="es") {
-                l = "language=Español";
-                }
-                else if(currLanguage==="fr") {
-                l = "language=Français";
-                }
-                else if(currLanguage==="hi") {
-                l = "language=हिंदी";
-                }
-                else if(currLanguage==="bn") {
-                l = "language=বাংলা";
-                }
-                else {
-                l = "language=中国人";
-                }
-                const queryString = window.location.search.substring(1);
-                const params = new URLSearchParams(queryString);
-                if (params.get("email")) {
-                    window.location.href = "http://localhost:8000/confirmCode?email=" + params.get("email") + "&" + l ;
-                }
-                else if(params.get("number")){
-                    window.location.href = "http://localhost:8000/confirmCode?number=" + params.get("number") + "&" + l;
-                }
-            }
+            nextButton.onclick = takeUserToConfirm;
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';
@@ -224,35 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
-            nextButton.onclick = function() {
-                let l;
-                if (currLanguage==="en") {
-                l = "language=English";
-                }
-                else if (currLanguage==="es") {
-                l = "language=Español";
-                }
-                else if(currLanguage==="fr") {
-                l = "language=Français";
-                }
-                else if(currLanguage==="hi") {
-                l = "language=हिंदी";
-                }
-                else if(currLanguage==="bn") {
-                l = "language=বাংলা";
-                }
-                else {
-                l = "language=中国人";
-                }
-                const queryString = window.location.search.substring(1);
-                const params = new URLSearchParams(queryString);
-                if (params.get("email")) {
-                    window.location.href = "http://localhost:8000/confirmCode?email=" + params.get("email") + "&" + l ;
-                }
-                else if(params.get("number")){
-                    window.location.href = "http://localhost:8000/confirmCode?number=" + params.get("number") + "&" + l;
-                }
-            }
+            nextButton.onclick = takeUserToConfirm;
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';
@@ -266,35 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
-            nextButton.onclick = function() {
-                let l;
-                if (currLanguage==="en") {
-                l = "language=English";
-                }
-                else if (currLanguage==="es") {
-                l = "language=Español";
-                }
-                else if(currLanguage==="fr") {
-                l = "language=Français";
-                }
-                else if(currLanguage==="hi") {
-                l = "language=हिंदी";
-                }
-                else if(currLanguage==="bn") {
-                l = "language=বাংলা";
-                }
-                else {
-                l = "language=中国人";
-                }
-                const queryString = window.location.search.substring(1);
-                const params = new URLSearchParams(queryString);
-                if (params.get("email")) {
-                    window.location.href = "http://localhost:8000/confirmCode?email=" + params.get("email") + "&" + l ;
-                }
-                else if(params.get("number")){
-                    window.location.href = "http://localhost:8000/confirmCode?number=" + params.get("number") + "&" + l;
-                }
-            }
+            nextButton.onclick = takeUserToConfirm;
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';

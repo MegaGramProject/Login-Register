@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: null
     };
+    var bcrypt = dcodeIO.bcrypt;
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -346,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const queryString = window.location.search.substring(1);
     const params = new URLSearchParams(queryString);
     let lingo = params.get("language");
-    console.log(lingo);
     if (lingo) {
         setLanguage(lingo);
     } else {
@@ -462,6 +462,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
     getPasswordValidity = function(passwordInput) {
+        if(passwordInput.length == 0 || passwordInput.length > 128) {
+            return 0;
+        }
         const lengthWeight = 0.6;
         const varietyWeight = 0.4;
         
@@ -488,6 +491,14 @@ document.addEventListener('DOMContentLoaded', function() {
         usernameSuggestions.style.display = 'none';
     })
 
+    getSalt = function() {
+        return bcrypt.genSaltSync(12);
+    }
+
+    getHashedPassword = function(password, salt) {
+        return bcrypt.hashSync(password, salt);
+    }
+
 
     takeUserToBday = function() {
         let currentLanguageLongForm;
@@ -509,12 +520,37 @@ document.addEventListener('DOMContentLoaded', function() {
         else {
             currentLanguageLongForm = "中国人";
         }
+        let ageCheckUrl;
         if (isValidEmail(numberEmail.value)) {
-            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + numberEmail.value;
+            ageCheckUrl= "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + numberEmail.value;
         }
         else {
-            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + numberEmail.value;
+            ageCheckUrl = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + numberEmail.value;
         }
+        const salt = getSalt();
+        const hashedPassword = getHashedPassword(password.value, salt)
+        const userData = {"salt":salt,"hashedPassword":hashedPassword,"username":username.value, "fullName":fullName.value};
+        const postOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        };
+        fetch(ageCheckUrl, postOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); })
+        .then(html => {
+            history.pushState(null, '', ageCheckUrl.substring(22));
+            document.open();
+            document.write(html);
+            document.close();
+        }).catch(error => {
+            console.error('Error:', error);
+        });
     }
         
 

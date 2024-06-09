@@ -21,9 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: null
     };
-
     const nextButton = document.getElementById("nextButton");
     const confirmCode = document.getElementById("confirmCode");
+    const postedUsername = document.getElementById("postedUsername").textContent;
+    const postedSalt = document.getElementById("postedSalt").textContent;
+    const postedHashedPassword = document.getElementById("postedHashedPassword").textContent;
+    const postedFullName = document.getElementById("postedFullName").textContent;
+    const postedDateOfBirth = document.getElementById("postedDateOfBirth").textContent;
+    const confirmationCodeValue = document.getElementById("confirmationCodeValue").textContent;
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -118,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setLanguage("English");
     }
 
+
     goBackButton.addEventListener("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
@@ -138,12 +144,37 @@ document.addEventListener('DOMContentLoaded', function() {
         else {
             currentLanguageLongForm = "中国人";
         }
+        let ageCheckUrl;
+        const queryString = window.location.search.substring(1);
+        const params = new URLSearchParams(queryString);
         if (params.get("email")) {
-            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + params.get("email");
+            ageCheckUrl= "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + params.get("email");
         }
         else {
-            window.location.href = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + params.get("number");
+            ageCheckUrl = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + params.get("number");
         }
+        const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
+        const postOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        };
+        fetch(ageCheckUrl, postOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); })
+        .then(html => {
+            history.pushState(null, '', ageCheckUrl.substring(22));
+            document.open();
+            document.write(html);
+            document.close();
+        }).catch(error => {
+            console.error('Error:', error);
+        });
     });
 
 
@@ -167,7 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                window.location.href = 'https://www.google.com';
+                if (confirmationCode==confirmCode.value) {
+                    window.location.href = 'https://www.google.com';
+                }
             }
         }
         else {
