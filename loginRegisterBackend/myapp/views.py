@@ -6,6 +6,8 @@ from .serializers import UserSerializer
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from twilio.rest import Client
+from . import keys
 import ssl
 import random
 
@@ -88,21 +90,19 @@ def sendEmail(request):
 
 @api_view(['GET'])
 def sendText(request, number):
-    confirmationCode = random.randint(100000, 999999)
-    message =  f"{confirmationCode}\nHi, Someone tried to sign up for a Megagram account with {number} If it was you, enter this confirmation code in the website: {confirmationCode}"
-    to = f"{number}@txt.att.net"
+        confirmationCode = random.randint(100000, 999999)
+        accountSid = keys.accountSid
+        authToken = keys.authToken
+        client = Client(accountSid, authToken)
+        to = number
+        messageBody = f"{confirmationCode}\n\nHi, Someone tried to sign up for a Megagram account with {to}. If it was you, enter the confirmation code mentioned at the start: {confirmationCode}"
 
-    emailMessage = f"Subject:\nTo:{to}\n{message}"
-
-    context = ssl.create_default_context()
-    
-    try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login("megagram664@gmail.com", "daqr zlkq vvil exfi")
-            server.sendmail("megagram664@gmail.com", f"{number}@txt.att.net", emailMessage)
+        try:
+            message = client.messages.create(
+            body=messageBody,
+            from_=keys.myPhoneNumber,
+            to=to)
             return Response({"confirmationCode": confirmationCode}, status=status.HTTP_201_CREATED)
-    except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
