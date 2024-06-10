@@ -181,6 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     takeUserToConfirm = function() {
+        nextButton.style.display = 'none';
         let currentLanguageLongForm;
         if (currLanguage==="en") {
             currentLanguageLongForm = "English";

@@ -28,7 +28,57 @@ document.addEventListener('DOMContentLoaded', function() {
     const postedHashedPassword = document.getElementById("postedHashedPassword").textContent;
     const postedFullName = document.getElementById("postedFullName").textContent;
     const postedDateOfBirth = document.getElementById("postedDateOfBirth").textContent;
-    const confirmationCodeValue = document.getElementById("confirmationCodeValue").textContent;
+    let confirmationCodeValue = document.getElementById("confirmationCodeValue").textContent;
+    const resendCode = document.getElementById("resendCode");
+
+
+    resendCode.addEventListener("click", function() {
+        const queryString = window.location.search.substring(1);
+        const params = new URLSearchParams(queryString);
+        if (params.get("email")) {
+            const emailURL = "http://localhost:8001/sendEmail/";
+            const data = {"email": params.get("email")};
+            const headers = new Headers({
+                'Content-Type': 'application/json'
+            });
+            fetch(emailURL, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (response.status === 201) {
+                    return response.json();
+                }
+                else {
+                    throw new Error('Failed to send email');
+                }
+            }).then(data => {
+                confirmationCodeValue = data["confirmationCode"];
+            }).catch(error => {
+                console.error(error);
+            });
+        }
+        else {
+            const textURL = "http://localhost:8001/sendText/"+params.get("number");
+            const headers = {'Accept': 'application/json'}
+            fetch(textURL, {
+                method: 'GET',
+                headers: headers,
+            }).then(response => {
+                if(response.status === 201) {
+                    return response.json();
+                }
+                else {
+                    throw new Error('Failed to send text');
+                }
+            }).then(data => {
+                confirmationCodeValue = data["confirmationCode"];
+            }).catch(error => {
+                console.error(error);
+            });
+        }
+        
+    });
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -198,7 +248,31 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                if (confirmationCode==confirmCode.value) {
+                if (confirmationCodeValue==confirmCode.value) {
+                    const createUserURL = "http://localhost:8001/createUser/";
+                    const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
+                    userData["dateOfBirth"] = postedDateOfBirth;
+                    const queryString = window.location.search.substring(1);
+                    const params = new URLSearchParams(queryString);
+                    if (params.get("email")) {
+                        userData["contactInfo"] = params.get("email");
+                    }
+                    else {
+                        userData["contactInfo"] = params.get("number");
+                    }
+                    const headers  = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(userData)
+                    };
+                    fetch(createUserURL, headers)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                    });
                     window.location.href = 'https://www.google.com';
                 }
             }

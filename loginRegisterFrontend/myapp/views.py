@@ -7,8 +7,6 @@ import json
 from django.http import HttpResponse
 
 
-
-
 def login(request):
     return render(request, "login.html")
 
@@ -29,7 +27,7 @@ def confirmCode(request):
         data = {'email': context['email']}
         headers = {'Content-Type': 'application/json'}
         response = requests.post(apiUrl, headers=headers, data=json.dumps(data))
-        if response.status_code == 200:
+        if response.status_code == 201:
             confirmationCode = response.json().get('confirmationCode')
             context['confirmationCode'] = confirmationCode
             return render(request, "confirmCode.html", context)
@@ -41,7 +39,7 @@ def confirmCode(request):
         apiUrl = f"http://localhost:8001/sendText/{context['number']}"
         headers = {'Accept': 'application/json'}
         response = requests.get(apiUrl, headers=headers)
-        if response.status_code == 200:
+        if response.status_code == 201:
             confirmationCode = response.json().get('confirmationCode')
             context['confirmationCode'] = confirmationCode
             return render(request, "confirmCode.html", context)

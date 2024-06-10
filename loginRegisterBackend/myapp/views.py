@@ -98,8 +98,8 @@ def sendEmail(request):
 @api_view(['GET'])
 def sendText(request, number):
     confirmationCode = random.randint(100000, 999999)
-    accountSid = os.getenv('accountSid')
-    authToken = os.getenv('authToken')
+    accountSid = os.environ['accountSid']
+    authToken = os.environ['authToken']
     client = Client(accountSid, authToken)
     to = number
     messageBody = f"{confirmationCode}\n\nHi, Someone tried to sign up for a Megagram account with {to}. If it was you, enter the confirmation code mentioned at the start: {confirmationCode}"
@@ -108,19 +108,25 @@ def sendText(request, number):
     try:
         message = client.messages.create(
         body=messageBody,
-        from_= os.getenv('twilioPhoneNumber'),
+        from_= os.environ['twilioPhoneNumber'],
         to=to)
         return Response({"confirmationCode": confirmationCode}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
-
-
-
-
-
+@api_view(['POST'])
+def doesUserExist(request):
+    if request.data.get('username'):
+        try:
+            user = User.objects.get(username = request.data['username'])
+            return Response({"salt": user.salt, "hashedPassword":user.hashedPassword})
+        except:
+            return Response({"userExists": False})
+    
+    else:
+        try:
+            user = User.objects.get(contactInfo = request.data['contactInfo'])
+            return Response({"salt": user.salt, "hashedPassword":user.hashedPassword})
+        except:
+            return Response({"userExists": False})

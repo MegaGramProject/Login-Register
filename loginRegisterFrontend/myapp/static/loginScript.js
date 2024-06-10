@@ -32,6 +32,64 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         body: null
     };
+    var bcrypt = dcodeIO.bcrypt;
+
+    loginUser = function() {
+        if (isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value)) {
+            const data = {"contactInfo": numberNameEmail.value};
+            const userVerifyURL = "http://localhost:8001/doesUserExist/";
+            const postOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+            fetch(userVerifyURL, postOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response not ok");
+                }
+                return response.json();
+            }).then(data => {
+                const salt = data['salt'];
+                const hashedPassword = data['hashedPassword'];
+                if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
+                    console.log("A");
+                    window.location.href = "https://www.google.com";
+                }
+                console.log("B");
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        else {
+            const data = {"username": numberNameEmail.value};
+            const userVerifyURL = "http://localhost:8001/doesUserExist/";
+            const postOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+            fetch(userVerifyURL, postOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response not ok");
+                }
+                return response.json();
+            }).then(data => {
+                const salt = data['salt'];
+                const hashedPassword = data['hashedPassword'];
+                if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
+                    window.location.href = "https://www.google.com";
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    }
 
     signupButton.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -241,10 +299,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if ((isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value) || usernameIsValid(numberNameEmail.value)) &&  password.value.length > 0) {
             loginButton.style.backgroundColor = '#347aeb';
             loginButton.style.cursor = 'pointer';
+            loginButton.onclick = loginUser;
         }
         else {
             loginButton.style.backgroundColor =  '#82bbf5';
             loginButton.style.cursor = 'initial';
+            loginButton.onclick = null;
         }
 
     })
@@ -263,10 +323,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if ((isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value) || usernameIsValid(numberNameEmail.value)) &&  password.value.length > 0) {
             loginButton.style.backgroundColor = '#347aeb';
             loginButton.style.cursor = 'pointer';
+            loginButton.onclick = loginUser;
         }
         else {
             loginButton.style.backgroundColor =  '#82bbf5';
             loginButton.style.cursor = 'initial';
+            loginButton.onclick = null;
         }
 
     })

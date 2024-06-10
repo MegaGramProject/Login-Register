@@ -34,7 +34,7 @@
             <p id="passwordContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.125em; color: gray; display: none;">Password</p>
         </div>
         <br>
-        <button class="blueButton" id="loginButton">Log in</button>
+        <button type="button" class="blueButton" id="loginButton">Log in</button>
         </form>
         <br>
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:0.5em;">_________________</p></div>
@@ -99,6 +99,7 @@
 </div>
 
 <script src="{% static 'loginScript.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
 </body>
 </html>
 
