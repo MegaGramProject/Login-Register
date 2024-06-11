@@ -46,6 +46,15 @@ document.addEventListener('DOMContentLoaded', function() {
         body: null
     };
     var bcrypt = dcodeIO.bcrypt;
+    const numberEmailTakenError = document.getElementById("numberEmailTakenError");
+    const numberEmailInvalidError = document.getElementById("numberEmailInvalidError");
+    const usernameTakenError = document.getElementById("usernameTakenError");
+    const usernameInvalidError = document.getElementById("usernameInvalidError");
+    const passwordInvalidError = document.getElementById("passwordInvalidError");
+    const fullNameInvalidError = document.getElementById("fullNameInvalidError");
+    let numberEmailError;
+    let usernameError;
+
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -64,8 +73,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
+        }
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
         }
         window.location.href = "http://localhost:8000/login?language=" + currentLanguageLongForm;
 
@@ -98,20 +125,37 @@ document.addEventListener('DOMContentLoaded', function() {
             numberEmailContainerInfo.style.display = 'none';
             numberEmail.style.paddingTop = '6px';
         }
-        if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && getPasswordValidity(password.value) > 0.65){
-            signupButton.style.backgroundColor = '#347aeb';
-            signupButton.style.cursor = 'pointer';
-            signupButton.onclick = takeUserToBday;
+
+        if (fullNameIsValid(fullName.value) && getPasswordValidity(password.value) >= 0.65
+        && (isValidEmail(numberEmail.value)||isValidNumber(numberEmail.value))){
+            checkNumberEmail(numberEmail.value).then(numberEmailIsValid => {
+                if (numberEmailIsValid) {
+                    usernameIsValid(username.value).then(usernameIsValid => {
+                        if(usernameIsValid) {
+                            signupButton.style.backgroundColor = '#347aeb';
+                            signupButton.style.cursor = 'pointer';
+                            signupButton.onclick = takeUserToBday;
+                        }
+                        else {
+                            signupButton.style.backgroundColor =  '#82bbf5';
+                            signupButton.style.cursor = 'initial';
+                            signupButton.onclick = null;
+                        }
+                    });
+                }
+                else {
+                    signupButton.style.backgroundColor =  '#82bbf5';
+                    signupButton.style.cursor = 'initial';
+                    signupButton.onclick = null;
+                }
+            });
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
             signupButton.style.cursor = 'initial';
             signupButton.onclick = null;
         }
-
-    
-
-    })
+        });
 
     fullName.addEventListener("input", function() {
         currentInput = fullName;
@@ -126,10 +170,29 @@ document.addEventListener('DOMContentLoaded', function() {
             fullNameContainerInfo.style.display = 'none';
             fullName.style.paddingTop = '6px';
         }
-        if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && getPasswordValidity(password.value) > 0.65){
-            signupButton.style.backgroundColor = '#347aeb';
-            signupButton.style.cursor = 'pointer';
-            signupButton.onclick = takeUserToBday;
+        if (fullNameIsValid(fullName.value) && getPasswordValidity(password.value) >= 0.65
+        && (isValidEmail(numberEmail.value)||isValidNumber(numberEmail.value))){
+            checkNumberEmail(numberEmail.value).then(numberEmailIsValid => {
+                if (numberEmailIsValid) {
+                    usernameIsValid(username.value).then(usernameIsValid => {
+                        if(usernameIsValid) {
+                            signupButton.style.backgroundColor = '#347aeb';
+                            signupButton.style.cursor = 'pointer';
+                            signupButton.onclick = takeUserToBday;
+                        }
+                        else {
+                            signupButton.style.backgroundColor =  '#82bbf5';
+                            signupButton.style.cursor = 'initial';
+                            signupButton.onclick = null;
+                        }
+                    });
+                }
+                else {
+                    signupButton.style.backgroundColor =  '#82bbf5';
+                    signupButton.style.cursor = 'initial';
+                    signupButton.onclick = null;
+                }
+            });
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
@@ -143,10 +206,10 @@ document.addEventListener('DOMContentLoaded', function() {
         currentInput = username;
         wrong3.style.display = 'none';
         checkmark3.style.display = 'none';
-        if(usernameSuggestions.style.display = 'none' && fullNameIsValid(fullName.value)) {
+        if(usernameSuggestions.style.display === 'none' && fullNameIsValid(fullName.value)) {
             usernameSuggestions.style.display = 'inline-block';
-            usernameSuggestion1.innerText = fullName.value + '123';
-            usernameSuggestion2.innerText = fullName.value + '.__';
+            usernameSuggestion1.innerText = fullName.value.split(" ")[0] + Math.floor(100 + Math.random() * 900).toString();
+            usernameSuggestion2.innerText = fullName.value.split(" ")[0]  + '.__';
         }
         if (username.value.length > 0) {
             usernameContainerInfo.style.display = 'inline-block';
@@ -157,10 +220,29 @@ document.addEventListener('DOMContentLoaded', function() {
             usernameContainerInfo.style.display = 'none';
             username.style.paddingTop = '6px';
         }
-        if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && getPasswordValidity(password.value) > 0.65){
-            signupButton.style.backgroundColor = '#347aeb';
-            signupButton.style.cursor = 'pointer';
-            signupButton.onclick = takeUserToBday;
+        if (fullNameIsValid(fullName.value) && getPasswordValidity(password.value) >= 0.65
+        && (isValidEmail(numberEmail.value)||isValidNumber(numberEmail.value))){
+            checkNumberEmail(numberEmail.value).then(numberEmailIsValid => {
+                if (numberEmailIsValid) {
+                    usernameIsValid(username.value).then(usernameIsValid => {
+                        if(usernameIsValid) {
+                            signupButton.style.backgroundColor = '#347aeb';
+                            signupButton.style.cursor = 'pointer';
+                            signupButton.onclick = takeUserToBday;
+                        }
+                        else {
+                            signupButton.style.backgroundColor =  '#82bbf5';
+                            signupButton.style.cursor = 'initial';
+                            signupButton.onclick = null;
+                        }
+                    });
+                }
+                else {
+                    signupButton.style.backgroundColor =  '#82bbf5';
+                    signupButton.style.cursor = 'initial';
+                    signupButton.onclick = null;
+                }
+            });
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
@@ -210,10 +292,29 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordContainerInfo.style.display = 'none';
             password.style.paddingTop = '6px';
         }
-        if (checkNumberEmail(numberEmail.value) && fullNameIsValid(fullName.value) && usernameIsValid(username.value) && passwordScore > 0.65){
-            signupButton.style.backgroundColor = '#347aeb';
-            signupButton.style.cursor = 'pointer';
-            signupButton.onclick = takeUserToBday;
+        if (fullNameIsValid(fullName.value) && getPasswordValidity(password.value) >= 0.65
+        && (isValidEmail(numberEmail.value)||isValidNumber(numberEmail.value))){
+            checkNumberEmail(numberEmail.value).then(numberEmailIsValid => {
+                if (numberEmailIsValid) {
+                    usernameIsValid(username.value).then(usernameIsValid => {
+                        if(usernameIsValid) {
+                            signupButton.style.backgroundColor = '#347aeb';
+                            signupButton.style.cursor = 'pointer';
+                            signupButton.onclick = takeUserToBday;
+                        }
+                        else {
+                            signupButton.style.backgroundColor =  '#82bbf5';
+                            signupButton.style.cursor = 'initial';
+                            signupButton.onclick = null;
+                        }
+                    });
+                }
+                else {
+                    signupButton.style.backgroundColor =  '#82bbf5';
+                    signupButton.style.cursor = 'initial';
+                    signupButton.onclick = null;
+                }
+            });
         }
         else {
             signupButton.style.backgroundColor =  '#82bbf5';
@@ -244,6 +345,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         else if(lang==="বাংলা"){
             newLanguage = "bn";
+        }
+        else if(lang==="العربية") {
+            newLanguage = "ar";
+        }
+        else if(lang==="Deutsch") {
+            newLanguage = "de";
+        }
+        else if(lang==="Bahasa Indonesia") {
+            newLanguage = "id";
+        }
+        else if(lang==="Italiano"){
+            newLanguage = "it";
+        }
+        else if(lang==="日本語") {
+            newLanguage = "ja";
+        }
+        else if(lang==="Русский") {
+            newLanguage = "ru";
         }
         else {
             return;
@@ -352,6 +471,16 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         setLanguage("English");
     }
+    if(params.get("numberEmail")) {
+        numberEmail.value = params.get("numberEmail");
+    }
+    if(params.get("username")) {
+        username.value = params.get("username");
+    }
+    if(params.get("fullName")) {
+        fullName.value = params.get("fullName");
+    }
+
 
     togglePassword.addEventListener("click", function(event) {
         event.preventDefault();
@@ -416,19 +545,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         }
-    
         return true;
     }
 
-    checkNumberEmail = function(numberEmailInput) {
-        if (isValidEmail(numberEmailInput) || isValidNumber(numberEmailInput)) {
-            return true;
+    checkNumberEmail = async function(numberEmailInput) {
+        numberEmailError = "invalid";
+        if (!isValidNumber(numberEmailInput) && !isValidEmail(numberEmailInput)) {
+            return false;
         }
-        return false;
+        numberEmailError = "taken";
+        const data = {"contactInfo": numberEmailInput};
+        const userVerifyURL = "http://localhost:8001/doesUserExist/";
+        const postOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }
+        try {
+            const response = await fetch(userVerifyURL, postOptions);
+            if (!response.ok) {
+                throw new Error("Network response not ok");
+            }
+            const data = await response.json();
+            if (data["userExists"] === false) {
+                usernameError = "";
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error:', error);
+            return false;
+        }
+
     }
 
     fullNameIsValid = function(fullNameInput) {
-        if(fullNameInput.length > 30) {
+        if(fullNameInput.length > 30 || fullNameInput[0]===" ") {
             return false;
         }
         if (fullNameInput.indexOf(' ') === -1) {
@@ -445,7 +599,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    usernameIsValid = function(usernameInput) {
+    usernameIsValid = async function(usernameInput) {
+            usernameError = "invalid"
             if (usernameInput.length > 30 || usernameInput.length < 1) {
                 return false;
             }
@@ -457,8 +612,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     return false;
                 }
             }
-        
-            return true;
+
+            usernameError = "taken";
+            const data = {"username": usernameInput};
+            const userVerifyURL = "http://localhost:8001/doesUserExist/";
+            const postOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }
+            try {
+                const response = await fetch(userVerifyURL, postOptions);
+                if (!response.ok) {
+                    throw new Error("Network response not ok");
+                }
+                const data = await response.json();
+                if (data["userExists"] === false) {
+                    usernameError = "";
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
         }
 
     getPasswordValidity = function(passwordInput) {
@@ -517,8 +696,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
+        }
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
         }
         let ageCheckUrl;
         if (isValidEmail(numberEmail.value)) {
@@ -565,39 +762,66 @@ document.addEventListener('DOMContentLoaded', function() {
             windowsDevices.style.display = 'none';
         }
         if(currentInput===numberEmail && !numberEmail.contains(event.target)) {
-            inputIsValid = checkNumberEmail(numberEmail.value);
-            if (inputIsValid) {
-                checkmark1.style.display = 'inline-block';
-            }
-            else {
-                wrong1.style.display = 'inline-block';
-            }
+            checkNumberEmail(numberEmail.value).then(inputIsValid => {
+                if (inputIsValid) {
+                    checkmark1.style.display = 'inline-block';
+                    numberEmailInvalidError.style.display = "none";
+                    numberEmailTakenError.style.display = "none";
+                }
+                else {
+                    wrong1.style.display = 'inline-block';
+                    if (numberEmailError==="invalid") {
+                        numberEmailInvalidError.style.display = "inline-block";
+                        numberEmailTakenError.style.display = "none";
+                    }
+                    else {
+                        numberEmailInvalidError.style.display = "none";
+                        numberEmailTakenError.style.display = "inline-block";
+                    }
+                }
+            });
         }
         else if(currentInput===fullName && !fullName.contains(event.target)) {
             inputIsValid = fullNameIsValid(fullName.value);
             if (inputIsValid) {
                 checkmark2.style.display = 'inline-block';
+                fullNameInvalidError.style.display = 'none';
             }
             else {
                 wrong2.style.display = 'inline-block';
+                fullNameInvalidError.style.display = 'inline-block';
             }
         }
         else if(currentInput===username && !username.contains(event.target)) {
-            inputIsValid = usernameIsValid(username.value);
-            if (inputIsValid) {
-                checkmark3.style.display = 'inline-block';
-                usernameSuggestions.style.display = 'none';
+            usernameIsValid(username.value).then(inputIsValid => {
+                if (inputIsValid) {
+                    checkmark3.style.display = 'inline-block';
+                    usernameSuggestions.style.display = 'none';
+                    usernameTakenError.style.display = 'none';
+                    usernameInvalidError.style.display = 'none';
+                }
+                else {
+                    wrong3.style.display = 'inline-block';
+                    if (usernameError==="invalid") {
+                        usernameInvalidError.style.display = "inline-block";
+                        usernameTakenError.style.display = "none";
+                    }
+                    else {
+                        usernameTakenError.style.display = "inline-block";
+                        usernameInvalidError.style.display = "none";
+                    }
+                }
             }
-            else {
-                wrong3.style.display = 'inline-block';
-            }
+            )
         }
         else if(currentInput==password && !password.contains(event.target)) {
             if (getPasswordValidity(password.value) > 0.65){
                 checkmark4.style.display = 'inline-block';
+                passwordInvalidError.style.display = 'none';
             }
             else {
                 wrong4.style.display = 'inline-block';
+                passwordInvalidError.style.display = 'inline-block';
             }
         }
     });

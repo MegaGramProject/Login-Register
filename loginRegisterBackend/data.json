@@ -1,0 +1,1391 @@
+[
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "app_label": "admin",
+        "model": "logentry"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "app_label": "auth",
+        "model": "permission"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "app_label": "auth",
+        "model": "group"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "app_label": "auth",
+        "model": "user"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "app_label": "contenttypes",
+        "model": "contenttype"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "app_label": "sessions",
+        "model": "session"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "app_label": "myapp",
+        "model": "user"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "2ytx70jjvjs2xisf1av9tn9byvysp3mv",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGkj4:KDFLSmM4z6isx5yMannFrH1lfYAz3KdJhIpiqcCx_98",
+        "expire_date": "2024-06-24T19:30:42.938Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "3w9dmtn45e3l6f3vu0rvsdx89ly07uqm",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGfDl:_9QmwciEuVfMdljhde1Xy7xYeoQohA3OCgqP3nys9nU",
+        "expire_date": "2024-06-24T13:38:01.935Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "5ko9d4yofi9qk41r9o2keb50ff7eaj9g",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGeej:xEIZJ7r7UuAYeuY7xt6oqRfbesCAmo6Jv-p6g-oGJ08",
+        "expire_date": "2024-06-24T13:01:49.406Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "5sxfsrduu3jqzrngdx2qhnydi756x93w",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUzh:_ThImgnSW0xQhguL7jlS451lr2XIFlbS8LbJoa2EXas",
+        "expire_date": "2024-06-24T02:42:49.773Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "6xkwi2r2b4cdtdin2k6w6gzav4n23npu",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGf5j:cqN7e7Mxz9UJbl1-kdUhozIfdTbZDAZTZH1hLbNWUv8",
+        "expire_date": "2024-06-24T13:29:43.270Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "6z58j5ko7xw3140ljiu764fx0whzips9",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGTtP:fV8jVRx1fIdoKEumU2tskYnwmh4yt_xQbOPXPrFY-e8",
+        "expire_date": "2024-06-24T01:32:15.355Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "71zky18aa73zp2cshyha8pyohrt4sio7",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGkqZ:3OQkwgPKVn2UEgxOLaRTNOb4g5KguwZWq7R--rqfLAg",
+        "expire_date": "2024-06-24T19:38:27.557Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "73o66j96o60sm2bhs9aoz9b6bhk1v8lg",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGkdx:mT6xEzBA0H7qI8ILIT7LdxwklPFK7nWcEclMw2-euCQ",
+        "expire_date": "2024-06-24T19:25:25.881Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "7qkt2w2kykmyryn8ecsy5mckpsmv91wd",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGgfG:f9SRZqH5kizJyBPO290vEW-GsMCR1zguO_6p_QYKxiI",
+        "expire_date": "2024-06-24T15:10:30.822Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "8gln06zx6h0jtza99firttwcksgl91x4",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGee7:G_d6_6r7JHpI4BRW-P3sneaflnWEsRNhE7UyKT22GHk",
+        "expire_date": "2024-06-24T13:01:11.992Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "8lmy4r6unmvi9j6ouc9f7iifdnqbyr25",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGSWm:mafuQHhCiecj2STAE7P2f_8bu54aSz1uUAFnwAcnyQU",
+        "expire_date": "2024-06-24T00:04:48.325Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "8m63gbta52e8gkoer8bqf1f6ayne6860",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGV5r:TH8QDxmrPLhcjg6dSSxdQFQZfonBVP2yM7pOdUvYTL0",
+        "expire_date": "2024-06-24T02:49:11.279Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "94bzygkhkeymh2j38al32aqlj784nbou",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGhyM:KWylQK6L4I34DWMKp_dyDAkFrwVgTEKvk8DPSk7ZAU4",
+        "expire_date": "2024-06-24T16:34:18.556Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "9is10s6jb8ap7jkkktp2l4wl9hyvtj7x",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGexr:sA3CEpwpf5Ad25viIhk3AvKnMWEGiRNVPnJuCgYOowY",
+        "expire_date": "2024-06-24T13:21:35.137Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "b6x10un8aeekrng90h57rqp4bfmun00a",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGfOI:iEBD119Wvuhss5zstrH_RHD6cIAgBvQBTaZX2pj9TaE",
+        "expire_date": "2024-06-24T13:48:54.130Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "befiso9jb63p7qp7n3id75u2has1pgqz",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGV1D:MEa368h-Y2unr-_R_VHU7chLfMuTfRso6t6eVtiXm0c",
+        "expire_date": "2024-06-24T02:44:23.917Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "bui069ceweqo9dhpsuci20127vivman8",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUyn:IbtUqCClkPVpJDg2nCEcqkuLuhkl1B3IJhoiapnxnFo",
+        "expire_date": "2024-06-24T02:41:53.993Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "cloixsegg4p5kdgvkn6bui08y580cdqf",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGfKQ:ORHJWQ9tEq8ulupkZhcpA0uqb3mspzXI3GEgLB62zKU",
+        "expire_date": "2024-06-24T13:44:54.993Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "cqpahrtdwe51ndz4a3zb6fi41ov4yaox",
+    "fields": {
+        "session_data": ".eJxVjEEOwiAQAP_C2ZBSoIBH730D2WUXqRqalPZk_Lsh6UGvM5N5iwjHXuLReIsLiatQ4vLLENKTaxf0gHpfZVrrvi0oeyJP2-S8Er9uZ_s3KNBK3wJoMMpmcjhMTtusk5-CMZgTZkQi7xXqMHJObF3oKfMI1rHyQwDx-QL8mTia:1sG267:5DbYJqs5Ec0e5F_7HU92oEWgVLUcFwYfcUSvEdJ-UlA",
+        "expire_date": "2024-06-22T19:51:31.014Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "d91fq0wdppfstleo6b0wvwuwzl85bpee",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGfMc:208MmUrxjcyJvejwbE6gMqTTS1oK0znIn_spxgbx73U",
+        "expire_date": "2024-06-24T13:47:10.526Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "f3cx1jtm3cn3dzy741lyw2hmcaundwzz",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGpM7:c_0wQTepWyLew3hegN-AQWBROt1YKZEu2f3HnkNt1uA",
+        "expire_date": "2024-06-25T00:27:19.833Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "gfbg4wzglgojjkhamjl3t29qmfovcvx3",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGf04:fQcnKEh4KVz8nHMnwKQeTbRGSDSZ9QAJlNV724QE3Ws",
+        "expire_date": "2024-06-24T13:23:52.564Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "i1favt52f53rr6j27knb7drfnqeutg96",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGfCz:CJMMch4z01-N0eOpUxE5I63Eo2OJp3BBajSyHZj4YmM",
+        "expire_date": "2024-06-24T13:37:13.535Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "j3c0hfvm3k324xgrvt193lsej08jinro",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGf23:44osfMaX8tRhVNmvnKP7wU-QhlsSqWnEzWE-sa21tJ0",
+        "expire_date": "2024-06-24T13:25:55.636Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "nki1dhc3l0rz2qskbx7k6ase9ozvk2tg",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGf1O:9kLDbhJPRFM3nMh4-w9acg3LOygp-gJJWKDK0f6rHFo",
+        "expire_date": "2024-06-24T13:25:14.125Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "o5o1l4bsngjvbjtvnvelsrxyombfx9s3",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGVkB:KLs1k_eZRdvQPhrn9rKrCJmgiezaphoDjPotDhoO1gw",
+        "expire_date": "2024-06-24T03:30:51.703Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "oexqegb6d9pk3b6m5vngbxwzdwqqrpor",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGf7p:n4je4YMeftoq4oJCAhzHbHP3x3oATvTVpNj_DQZZRJI",
+        "expire_date": "2024-06-24T13:31:53.854Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "p3elt52y0n59elr93rf9bk77ajgl8yd5",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUsH:bEpV4Pp_anE81hARwkVpzn1Om-rMQ7wxlWP_rMfrNlU",
+        "expire_date": "2024-06-24T02:35:09.075Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "pzzou1nccmnnfl465i3prj0ch2p7bz00",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGTSW:sgaraSDAUPmM_GiZ1sq_24NY_bKhpJg46vifiXV8_X0",
+        "expire_date": "2024-06-24T01:04:28.617Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "qf6rvifgt1zcd8dc59zqh79lq3oce2s9",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGfQG:dKrq6p3160IugXxCs4zm0ZGt4efpuq0cSOA-4wYqKac",
+        "expire_date": "2024-06-24T13:50:56.021Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "r46nkz7ym066gheexngz1c6zrgudut9y",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUpM:_6yv3k-fayE5tq_OpBKzRFEpeX3fsBuq9tmRV6X7qRE",
+        "expire_date": "2024-06-24T02:32:08.991Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "s200jl1y6ha3j9e44sqytrns1kohrp0a",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUos:A14YKge9ewbFZfzVGzEUUM8LPOCZbSLj6Mkqm9SxkBQ",
+        "expire_date": "2024-06-24T02:31:38.366Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "sd2vxuh5rtre6iduasoqimcnjb9uk3aq",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUjx:kRNkWIflwxXVz4_s34F5f0TlJVHRXotQgitIkhltolM",
+        "expire_date": "2024-06-24T02:26:33.603Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "sdrahuvkkpreo5htfaggeopjwxu8oe67",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGTZi:_oK9l1zrEFU95UBwrSQG-6f0CnPpDDV4RWC94VrvCTo",
+        "expire_date": "2024-06-24T01:11:54.396Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "ug17zauxbh0jr8a28n2357gdvy00khyj",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGexb:mBFAAsLweqvqYRNKciEzjsjHi7qZhVs3ttByRmA5vzM",
+        "expire_date": "2024-06-24T13:21:19.556Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "v0el2spdwls172bb2xxb22ncjscneyet",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGfE3:cnRmEGVyM_-ouLsC4DQPpbh-P_-CVdCcqBmthccIegE",
+        "expire_date": "2024-06-24T13:38:19.172Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "v4b7xetk0x02mdyu8fn5y0xw0yu52znk",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGV6E:8e26UJhnYf-qh90Kz7DRyy76yxlGFDevnSwV9gK3HHs",
+        "expire_date": "2024-06-24T02:49:34.948Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "xw3ghf75kgqg4jgs4qze3hpalmicxglh",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGVgk:Brzi8yU_hRfBSQq9pBQ7k9MvGoJlp1fYF1fT8SEv1nI",
+        "expire_date": "2024-06-24T03:27:18.456Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "y8llnzwjzz1exgh8csj3nlb5nb248szq",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGebf:UY8cg9Sorhl65-_tJC1JDe4feb7udJndk0ddHm3LNVE",
+        "expire_date": "2024-06-24T12:58:39.907Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "yi6h0mbl8np14z2q2hh2qn0pd4nucdqy",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGWFT:0lvvHAxVnchNzPM3ranYet5271adQM-JJgYc3no9MUc",
+        "expire_date": "2024-06-24T04:03:11.839Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "yvvtvb7vpyk1knzu7arvon4gvf6yrxkt",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGgQ8:Z3-LqJOnuUWL1auFbAg_aQTVirefztU8DHYns93lXz8",
+        "expire_date": "2024-06-24T14:54:52.649Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "z3lvq7dd3m1zv5e6lglm6yqgt6nywaa6",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUuP:t4bXCPifxGFOkJ_KPteb0r3Bt86BqSBtfLbOD3GOEdA",
+        "expire_date": "2024-06-24T02:37:21.827Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "z62hwno8rdzuwahoaripcxgyszc0ptmv",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUlh:2ZWpPpab_LCqvrpt049T-wdKRdaw8czS-Q6FhSoRK1o",
+        "expire_date": "2024-06-24T02:28:21.106Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "z7azzylnvh1jaann2w2agx9fr753ub6h",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGUto:vf_9z68_YL4XWmxUXTsgcHjQ4C2_AIGdJPLtbHXu7Is",
+        "expire_date": "2024-06-24T02:36:44.533Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "zi05ijdwky1mom684in5ztan7dxajf1k",
+    "fields": {
+        "session_data": ".eJxVjDsOwjAQBe_iGlng_1LScwZr7fXiALKlOKkQd4dIKaB9M_NeIuK61LiOMseJxFkocfjdEuZHaRugO7Zbl7m3ZZ6S3BS50yGvncrzsrt_BxVH_dbGeGsdEGkKyMDBH7NX2nkyyiAFlwkUGkpOg2ImDZxPmj0wAiptxfsD3Hw3-g:1sGehM:lHKd5weH3ZWMpOKcAqafM4WJ4JKPN26-_Lo87ieoTJw",
+        "expire_date": "2024-06-24T13:04:32.697Z"
+    }
+},
+{
+    "model": "myapp.user",
+    "pk": 8,
+    "fields": {
+        "username": "username1",
+        "fullName": "R R",
+        "salt": "$2a$12$f./QXLN1VWdbD5XPbFetBu",
+        "hashedPassword": "$2a$12$f./QXLN1VWdbD5XPbFetBuCBPkgXejr5CQFSTjAFvuvD8sbBifP3q",
+        "contactInfo": "risjavram@gmail.com",
+        "dateOfBirth": "jun62008",
+        "created": "2024-06-10T13:46:40.263Z"
+    }
+},
+{
+    "model": "myapp.user",
+    "pk": 11,
+    "fields": {
+        "username": "rishavry",
+        "fullName": "Rishav R",
+        "salt": "$2a$12$sl4L7zzmhkpD5/x5yh6.LO",
+        "hashedPassword": "$2a$12$sl4L7zzmhkpD5/x5yh6.LOB5rtjmptS09OSa5bmYjra77KJUKwTcu",
+        "contactInfo": "6084736793",
+        "dateOfBirth": "apr102008",
+        "created": "2024-06-10T19:38:21.111Z"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can add log entry",
+        "content_type": [
+            "admin",
+            "logentry"
+        ],
+        "codename": "add_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can change log entry",
+        "content_type": [
+            "admin",
+            "logentry"
+        ],
+        "codename": "change_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can delete log entry",
+        "content_type": [
+            "admin",
+            "logentry"
+        ],
+        "codename": "delete_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can view log entry",
+        "content_type": [
+            "admin",
+            "logentry"
+        ],
+        "codename": "view_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can add permission",
+        "content_type": [
+            "auth",
+            "permission"
+        ],
+        "codename": "add_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can change permission",
+        "content_type": [
+            "auth",
+            "permission"
+        ],
+        "codename": "change_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can delete permission",
+        "content_type": [
+            "auth",
+            "permission"
+        ],
+        "codename": "delete_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can view permission",
+        "content_type": [
+            "auth",
+            "permission"
+        ],
+        "codename": "view_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can add group",
+        "content_type": [
+            "auth",
+            "group"
+        ],
+        "codename": "add_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can change group",
+        "content_type": [
+            "auth",
+            "group"
+        ],
+        "codename": "change_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can delete group",
+        "content_type": [
+            "auth",
+            "group"
+        ],
+        "codename": "delete_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can view group",
+        "content_type": [
+            "auth",
+            "group"
+        ],
+        "codename": "view_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can add user",
+        "content_type": [
+            "auth",
+            "user"
+        ],
+        "codename": "add_user"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can change user",
+        "content_type": [
+            "auth",
+            "user"
+        ],
+        "codename": "change_user"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can delete user",
+        "content_type": [
+            "auth",
+            "user"
+        ],
+        "codename": "delete_user"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can view user",
+        "content_type": [
+            "auth",
+            "user"
+        ],
+        "codename": "view_user"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can add content type",
+        "content_type": [
+            "contenttypes",
+            "contenttype"
+        ],
+        "codename": "add_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can change content type",
+        "content_type": [
+            "contenttypes",
+            "contenttype"
+        ],
+        "codename": "change_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can delete content type",
+        "content_type": [
+            "contenttypes",
+            "contenttype"
+        ],
+        "codename": "delete_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can view content type",
+        "content_type": [
+            "contenttypes",
+            "contenttype"
+        ],
+        "codename": "view_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can add session",
+        "content_type": [
+            "sessions",
+            "session"
+        ],
+        "codename": "add_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can change session",
+        "content_type": [
+            "sessions",
+            "session"
+        ],
+        "codename": "change_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can delete session",
+        "content_type": [
+            "sessions",
+            "session"
+        ],
+        "codename": "delete_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can view session",
+        "content_type": [
+            "sessions",
+            "session"
+        ],
+        "codename": "view_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can add user",
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "codename": "add_user"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can change user",
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "codename": "change_user"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can delete user",
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "codename": "delete_user"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "name": "Can view user",
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "codename": "view_user"
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "password": "pbkdf2_sha256$720000$sWQVwtemw7HseGov4v5ql5$CJkdIToYb6944WG3+DPkEBTGJXddlUZfXp84msGbPHc=",
+        "last_login": "2024-06-08T19:51:31.012Z",
+        "is_superuser": true,
+        "username": "rishav",
+        "first_name": "",
+        "last_name": "",
+        "email": "risjavram@gmail.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2024-06-08T19:50:43.161Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "password": "pbkdf2_sha256$720000$3s8xe1ocL5IJzx10vhfIfw$6u07lzsrVNf7xQD1tR7UOaDhGLhT9X3DjPoh974EEQs=",
+        "last_login": "2024-06-11T00:27:19.830Z",
+        "is_superuser": true,
+        "username": "rishavr",
+        "first_name": "",
+        "last_name": "",
+        "email": "risjavram@gmail.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2024-06-10T00:01:22.738Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 1,
+    "fields": {
+        "action_time": "2024-06-08T19:58:03.909Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "1",
+        "object_repr": "rishavr",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 2,
+    "fields": {
+        "action_time": "2024-06-08T19:58:11.193Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "1",
+        "object_repr": "rishavr",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 3,
+    "fields": {
+        "action_time": "2024-06-08T20:00:04.425Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "2",
+        "object_repr": "rishavr",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 4,
+    "fields": {
+        "action_time": "2024-06-08T20:00:11.824Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "2",
+        "object_repr": "rishavr",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"DateOfBirth\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 5,
+    "fields": {
+        "action_time": "2024-06-08T20:00:16.463Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "2",
+        "object_repr": "rishavr",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"DateOfBirth\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 6,
+    "fields": {
+        "action_time": "2024-06-08T20:09:56.719Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "2",
+        "object_repr": "rishavr",
+        "action_flag": 2,
+        "change_message": "[]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 7,
+    "fields": {
+        "action_time": "2024-06-08T21:47:34.806Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "3",
+        "object_repr": "rishavr",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 8,
+    "fields": {
+        "action_time": "2024-06-08T21:55:01.400Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "4",
+        "object_repr": "ri",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 9,
+    "fields": {
+        "action_time": "2024-06-08T22:00:33.172Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "5",
+        "object_repr": "rishavry",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 10,
+    "fields": {
+        "action_time": "2024-06-08T22:14:24.056Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "7",
+        "object_repr": "Blue Robin",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 11,
+    "fields": {
+        "action_time": "2024-06-08T22:14:24.059Z",
+        "user": [
+            "rishav"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "6",
+        "object_repr": "Red Robin",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 12,
+    "fields": {
+        "action_time": "2024-06-10T00:04:16.573Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "8",
+        "object_repr": "R",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 13,
+    "fields": {
+        "action_time": "2024-06-10T00:04:48.323Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "auth",
+            "user"
+        ],
+        "object_id": "2",
+        "object_repr": "rishavr",
+        "action_flag": 2,
+        "change_message": "[{\"changed\": {\"fields\": [\"password\"]}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 14,
+    "fields": {
+        "action_time": "2024-06-10T02:26:41.849Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "5",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 15,
+    "fields": {
+        "action_time": "2024-06-10T02:29:18.795Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "9",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 16,
+    "fields": {
+        "action_time": "2024-06-10T02:29:23.505Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "10",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 17,
+    "fields": {
+        "action_time": "2024-06-10T02:37:30.537Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "12",
+        "object_repr": "rr",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 18,
+    "fields": {
+        "action_time": "2024-06-10T02:37:30.542Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "11",
+        "object_repr": "rr",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 19,
+    "fields": {
+        "action_time": "2024-06-10T02:44:32.969Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "13",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 20,
+    "fields": {
+        "action_time": "2024-06-10T02:47:51.189Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "1",
+        "object_repr": "rishavry",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 21,
+    "fields": {
+        "action_time": "2024-06-10T02:48:09.326Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "1",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 22,
+    "fields": {
+        "action_time": "2024-06-10T02:49:37.801Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "2",
+        "object_repr": "seass",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 23,
+    "fields": {
+        "action_time": "2024-06-10T03:28:37.069Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "1",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 24,
+    "fields": {
+        "action_time": "2024-06-10T04:03:20.178Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "3",
+        "object_repr": "Sri",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 25,
+    "fields": {
+        "action_time": "2024-06-10T12:58:46.486Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "2",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 26,
+    "fields": {
+        "action_time": "2024-06-10T13:32:52.011Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "5",
+        "object_repr": "rishavry2",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 27,
+    "fields": {
+        "action_time": "2024-06-10T13:37:20.107Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "5",
+        "object_repr": "rishavry2",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 28,
+    "fields": {
+        "action_time": "2024-06-10T13:45:18.323Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "7",
+        "object_repr": "rishavry3",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 29,
+    "fields": {
+        "action_time": "2024-06-10T13:45:18.326Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "6",
+        "object_repr": "rishavry2",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 30,
+    "fields": {
+        "action_time": "2024-06-10T13:45:18.327Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "4",
+        "object_repr": "rishavry",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 31,
+    "fields": {
+        "action_time": "2024-06-10T19:31:01.420Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "10",
+        "object_repr": "username3",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 32,
+    "fields": {
+        "action_time": "2024-06-10T19:31:04.947Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "8",
+        "object_repr": "username1",
+        "action_flag": 2,
+        "change_message": "[]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 33,
+    "fields": {
+        "action_time": "2024-06-10T19:31:07.435Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "9",
+        "object_repr": "username2",
+        "action_flag": 2,
+        "change_message": "[]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 34,
+    "fields": {
+        "action_time": "2024-06-10T19:35:39.574Z",
+        "user": [
+            "rishavr"
+        ],
+        "content_type": [
+            "myapp",
+            "user"
+        ],
+        "object_id": "9",
+        "object_repr": "username2",
+        "action_flag": 3,
+        "change_message": ""
+    }
+}
+]

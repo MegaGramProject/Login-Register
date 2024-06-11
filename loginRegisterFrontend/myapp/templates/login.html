@@ -8,10 +8,34 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
     <title>Login</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+    @media screen and (max-width:1400px) {
+    #loginPhotoSlideshow {
+        position: fixed;
+        right: 10em;
+                        }          }
+                    
+    @media screen and (max-width:1100px) {
+    #loginPhotoSlideshow {
+    display: none;       }
+    #loginBox {
+        margin-right: 28em;
+        right: 0em;
+            }
+    footer {
+        margin-left: 28em;
+        width: 50em;
+    }
+    .dropdown {
+        margin-left: 28em;
+    }
+    }
+
+
+    </style>
 </head>
 <body>
-    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
-
+    <div id="loginBox" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
     <div style="display:flex; justify-content:center; align-items:center;">
     <div id="loginPhotoSlideshow" style="position: relative;">
         <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: true;" src="{% static 'images/instagramLoginPhoto.png' %}">
@@ -21,7 +45,7 @@
     </div>
     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; margin-left: 31.25em">
     <div class="box" style="margin-top:6.25em;">
-        <h1 class="Megagram" style="font-size: 4.31em;">Megagram</h1>
+        <h1 class="Megagram" style="font-size: 4.2em;">Megagram</h1>
         <form>
         <div class="userContainer" style="position:relative;">
         <input type="text" id="numberNameEmail" class="textInput" placeholder="Phone number, username, or email" style="font-size: 0.94em;">
@@ -36,6 +60,9 @@
         <br>
         <button type="button" class="blueButton" id="loginButton">Log in</button>
         </form>
+        <p id="incorrectPassword" style="font-size:small; color: red; display: none;">Your password is incorrect</p>
+        <p id="userNotFound" style="font-size:small; color: red; display: none;">User not found</p>
+        <p id="accountLocked" style="font-size:small; color: red; display: none;">Your account is locked for 5 minutes.</p>
         <br>
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:0.5em;">_________________</p></div>
         <br>
@@ -45,8 +72,6 @@
         <img class="googleIcon" id="googleIcon" src="{% static 'images/googleIcon.png' %}">
         <img class="appleIcon" id="appleIcon" src="{% static 'images/appleIcon.png' %}">
         </div>
-        <p style="font-size:0.81em; color: red; display:none;">Your username or password</p>
-        <p style="font-size:0.81em; color: red; margin-top: -0.94em; display:none;">was incorrect</p>
         <a href="https://google.com" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
     </div>
 
@@ -79,7 +104,7 @@
 </div>
 </div>
 
-<footer class="footnote" style="margin-top:4em;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
+<footer class="footnote" style="margin-top:4em; text-align: center;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
 <div class="dropdown">
     <button class="dropbtn">
     <div style="display: flex; justify-content: center; align-items:center; gap: 0.1em;">
@@ -87,12 +112,18 @@
     </div>
 </button>
 <div id="languageList" class="dropdown-content">
+    <p class="lang" onclick="setLanguage('العربية')">العربية</p>
+    <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+    <p class="lang" onclick="setLanguage('Deutsch')">Deutsch</p>
     <p class="lang" onclick="setLanguage('English')">English</p>
     <p class="lang" onclick="setLanguage('Español')">Español</p>
     <p class="lang" onclick="setLanguage('Français')">Français</p>
     <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+    <p class="lang" onclick="setLanguage('Bahasa Indonesia')">Bahasa Indonesia</p>
+    <p class="lang" onclick="setLanguage('Italiano')">Italiano</p>
+    <p class="lang" onclick="setLanguage('日本語')">日本語</p>
+    <p class="lang" onclick="setLanguage('Русский')">Русский</p>
     <p class="lang" onclick="setLanguage('中国人')">中国人</p>
-    <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
 </div>
 </div>
 

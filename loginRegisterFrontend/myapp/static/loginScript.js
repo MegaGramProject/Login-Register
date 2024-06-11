@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
         body: null
     };
     var bcrypt = dcodeIO.bcrypt;
+    const incorrectPassword = document.getElementById("incorrectPassword");
+    const userNotFound = document.getElementById("userNotFound");
+    const accountLocked = document.getElementById("userNotFound");
 
     loginUser = function() {
         if (isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value)) {
@@ -53,12 +56,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             }).then(data => {
                 const salt = data['salt'];
-                const hashedPassword = data['hashedPassword'];
-                if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
-                    console.log("A");
-                    window.location.href = "https://www.google.com";
+                if (typeof salt === 'undefined') {
+                    incorrectPassword.style.display = 'none';
+                    userNotFound.style.display = 'inline-block';
                 }
-                console.log("B");
+                else {
+                    const hashedPassword = data['hashedPassword'];
+                    if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
+                        incorrectPassword.style.display = 'none';
+                        userNotFound.style.display = 'none';
+                        window.location.href = "https://www.google.com";
+                    }
+                    else {
+                        incorrectPassword.style.display = 'inline-block';
+                        userNotFound.style.display = 'none';
+                    }
+                }
             }).catch(error => {
                 console.error('Error:', error);
             });
@@ -81,10 +94,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             }).then(data => {
                 const salt = data['salt'];
-                const hashedPassword = data['hashedPassword'];
-                if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
-                    window.location.href = "https://www.google.com";
+                if (typeof salt === 'undefined') {
+                    incorrectPassword.style.display = 'none';
+                    userNotFound.style.display = 'inline-block';
                 }
+                else {
+                    const hashedPassword = data['hashedPassword'];
+                    if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
+                        incorrectPassword.style.display = 'none';
+                        userNotFound.style.display = 'none';
+                        window.location.href = "https://www.google.com";
+                    }
+                    else {
+                        incorrectPassword.style.display = 'inline-block';
+                        userNotFound.style.display = 'none';
+                    }
+                    }
             }).catch(error => {
                 console.error('Error:', error);
             });
@@ -108,8 +133,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
+        }
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
         }
         window.location.href = "http://localhost:8000/signUp?language=" + currentLanguageLongForm;
     });
@@ -133,6 +176,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         else if(lang==="বাংলা"){
             newLanguage = "bn";
+        }
+        else if(lang==="العربية") {
+            newLanguage = "ar";
+        }
+        else if(lang==="Deutsch") {
+            newLanguage = "de";
+        }
+        else if(lang==="Bahasa Indonesia") {
+            newLanguage = "id";
+        }
+        else if(lang==="Italiano"){
+            newLanguage = "it";
+        }
+        else if(lang==="日本語") {
+            newLanguage = "ja";
+        }
+        else if(lang==="Русский") {
+            newLanguage = "ru";
         }
         else {
             return;

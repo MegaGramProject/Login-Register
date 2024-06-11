@@ -26,8 +26,8 @@
         <div class="numberEmailContainer" style="position:relative;">
         <input type="text" class="textInput" id="numberEmail" placeholder="Mobile Number or Email" style="padding-left:0.75em; padding-top: 0.46875em; padding-bottom: 0.46875em; font-size: 0.875em;">
         <p id="numberEmailContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.125em; color: gray; display: none;">Mobile Number or Email</p>
-        <img id="checkmark1" class="checkmark" src="{% static 'images/checkmark.png' %}" style="height:0.2625em;width:0.2625em;">
-        <img id="wrong1" class="wrong" src="{% static 'images/wrong.png' %}" style="height:0.2625em;width:0.2625em;">
+        <img id="checkmark1" class="checkmark" src="{% static 'images/checkmark.png' %}" style="height:1.85em;width:1.85em; object-fit: contain; right: 1.6875em;">
+        <img id="wrong1" class="wrong" src="{% static 'images/wrong.png' %}" style="height:1.87em;width:1.87em;object-fit:contain;right:1.6875em;">
         </div>
         <div class="fullNameContainer" style="position:relative;">
             <input type="text" class="textInput" id="fullName" placeholder="Full Name" style="padding-left:0.75em; padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size:0.875em;">
@@ -56,6 +56,13 @@
             <div id="passwordStrength" style="width:0; height:0.4375em;"></div>
         </div>
         <button class="blueButton" id="signupButton">Sign up</button>
+        <p id="numberEmailTakenError" style="font-size:medium;color:red; display:none;">Your number/email is taken.</p>
+        <p id="numberEmailInvalidError" style="font-size:medium;color:red; display:none;">Your number/email is invalid.</p>
+        <p id="emailTakenError" style="font-size:medium;color:red; display:none;">Your email is taken.</p>
+        <p id="fullNameInvalidError" style="font-size:medium;color:red; display:none;">Your full name must contain at-least 1 space, with none at the start. Letters only.</p>
+        <p id="usernameTakenError" style="font-size:medium;color:red; display:none;">Your username is taken.</p>
+        <p id="usernameInvalidError" style="font-size:medium;color:red; display:none;">Usernames can only contain letters, periods, and underscores.</p>
+        <p id="passwordInvalidError" style="font-size:medium;color:red; display:none;">Your password is too weak.</p>
         <br>
         <br>
     </div>
@@ -96,12 +103,19 @@
             </div>
         </button>
         <div class="dropdown-content">
+            <p class="lang" onclick="setLanguage('العربية')">العربية</p>
+            <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+            <p class="lang" onclick="setLanguage('Deutsch')">Deutsch</p>
             <p class="lang" onclick="setLanguage('English')">English</p>
             <p class="lang" onclick="setLanguage('Español')">Español</p>
             <p class="lang" onclick="setLanguage('Français')">Français</p>
             <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+            <p class="lang" onclick="setLanguage('Bahasa Indonesia')">Bahasa Indonesia</p>
+            <p class="lang" onclick="setLanguage('Italiano')">Italiano</p>
+            <p class="lang" onclick="setLanguage('日本語')">日本語</p>
+            <p class="lang" onclick="setLanguage('Русский')">Русский</p>
             <p class="lang" onclick="setLanguage('中国人')">中国人</p>
-            <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+        
         </div>
     </div>
     <script src="{% static 'registerScript.js' %}"></script>

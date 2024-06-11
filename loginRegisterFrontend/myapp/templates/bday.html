@@ -179,7 +179,8 @@
         <p style="color:gray; font-size:14.5px;">You need to enter the date you were born</p>
         <p style="color:gray; font-size:14.5px;">Use your own birthday, even if this account is for a</p> 
         <p style="color:gray; font-size:14.5px; margin-top:-25px;">business, a pet, or something else</p>
-        <button id="nextButton" class="blueButton" style="font-size:14px;">Next</button>
+        <button type="button" id="nextButton" class="blueButton" style="font-size:14px;">Next</button>
+        <p id="errorMessage" style="display:none; font-size: medium; color: red;">You must be born at-least 10 years ago.</p>
         <a href="#" id="goBackText" style="color:#2499f2; font-weight:bold; text-decoration: none;">Go Back<a/>
         
     </div>
@@ -227,12 +228,18 @@
         </div>
     </button>
     <div class="dropdown-content">
+        <p class="lang" onclick="setLanguage('العربية')">العربية</p>
+        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+        <p class="lang" onclick="setLanguage('Deutsch')">Deutsch</p>
         <p class="lang" onclick="setLanguage('English')">English</p>
         <p class="lang" onclick="setLanguage('Español')">Español</p>
         <p class="lang" onclick="setLanguage('Français')">Français</p>
         <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+        <p class="lang" onclick="setLanguage('Bahasa Indonesia')">Bahasa Indonesia</p>
+        <p class="lang" onclick="setLanguage('Italiano')">Italiano</p>
+        <p class="lang" onclick="setLanguage('日本語')">日本語</p>
+        <p class="lang" onclick="setLanguage('Русский')">Русский</p>
         <p class="lang" onclick="setLanguage('中国人')">中国人</p>
-        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
     </div>
 </div>
 </div>

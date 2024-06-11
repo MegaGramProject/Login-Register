@@ -30,6 +30,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const postedDateOfBirth = document.getElementById("postedDateOfBirth").textContent;
     let confirmationCodeValue = document.getElementById("confirmationCodeValue").textContent;
     const resendCode = document.getElementById("resendCode");
+    const incorrectCode = document.getElementById("incorrectCode");
+    const timeRemaining = document.getElementById("timeRemaining");
+    const tooLateCode = document.getElementById("tooLateCode");
+    let timeRemainingValue = 59;
+    let intervalId;
+
+    showTimeRemaining = function() {
+        if(timeRemainingValue==0) {
+            timeRemaining.innerText = "Time's up!";
+        }
+        else {
+            timeRemaining.innerText = timeRemainingValue.toString() + "s";
+            timeRemainingValue -=1;
+        }
+    }
+
+    intervalId = setInterval(showTimeRemaining, 1000);
 
 
     resendCode.addEventListener("click", function() {
@@ -54,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }).then(data => {
                 confirmationCodeValue = data["confirmationCode"];
+                timeRemainingValue = 60;
             }).catch(error => {
                 console.error(error);
             });
@@ -97,8 +115,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
+        }
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
         }
         window.location.href = "http://localhost:8000/login?language=" + currentLanguageLongForm;
     });
@@ -123,6 +159,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         else if(lang==="বাংলা"){
             newLanguage = "bn";
+        }
+        else if(lang==="العربية") {
+            newLanguage = "ar";
+        }
+        else if(lang==="Deutsch") {
+            newLanguage = "de";
+        }
+        else if(lang==="Bahasa Indonesia") {
+            newLanguage = "id";
+        }
+        else if(lang==="Italiano"){
+            newLanguage = "it";
+        }
+        else if(lang==="日本語") {
+            newLanguage = "ja";
+        }
+        else if(lang==="Русский") {
+            newLanguage = "ru";
+        }
+        else {
+            return;
         }
         if (currLanguage === newLanguage) {
             return;
@@ -191,8 +248,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
+        }
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
         }
         let ageCheckUrl;
         const queryString = window.location.search.substring(1);
@@ -203,6 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         else {
             ageCheckUrl = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + params.get("number");
         }
+        ageCheckUrl += "&dateOfBirth=" + postedDateOfBirth;
         const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
         const postOptions = {
             method: 'POST',
@@ -248,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = function() {
-                if (confirmationCodeValue==confirmCode.value) {
+                if (confirmationCodeValue==confirmCode.value && timeRemainingValue>0) {
                     const createUserURL = "http://localhost:8001/createUser/";
                     const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
                     userData["dateOfBirth"] = postedDateOfBirth;
@@ -273,7 +349,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             throw new Error('Network response was not ok');
                         }
                     });
+                    incorrectCode.style.display =  'none';
+                    tooLateCode.style.display = 'none';
                     window.location.href = 'https://www.google.com';
+                }
+                else if(confirmationCodeValue==confirmCode.value) {
+                    tooLateCode.style.display = 'inline-block';
+                    incorrectCode.style.display =  'none';
+                }
+                else {
+                    incorrectCode.style.display =  'inline-block';
+                    tooLateCode.style.display = 'none';
                 }
             }
         }

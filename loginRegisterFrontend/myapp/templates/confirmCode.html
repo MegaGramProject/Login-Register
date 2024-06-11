@@ -26,10 +26,13 @@
         {% endif %}
         
         <a href="#" id="resendCode" class="noUnderline" style="font-weight:bold; color:#2499f2;">Resend Code</a></p>
+        <p id="timeRemaining" style="font-size:small; margin-bottom:1.2em;">60s</p>
         <input id="confirmCode" type="text" class="textInput" placeholder="Confirmation Code" style="font-size: 1.0625em; border-radius: 0.4375em; padding: 0.9375em 1.0625em;">
         <button type="button" id="nextButton" class="blueButton" style="font-size:0.875em; width: 23.5em;">Next</button>
+        <p id="incorrectCode" style="display:none; font-size: medium; color:red;">The code you have provided is incorrect.</p>
+        <p id="tooLateCode" style="display:none; font-size: medium; color:red;">The code you have provided is correct but too late.</p>
         <a href="#" id="goBackButton" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 1.25em; margin-bottom: 2.1875em;">Go Back<a/>
-    </div>
+        </div>
 
     <div class="box" style="height:50%; margin-top:0.5em; width: 28.125em;">
         <p style="font-size:small; color: black;">Have an account? <a href="#" id="loginText" class="noUnderline" style="color:#2499f2; font-weight:bold;">Log in</a></p>
@@ -76,12 +79,19 @@
         </div>
     </button>
     <div class="dropdown-content">
+        <p class="lang" onclick="setLanguage('العربية')">العربية</p>
+        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+        <p class="lang" onclick="setLanguage('Deutsch')">Deutsch</p>
         <p class="lang" onclick="setLanguage('English')">English</p>
         <p class="lang" onclick="setLanguage('Español')">Español</p>
         <p class="lang" onclick="setLanguage('Français')">Français</p>
         <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+        <p class="lang" onclick="setLanguage('Bahasa Indonesia')">Bahasa Indonesia</p>
+        <p class="lang" onclick="setLanguage('Italiano')">Italiano</p>
+        <p class="lang" onclick="setLanguage('日本語')">日本語</p>
+        <p class="lang" onclick="setLanguage('Русский')">Русский</p>
         <p class="lang" onclick="setLanguage('中国人')">中国人</p>
-        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+    
     </div>
 </div>
 </div>

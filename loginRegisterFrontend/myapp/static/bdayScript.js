@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const postedSalt = document.getElementById("postedSalt").textContent;
     const postedHashedPassword = document.getElementById("postedHashedPassword").textContent;
     const postedFullName = document.getElementById("postedFullName").textContent;
+    const errorMessage = document.getElementById("errorMessage");
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -51,8 +52,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
+        }
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
         }
         window.location.href = "http://localhost:8000/login?language=" + currentLanguageLongForm;
 
@@ -78,6 +97,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         else if(lang==="বাংলা"){
             newLanguage = "bn";
+        }
+        else if(lang==="العربية") {
+            newLanguage = "ar";
+        }
+        else if(lang==="Deutsch") {
+            newLanguage = "de";
+        }
+        else if(lang==="Bahasa Indonesia") {
+            newLanguage = "id";
+        }
+        else if(lang==="Italiano"){
+            newLanguage = "it";
+        }
+        else if(lang==="日本語") {
+            newLanguage = "ja";
+        }
+        else if(lang==="Русский") {
+            newLanguage = "ru";
         }
         if (currLanguage === newLanguage) {
             return;
@@ -127,6 +164,19 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         setLanguage("English");
     }
+    if (params.get("dateOfBirth")) {
+        const dob = params.get("dateOfBirth");
+        birthMonth.value = dob.substring(0, 3);
+        if(dob.length==8) {
+            birthDay.value = dob[3];
+            birthYear.value = dob.substring(4);
+        }
+        else {
+            birthDay.value =  dob.substring(3,5);
+            birthYear.value = dob.substring(5);
+        }
+    }
+    
 
     goBackText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -145,10 +195,40 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
         }
-        window.location.href = "http://localhost:8000/signUp?language=" + currentLanguageLongForm;
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
+        }
+        let signUpURL = "http://localhost:8000/signUp?language=" + currentLanguageLongForm;
+        signUpURL+="&username=" + postedUsername;
+        signUpURL+="&fullName=" + postedFullName;
+        signUpURL+="&numberEmail=";
+        const queryString = window.location.search.substring(1);
+        const params = new URLSearchParams(queryString);
+        if (params.get("email")) {
+            signUpURL+=params.get("email");
+        }
+        else {
+            signUpURL+=params.get("number");
+        }
+        window.location.href = signUpURL;
     });
 
 
@@ -198,8 +278,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="bn") {
             currentLanguageLongForm = "বাংলা";
         }
-        else {
+        else if(currLanguage==="zh-CN"){
             currentLanguageLongForm = "中国人";
+        }
+        else if(currLanguage==="ar") {
+            currentLanguageLongForm = "العربية";
+        }
+        else if(currLanguage==="de") {
+            currentLanguageLongForm = "Deutsch";
+        }
+        else if(currLanguage==="id") {
+            currentLanguageLongForm = "Bahasa Indonesia";
+        }
+        else if(currLanguage==="it"){
+            currentLanguageLongForm = "Italiano";
+        }
+        else if(currLanguage==="ja") {
+            currentLanguageLongForm = "日本語";
+        }
+        else if(currLanguage==="ru") {
+            currentLanguageLongForm = "Русский";
         }
         let confirmCodeUrl;
         const queryString = window.location.search.substring(1);
@@ -238,9 +336,16 @@ document.addEventListener('DOMContentLoaded', function() {
     birthMonth.addEventListener('input', function() {
         birthMonth.style.borderColor = "#caced1";
         if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
+            errorMessage.style.display = "none";
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = takeUserToConfirm;
+        }
+        else if(birthMonth.value && birthDay.value && birthYear.value) {
+            errorMessage.style.display = "inline-block";
+            nextButton.style.backgroundColor =  '#82bbf5';
+            nextButton.style.cursor = 'initial';
+            nextButton.onclick = null;
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';
@@ -252,9 +357,16 @@ document.addEventListener('DOMContentLoaded', function() {
     birthDay.addEventListener('input', function() {
         birthDay.style.borderColor = "#caced1";
         if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
+            errorMessage.style.display = "none";
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = takeUserToConfirm;
+        }
+        else if(birthMonth.value && birthDay.value && birthYear.value) {
+            errorMessage.style.display = "inline-block";
+            nextButton.style.backgroundColor =  '#82bbf5';
+            nextButton.style.cursor = 'initial';
+            nextButton.onclick = null;
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';
@@ -266,9 +378,16 @@ document.addEventListener('DOMContentLoaded', function() {
     birthYear.addEventListener('input', function() {
         birthYear.style.borderColor = "#caced1";
         if(birthMonth.value && birthDay.value && birthYear.value && isValidDate(birthMonth.value, parseInt(birthDay.value,10), parseInt(birthYear.value,10))) {
+            errorMessage.style.display = "none";
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
             nextButton.onclick = takeUserToConfirm;
+        }
+        else if (birthMonth.value && birthDay.value && birthYear.value) {
+            errorMessage.style.display = "inline-block";
+            nextButton.style.backgroundColor =  '#82bbf5';
+            nextButton.style.cursor = 'initial';
+            nextButton.onclick = null;
         }
         else {
             nextButton.style.backgroundColor =  '#82bbf5';
