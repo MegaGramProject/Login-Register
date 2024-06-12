@@ -10,7 +10,8 @@ from twilio.rest import Client
 import ssl
 import random
 import os
-
+import requests
+import json
 
 @api_view(['POST'])
 def createUser(request):
@@ -130,3 +131,29 @@ def doesUserExist(request):
             return Response({"salt": user.salt, "hashedPassword":user.hashedPassword})
         except:
             return Response({"userExists": False})
+
+
+@api_view(['POST'])
+def verifyCaptcha(request):
+    data = {
+        'secret': request.data['secret'],
+        'response': request.data['response']
+    }
+    
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    
+    encoded_data = "&".join([f"{key}={value}" for key, value in data.items()])
+    print(encoded_data)
+    
+    response = requests.post("https://www.google.com/recaptcha/api/siteverify", data=encoded_data, headers=headers)
+    
+    if response.ok:
+        print(response.json())
+        if response.json()['success']:
+            return Response({"verified": True})
+        else:
+            return Response({"verified": False})
+    else:
+        return Response({"error": "Failed to verify reCAPTCHA"})

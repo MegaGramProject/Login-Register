@@ -535,18 +535,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    isValidNumber = function(phoneNumberInput) {
-        if (phoneNumberInput.length !== 10) {
-            return false;
-        }
-    
-        for (let i = 0; i < phoneNumberInput.length; i++) {
-            if (isNaN(phoneNumberInput[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
+
+    isValidNumber = function (phoneNumberInput) {
+        const phoneRegex = /^\d{8,17}$/;
+        return phoneRegex.test(phoneNumberInput);
+    };
+
 
     checkNumberEmail = async function(numberEmailInput) {
         numberEmailError = "invalid";

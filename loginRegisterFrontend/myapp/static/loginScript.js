@@ -35,7 +35,18 @@ document.addEventListener('DOMContentLoaded', function() {
     var bcrypt = dcodeIO.bcrypt;
     const incorrectPassword = document.getElementById("incorrectPassword");
     const userNotFound = document.getElementById("userNotFound");
-    const accountLocked = document.getElementById("userNotFound");
+    const loadingScreen = document.getElementById("loadingScreen");
+    const loginBox = document.getElementById("loginBox");
+    let recaptchaVerified = false;
+    
+
+
+    setTimeout(function() {
+        loadingScreen.style.display = "none";
+        loginBox.style.display = "flex";
+    }, 740);
+
+
 
     loginUser = function() {
         if (isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value)) {
@@ -116,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    signupButton.addEventListener("click", function() {
+    signupButton.addEventListener("click", function(event) {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
             currentLanguageLongForm = "English";
@@ -316,19 +327,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    isValidNumber = function(phoneNumberInput) {
-        if (phoneNumberInput.length !== 10) {
-            return false;
-        }
-    
-        for (let i = 0; i < phoneNumberInput.length; i++) {
-            if (isNaN(phoneNumberInput[i])) {
-                return false;
-            }
-        }
-    
-        return true;
-    }
+    isValidNumber = function (phoneNumberInput) {
+        const phoneRegex = /^\d{8,17}$/;
+        return phoneRegex.test(phoneNumberInput);
+    };
 
     usernameIsValid = function(usernameInput) {
         if (usernameInput.length > 30 || usernameInput.length < 1) {
@@ -357,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
             numberNameEmail.style.paddingTop = '6px';
         }
 
-        if ((isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value) || usernameIsValid(numberNameEmail.value)) &&  password.value.length > 0) {
+        if ((isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value) || usernameIsValid(numberNameEmail.value)) &&  password.value.length > 0 && recaptchaVerified) {
             loginButton.style.backgroundColor = '#347aeb';
             loginButton.style.cursor = 'pointer';
             loginButton.onclick = loginUser;
@@ -381,7 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordContainerInfo.style.display = 'none';
             password.style.paddingTop = '6px';
         }
-        if ((isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value) || usernameIsValid(numberNameEmail.value)) &&  password.value.length > 0) {
+        if ((isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value) || usernameIsValid(numberNameEmail.value)) &&  password.value.length > 0 && recaptchaVerified) {
             loginButton.style.backgroundColor = '#347aeb';
             loginButton.style.cursor = 'pointer';
             loginButton.onclick = loginUser;
@@ -437,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
 
-    displayFirstLoginPhoto();
+    setTimeout(displayFirstLoginPhoto(),2000);
 
 
     displayLoginPhotos = function() {
@@ -463,6 +465,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     setInterval(displayLoginPhotos, 4500);
+
+
+    onSubmit = function(token){
+        const data = {'secret': '6Lf9bfYpAAAAALiCROGJi4ycOi_nnmdmQsDR8KBA', 'response': token};
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        fetch("http://localhost:8001/verifyCaptcha/", options)
+        .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response not ok");
+        }
+        return response.json();
+        }).then(data => {
+        if (data["verified"]==true) {
+            recaptchaVerified = true;
+            if ((isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value) || usernameIsValid(numberNameEmail.value)) && password.value.length > 0) {
+                loginButton.style.backgroundColor = '#347aeb';
+                loginButton.style.cursor = 'pointer';
+                loginButton.onclick = loginUser;
+            }
+        }
+        }).catch(error => {
+            console.error('Error: ' + error);
+        });
+        }
 
 
 

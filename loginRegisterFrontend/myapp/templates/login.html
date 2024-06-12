@@ -35,7 +35,11 @@
     </style>
 </head>
 <body>
-    <div id="loginBox" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <div id="loadingScreen" style="width: 30em; height: 30em; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 20em; margin-left: 57em; border-style: solid; border-radius: 1000px; border-width: 0.1em; border-color: lightgray;">
+        <h1 class="Megagram" style="font-size: 4.2em;">Megagram</h1>
+        <img src = "{% static 'images/megagramLoading.png' %}" style="height:55%; width:55%; margin-left: 1.6em; margin-top: -1.5em; object-fit: contain">
+    </div>
+    <div id="loginBox" style="display:none; flex-direction:column; justify-content:center; align-items:center;">
     <div style="display:flex; justify-content:center; align-items:center;">
     <div id="loginPhotoSlideshow" style="position: relative;">
         <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: true;" src="{% static 'images/instagramLoginPhoto.png' %}">
@@ -44,7 +48,7 @@
         <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="{% static 'images/instagramLoginPhoto4.png' %}">
     </div>
     <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; margin-left: 31.25em">
-    <div class="box" style="margin-top:6.25em;">
+    <div class="box" style="margin-top:10em; height: 36em;">
         <h1 class="Megagram" style="font-size: 4.2em;">Megagram</h1>
         <form>
         <div class="userContainer" style="position:relative;">
@@ -58,11 +62,11 @@
             <p id="passwordContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.125em; color: gray; display: none;">Password</p>
         </div>
         <br>
+        <div class="g-recaptcha" data-sitekey="6Lf9bfYpAAAAAHDspCvL869y03gQ8SIkesqJwfB-" data-callback="onSubmit"></div>
         <button type="button" class="blueButton" id="loginButton">Log in</button>
         </form>
         <p id="incorrectPassword" style="font-size:small; color: red; display: none;">Your password is incorrect</p>
         <p id="userNotFound" style="font-size:small; color: red; display: none;">User not found</p>
-        <p id="accountLocked" style="font-size:small; color: red; display: none;">Your account is locked for 5 minutes.</p>
         <br>
         <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:0.5em;">_________________</p></div>
         <br>
@@ -129,8 +133,10 @@
 
 </div>
 
+
 <script src="{% static 'loginScript.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
 </html>
 
