@@ -29,11 +29,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextButton = document.getElementById("nextButton");
     const goBackText = document.getElementById("goBackText");
     const loginText = document.getElementById("loginText");
-    const postedUsername = document.getElementById("postedUsername").textContent;
-    const postedSalt = document.getElementById("postedSalt").textContent;
-    const postedHashedPassword = document.getElementById("postedHashedPassword").textContent;
-    const postedFullName = document.getElementById("postedFullName").textContent;
+    const username = sessionStorage.getItem("username");
+    const salt = sessionStorage.getItem("salt");
+    const hashedPassword = sessionStorage.getItem("hashedPassword");
+    const fullName = sessionStorage.getItem("fullName");
     const errorMessage = document.getElementById("errorMessage");
+
+    if (sessionStorage.getItem("dateOfBirth")) {
+        birthMonth.value = sessionStorage.getItem("dateOfBirth").substring(0, 3);
+        birthYear.value = sessionStorage.getItem("dateOfBirth").slice(-4);
+    }
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -217,17 +222,6 @@ document.addEventListener('DOMContentLoaded', function() {
             currentLanguageLongForm = "Русский";
         }
         let signUpURL = "http://localhost:8000/signUp?language=" + currentLanguageLongForm;
-        signUpURL+="&username=" + postedUsername;
-        signUpURL+="&fullName=" + postedFullName;
-        signUpURL+="&numberEmail=";
-        const queryString = window.location.search.substring(1);
-        const params = new URLSearchParams(queryString);
-        if (params.get("email")) {
-            signUpURL+=params.get("email");
-        }
-        else {
-            signUpURL+=params.get("number");
-        }
         window.location.href = signUpURL;
     });
 
@@ -308,29 +302,8 @@ document.addEventListener('DOMContentLoaded', function() {
         else {
             confirmCodeUrl = "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&number=" + params.get("number");
         }
-        const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
-        userData["dateOfBirth"] = birthMonth.value + birthDay.value + birthYear.value;
-        const postOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData)
-        };
-        fetch(confirmCodeUrl, postOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text(); })
-        .then(html => {
-            history.pushState(null, '', confirmCodeUrl.substring(22));
-            document.open();
-            document.write(html);
-            document.close();
-        }).catch(error => {
-            console.error('Error:', error);
-        });
+        sessionStorage.setItem("dateOfBirth", birthMonth.value + birthDay.value + birthYear.value);
+        window.location.href = confirmCodeUrl;
     }
 
     birthMonth.addEventListener('input', function() {

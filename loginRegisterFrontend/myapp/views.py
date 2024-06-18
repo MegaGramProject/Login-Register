@@ -13,13 +13,13 @@ def login(request):
 def signUp(request):
     return render(request, "register.html")
 
-@api_view(['POST'])
-def ageCheck(request):
-    return render(request, "bday.html", request.data)
 
-@api_view(['POST'])
+def ageCheck(request):
+    return render(request, "bday.html")
+
+
 def confirmCode(request):
-    context = request.data
+    context = {}
     context['email'] = request.GET.get('email', 'N/A')
     context['number'] = request.GET.get('number', 'N/A')
     if context['email'] != 'N/A':

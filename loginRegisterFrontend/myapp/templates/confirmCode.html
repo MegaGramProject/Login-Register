@@ -32,6 +32,7 @@
         <button type="button" id="nextButton" class="blueButton" style="font-size:0.875em; width: 23.5em;">Next</button>
         <p id="incorrectCode" style="display:none; font-size: medium; color:red;">The code you have provided is incorrect.</p>
         <p id="tooLateCode" style="display:none; font-size: medium; color:red;">The code you have provided is correct but too late.</p>
+        <p id="networkFailure"  style="display:none; font-size: medium; color:red;">The network response was not ok.</p>
         <a href="#" id="goBackButton" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 1.25em; margin-bottom: 2.1875em;">Go Back<a/>
         </div>
 
@@ -63,11 +64,6 @@
 
     </div>
     <div>
-        <p id="postedUsername" style="display:none;">{{username}}</p>
-        <p id="postedFullName" style="display:none;">{{fullName}}</p>
-        <p id="postedSalt" style="display:none;">{{salt}}</p>
-        <p id="postedHashedPassword" style="display:none;">{{hashedPassword}}</p>
-        <p id="postedDateOfBirth" style="display:none;">{{dateOfBirth}}</p>
         <p id="confirmationCodeValue" style="display:none;">{{confirmationCode}}</p>
     </div>
 

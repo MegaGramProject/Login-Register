@@ -55,6 +55,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let numberEmailError;
     let usernameError;
 
+    if(sessionStorage.getItem("numberEmail")) {
+        numberEmail.value = sessionStorage.getItem("numberEmail");
+    }
+    if(sessionStorage.getItem("fullName")) {
+        fullName.value = sessionStorage.getItem("fullName");
+    }
+    if (sessionStorage.getItem("username")) {
+        username.value = sessionStorage.getItem("username");
+    }
+    
+
+
 
     loginText.addEventListener("click", function() {
         let currentLanguageLongForm;
@@ -718,30 +730,13 @@ document.addEventListener('DOMContentLoaded', function() {
         else {
             ageCheckUrl = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + numberEmail.value;
         }
+        sessionStorage.setItem("numberEmail", numberEmail.value);
+        sessionStorage.setItem("fullName", fullName.value);
+        sessionStorage.setItem("username", username.value);
         const salt = getSalt();
-        const hashedPassword = getHashedPassword(password.value, salt)
-        const userData = {"salt":salt,"hashedPassword":hashedPassword,"username":username.value, "fullName":fullName.value};
-        const postOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData)
-        };
-        fetch(ageCheckUrl, postOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text(); })
-        .then(html => {
-            history.pushState(null, '', ageCheckUrl.substring(22));
-            document.open();
-            document.write(html);
-            document.close();
-        }).catch(error => {
-            console.error('Error:', error);
-        });
+        sessionStorage.setItem("salt", salt);
+        sessionStorage.setItem("hashedPassword", getHashedPassword(password.value, salt));
+        window.location.href = ageCheckUrl;
     }
         
 

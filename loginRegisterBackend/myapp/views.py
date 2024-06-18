@@ -69,7 +69,7 @@ def sendEmail(request):
     html =f"""\
     <html>
     <body>
-    <img src="https://static.vecteezy.com/system/resources/thumbnails/025/067/762/small_2x/4k-beautiful-colorful-abstract-wallpaper-photo.jpg" alt="Megagram" style="height:5%; width: 15%; object-fit: contain; margin-left:745px;">
+    <img src="https://static.vecteezy.com/system/resources/thumbnails/025/067/762/small_2x/4k-beautiful-colorful-abstract-wallpaper-photo.jpg" alt="Megagram" style="height:13em; width: 36em; object-fit: contain; margin-left:650px;">
     <div style="width: 560px; font-family:Arial; line-height:1.4; font-size:23px; margin-left: 630px;">
         <p>Hi,</p>
         <p></p>Someone tried to sign up for a Megagram account with {email} If it was you, enter this confirmation code in the website:</p>
@@ -145,15 +145,14 @@ def verifyCaptcha(request):
     }
     
     encoded_data = "&".join([f"{key}={value}" for key, value in data.items()])
-    print(encoded_data)
-    
+
     response = requests.post("https://www.google.com/recaptcha/api/siteverify", data=encoded_data, headers=headers)
     
     if response.ok:
-        print(response.json())
         if response.json()['success']:
             return Response({"verified": True})
         else:
             return Response({"verified": False})
     else:
         return Response({"error": "Failed to verify reCAPTCHA"})
+    

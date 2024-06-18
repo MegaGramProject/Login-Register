@@ -23,16 +23,17 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     const nextButton = document.getElementById("nextButton");
     const confirmCode = document.getElementById("confirmCode");
-    const postedUsername = document.getElementById("postedUsername").textContent;
-    const postedSalt = document.getElementById("postedSalt").textContent;
-    const postedHashedPassword = document.getElementById("postedHashedPassword").textContent;
-    const postedFullName = document.getElementById("postedFullName").textContent;
-    const postedDateOfBirth = document.getElementById("postedDateOfBirth").textContent;
+    const username = sessionStorage.getItem("username");
+    const salt = sessionStorage.getItem("salt");
+    const hashedPassword = sessionStorage.getItem("hashedPassword");
+    const fullName = sessionStorage.getItem("fullName");
+    const dateOfBirth = sessionStorage.getItem("dateOfBirth");
     let confirmationCodeValue = document.getElementById("confirmationCodeValue").textContent;
     const resendCode = document.getElementById("resendCode");
     const incorrectCode = document.getElementById("incorrectCode");
     const timeRemaining = document.getElementById("timeRemaining");
     const tooLateCode = document.getElementById("tooLateCode");
+    const networkFailure = document.getElementById("networkFailure");
     let timeRemainingValue = 59;
     let intervalId;
 
@@ -91,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }).then(data => {
                 confirmationCodeValue = data["confirmationCode"];
+                timeRemainingValue = 60;
             }).catch(error => {
                 console.error(error);
             });
@@ -278,29 +280,8 @@ document.addEventListener('DOMContentLoaded', function() {
         else {
             ageCheckUrl = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + params.get("number");
         }
-        ageCheckUrl += "&dateOfBirth=" + postedDateOfBirth;
-        const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
-        const postOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData)
-        };
-        fetch(ageCheckUrl, postOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text(); })
-        .then(html => {
-            history.pushState(null, '', ageCheckUrl.substring(22));
-            document.open();
-            document.write(html);
-            document.close();
-        }).catch(error => {
-            console.error('Error:', error);
-        });
+        window.location.href = ageCheckUrl;
+
     });
 
 
@@ -326,8 +307,8 @@ document.addEventListener('DOMContentLoaded', function() {
             nextButton.onclick = function() {
                 if (confirmationCodeValue==confirmCode.value && timeRemainingValue>0) {
                     const createUserURL = "http://localhost:8001/createUser/";
-                    const userData = {"salt":postedSalt,"hashedPassword":postedHashedPassword,"username":postedUsername, "fullName":postedFullName};
-                    userData["dateOfBirth"] = postedDateOfBirth;
+                    const userData = {"salt":salt,"hashedPassword":hashedPassword,"username":username, "fullName":fullName};
+                    userData["dateOfBirth"] = dateOfBirth;
                     const queryString = window.location.search.substring(1);
                     const params = new URLSearchParams(queryString);
                     if (params.get("email")) {
@@ -347,19 +328,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
+                            networkFailure.style.display = 'inline-block';
+                            incorrectCode.style.display =  'none';
+                            tooLateCode.style.display = 'none';
                         }
-                    });
-                    incorrectCode.style.display =  'none';
-                    tooLateCode.style.display = 'none';
-                    window.location.href = 'https://www.google.com';
-                }
+                        const getTokensURL = "http://localhost:8003/getTokens";
+                        const data = {"username": username};
+                        headers["body"] = JSON.stringify(data);
+                        fetch(getTokensURL, headers)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                                networkFailure.style.display = 'inline-block';
+                                incorrectCode.style.display =  'none';
+                                tooLateCode.style.display = 'none';
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            incorrectCode.style.display =  'none';
+                            tooLateCode.style.display = 'none';
+                            networkFailure.style.display = 'none';
+                            window.location.href = 'https://www.google.com';
+                            });
+                        });
+                    }
                 else if(confirmationCodeValue==confirmCode.value) {
                     tooLateCode.style.display = 'inline-block';
                     incorrectCode.style.display =  'none';
+                    networkFailure.style.display = 'none';
                 }
                 else {
                     incorrectCode.style.display =  'inline-block';
                     tooLateCode.style.display = 'none';
+                    networkFailure.style.display = 'none';
                 }
             }
         }

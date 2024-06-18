@@ -35,9 +35,9 @@
     </style>
 </head>
 <body>
-    <div id="loadingScreen" style="width: 30em; height: 30em; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 20em; margin-left: 57em; border-style: solid; border-radius: 1000px; border-width: 0.1em; border-color: lightgray;">
+    <div id="loadingScreen" style="width: 30em; height: 30em; display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-style: solid; border-radius: 1000px; border-width: 0.1em; border-color: lightgray;">
         <h1 class="Megagram" style="font-size: 4.2em;">Megagram</h1>
-        <img src = "{% static 'images/megagramLoading.png' %}" style="height:55%; width:55%; margin-left: 1.6em; margin-top: -1.5em; object-fit: contain">
+        <img src="{% static 'images/megagramLoading.png' %}" style="height:55%; width:55%; margin-left: 2em; object-fit:contain;">
     </div>
     <div id="loginBox" style="display:none; flex-direction:column; justify-content:center; align-items:center;">
     <div style="display:flex; justify-content:center; align-items:center;">
@@ -76,7 +76,7 @@
         <img class="googleIcon" id="googleIcon" src="{% static 'images/googleIcon.png' %}">
         <img class="appleIcon" id="appleIcon" src="{% static 'images/appleIcon.png' %}">
         </div>
-        <a href="https://google.com" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
+        <a href="http://localhost:3001/forgotPassword" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
     </div>
 
     <div class="box" style="height:50%; margin-top:0.5em;">
