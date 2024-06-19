@@ -15,7 +15,6 @@ import json
 
 @api_view(['POST'])
 def createUser(request):
-    #username, fullName, salt, hashedPassword, contactInfo, dateOfBirth
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
