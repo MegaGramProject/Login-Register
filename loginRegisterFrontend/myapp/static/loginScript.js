@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    loginUser = function() {
+    loginUser = async function() {
         if (isValidEmail(numberNameEmail.value) || isValidNumber(numberNameEmail.value)) {
             const data = {"contactInfo": numberNameEmail.value};
             const userVerifyURL = "http://localhost:8001/doesUserExist/";
@@ -58,34 +58,45 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
-            }
-            fetch(userVerifyURL, postOptions)
-            .then(response => {
+            };
+            
+            try {
+                const response = await fetch(userVerifyURL, postOptions);
                 if (!response.ok) {
                     throw new Error("Network response not ok");
                 }
-                return response.json();
-            }).then(data => {
+                const data = await response.json();
                 const salt = data['salt'];
+                
                 if (typeof salt === 'undefined') {
                     incorrectPassword.style.display = 'none';
                     userNotFound.style.display = 'inline-block';
-                }
-                else {
+                } else {
                     const hashedPassword = data['hashedPassword'];
-                    if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
+                    if (bcrypt.hashSync(password.value, salt) === hashedPassword) {
                         incorrectPassword.style.display = 'none';
                         userNotFound.style.display = 'none';
-                        window.location.href = "https://www.google.com";
-                    }
-                    else {
+                        postOptions.body = JSON.stringify({"username": data['username']});
+                        postOptions.credentials = 'include';
+    
+                        const tokenResponse = await fetch('http://localhost:8003/cookies/getTokensAfterLogin', postOptions);
+                        if (!tokenResponse.ok) {
+                            console.error("Network response not ok");
+                        }
+                        const responseData = await tokenResponse.text();
+                        if (responseData === "Cookies set successfully") {
+                            window.location.href = "http://localhost:3100/" + data['username'];
+                        } else {
+                            console.log(responseData);
+                        }
+                    } else {
                         incorrectPassword.style.display = 'inline-block';
                         userNotFound.style.display = 'none';
                     }
                 }
-            }).catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
-            });
+            }
         }
         else {
             const data = {"username": numberNameEmail.value};
@@ -96,34 +107,47 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
-            }
-            fetch(userVerifyURL, postOptions)
-            .then(response => {
+            };
+    
+            try {
+                const response = await fetch(userVerifyURL, postOptions);
                 if (!response.ok) {
                     throw new Error("Network response not ok");
                 }
-                return response.json();
-            }).then(data => {
+    
+                const data = await response.json();
                 const salt = data['salt'];
+    
                 if (typeof salt === 'undefined') {
                     incorrectPassword.style.display = 'none';
                     userNotFound.style.display = 'inline-block';
-                }
-                else {
+                } else {
                     const hashedPassword = data['hashedPassword'];
-                    if(bcrypt.hashSync(password.value, salt) === hashedPassword) {
+                    if (bcrypt.hashSync(password.value, salt) === hashedPassword) {
                         incorrectPassword.style.display = 'none';
                         userNotFound.style.display = 'none';
-                        window.location.href = "https://www.google.com";
-                    }
-                    else {
+                        postOptions.body = JSON.stringify({"username": numberNameEmail.value});
+                        postOptions.credentials = 'include';
+    
+                        const tokenResponse = await fetch('http://localhost:8003/cookies/getTokensAfterLogin', postOptions);
+                        if (!tokenResponse.ok) {
+                            console.error("Network response not ok");
+                        }
+    
+                        const responseData = await tokenResponse.text();
+                        if (responseData === "Cookies set successfully") {
+                            window.location.href = "http://localhost:3100/" + numberNameEmail.value;
+                        } else {
+                            console.log(responseData);
+                        }
+                    } else {
                         incorrectPassword.style.display = 'inline-block';
                         userNotFound.style.display = 'none';
                     }
-                    }
-            }).catch(error => {
+                }
+            } catch (error) {
                 console.error('Error:', error);
-            });
+            }
         }
     }
 

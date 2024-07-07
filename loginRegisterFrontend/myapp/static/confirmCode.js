@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(confirmCode.value.length > 5) {
             nextButton.style.backgroundColor = '#347aeb';
             nextButton.style.cursor = 'pointer';
-            nextButton.onclick = function() {
+            nextButton.onclick = async function() {
                 if (confirmationCodeValue==confirmCode.value && timeRemainingValue>0) {
                     const createUserURL = "http://localhost:8001/createUser/";
                     const userData = {"salt":salt,"hashedPassword":hashedPassword,"username":username, "fullName":fullName};
@@ -327,32 +327,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     fetch(createUserURL, headers)
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Network response was not ok');
                             networkFailure.style.display = 'inline-block';
                             incorrectCode.style.display =  'none';
                             tooLateCode.style.display = 'none';
+                            throw new Error('Network response was not ok');
                         }
-                        const getTokensURL = "http://localhost:8003/getTokens";
+                        const getTokensURL = "http://localhost:8003/cookies/getTokens";
                         const data = {"username": username};
                         headers["body"] = JSON.stringify(data);
+                        headers["credentials"] = 'include';
                         fetch(getTokensURL, headers)
                         .then(response => {
                             if (!response.ok) {
-                                throw new Error('Network response was not ok');
                                 networkFailure.style.display = 'inline-block';
                                 incorrectCode.style.display =  'none';
                                 tooLateCode.style.display = 'none';
+                                throw new Error('Network response was not ok');
                             }
-                            return response.json();
+                            return response.text();
                         })
                         .then(data => {
-                            incorrectCode.style.display =  'none';
-                            tooLateCode.style.display = 'none';
-                            networkFailure.style.display = 'none';
-                            window.location.href = 'https://www.google.com';
-                            });
+                            if(data==="Cookies set successfully") {
+                                incorrectCode.style.display =  'none';
+                                tooLateCode.style.display = 'none';
+                                networkFailure.style.display = 'none';
+                                window.location.href = 'http://localhost:3100/'+username;
+                            }
                         });
-                    }
+                    });
+                }
                 else if(confirmationCodeValue==confirmCode.value) {
                     tooLateCode.style.display = 'inline-block';
                     incorrectCode.style.display =  'none';

@@ -127,7 +127,7 @@ def doesUserExist(request):
     else:
         try:
             user = User.objects.get(contactInfo = request.data['contactInfo'])
-            return Response({"salt": user.salt, "hashedPassword":user.hashedPassword})
+            return Response({"salt": user.salt, "hashedPassword":user.hashedPassword, "username":user.username})
         except:
             return Response({"userExists": False})
 

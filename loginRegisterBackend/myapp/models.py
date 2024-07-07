@@ -9,6 +9,7 @@ class User(models.Model):
     contactInfo = models.CharField(max_length=320, unique=True)
     dateOfBirth = models.CharField(max_length=9)
     created = models.DateTimeField(auto_now_add=True)
+    isVerified = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
