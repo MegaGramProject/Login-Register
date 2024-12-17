@@ -180,7 +180,7 @@ def get_usernames_and_full_names_of_all(request):
         
 
 @api_view(['GET'])
-def get_relevant_info_from_username(request, username):
+def get_relevant_user_info_from_username(request, username):
     try:
         user = User.objects.get(username = username)
     except user.DoesNotExist:
