@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Rishav Ray">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
+    <title>Confirm Code</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div class="box" style="margin-top:6.5625em; height:29.375em; width: 28.125em; padding-bottom: 1.5em;">
+        {% if email != "N/A" %}
+            <img src="{% static 'images/emailIcon.png' %}" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:0.625em; pointer-events: none;">
+        {% else %}
+            <img src="{% static 'images/phoneIcon.png' %}" style="height:37%; width:37%; object-fit:contain; border-radius: 300%; margin-top:0.625em; pointer-events: none;">
+            {% endif %}
+        <p style="font-weight: bold; font-size: 1.0625em; margin-top: 1.875em;">Enter Confirmation Code</p>
+        <p style="font-size: 1.0625em; text-align: center; display: inline; margin-top:0.9375em; line-height: 1.5;">Enter the confirmation code we sent to
+        {% if email != "N/A" %}
+            {{ email }}.
+        {% else %}
+            {{ number }}.
+        {% endif %}
+        
+        <a href="#" id="resendCode" class="noUnderline" style="font-weight:bold; color:#2499f2;">Resend Code</a></p>
+        <p id="timeRemaining" style="font-size:small; margin-bottom:1.2em;">60s</p>
+        <input id="confirmCode" type="text" class="textInput" placeholder="Confirmation Code" style="font-size: 1.0625em; border-radius: 0.4375em; padding: 0.9375em 1.0625em;">
+        
+        <button type="button" id="nextButton" class="blueButton" style="font-size:0.875em; width: 23.5em;">Next</button>
+        <p id="incorrectCode" style="display:none; font-size: medium; color:red;">The code you have provided is incorrect.</p>
+        <p id="tooLateCode" style="display:none; font-size: medium; color:red;">The code you have provided is correct but too late.</p>
+        <p id="networkFailure"  style="display:none; font-size: medium; color:red;">The network response was not ok.</p>
+        <a href="#" id="goBackButton" style="color:#2499f2; font-weight:bold; text-decoration: none; margin-top: 1.25em; margin-bottom: 2.1875em;">Go Back<a/>
+        </div>
+
+    <div class="box" style="height:50%; margin-top:0.5em; width: 28.125em;">
+        <p style="font-size:small; color: black;">Have an account? <a href="#" id="loginText" class="noUnderline" style="color:#2499f2; font-weight:bold;">Log in</a></p>
+        <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:bold;">Click here</a></p>
+    </div>
+    <p style="font-size:0.9625em;">Get the app.</p>
+    <div style="display: flex; justify-content:center; gap:0.625em; margin-bottom: 21.875em;">
+        <img style="height:1.5em; width:1.5em;" src="{% static 'images/appleIcon.png' %}" class="appleIcon" id="appleDropdown">
+        <div id="appleDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0em;">
+            <p>iPhone-Swift</p>
+            <p>iPhone-Flutter</p>
+            <p>iPhone-React-Native</p>
+            <p>Macbook-Swift</p>
+            <p>Macbook-Flutter</p>
+            <p>Macbook-React-Native</p>
+        </div>
+        <img style="height:1.5em; width:1.5em;" class="androidIcon" src="{% static 'images/androidIcon.png' %}" id="androidDropdown">
+        <div id="androidDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0em;">
+            <p>Android-Flutter</p>
+            <p>Android-React-Native</p>
+        </div>
+        <img style="height:1.5em; width:1.5em;" class="windowsIcon" src="{% static 'images/windowsIcon.webp' %}" id="windowsDropdown">
+        <div id="windowsDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0em;">
+            <p>Windows-Flutter</p>
+            <p>Windows-React-Native</p>
+        </div>
+
+    </div>
+    <div>
+        <p id="confirmationCodeValue" style="display:none;">{{ confirmation_code }}</p>
+    </div>
+
+
+    <footer class="footnote">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
+<div class="dropdown">
+    <button class="dropbtn">
+        <div style="display: flex; justify-content: center; align-items:center; gap: 0.1em;">
+        <p id="language" style="margin-top: 0em;">English</p> <img class="dropdownV" src="{% static 'images/dropdownV.png' %}" style="margin-top:-0.75em;">
+        </div>
+    </button>
+    <div class="dropdown-content">
+        <p class="lang" onclick="setLanguage('العربية')">العربية</p>
+        <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
+        <p class="lang" onclick="setLanguage('Deutsch')">Deutsch</p>
+        <p class="lang" onclick="setLanguage('English')">English</p>
+        <p class="lang" onclick="setLanguage('Español')">Español</p>
+        <p class="lang" onclick="setLanguage('Français')">Français</p>
+        <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
+        <p class="lang" onclick="setLanguage('Bahasa Indonesia')">Bahasa Indonesia</p>
+        <p class="lang" onclick="setLanguage('Italiano')">Italiano</p>
+        <p class="lang" onclick="setLanguage('日本語')">日本語</p>
+        <p class="lang" onclick="setLanguage('Русский')">Русский</p>
+        <p class="lang" onclick="setLanguage('中国人')">中国人</p>
+    </div>
+</div>
+</div>
+
+<div id="whyBdayPopup" class="box">
+    <div style="display: flex; margin-left: 8.75em;">
+        <p style="font-weight: bold; display: inline; font-size: 1.1875em;">Birthdays</p>
+        <img id="exitPopup" src="{% static 'images/clearBlackX.png' %}" style="display: inline-block; height: 44%; width: 13%; object-fit: contain; margin-left: 7.5em; margin-top: 0.9375em; background-color: lightgray; border-radius: 1.25em;">
+    </div>
+    <p style="margin-top: -0.625em; color: lightgray;">________________________________________________</p>
+    <img src="{% static 'images/cakeAndBalloons.jpeg' %}" style="height:60%; width:60%; object-fit:contain; margin-top:0.625em; pointer-events: none;">
+    <p style="font-weight:600; font-size:1.0625em; margin-top: 0em;">Birthdays on Instagram</p>
+    <br>
+    <p style="font-size: 0.875em; text-align: center; margin-top: 0em; line-height: 1.5;">Providing your birthday improves the features and ads you see, and helps us keep the Megagram community safe. You can find your birthday in your personal information account settings.</p>
+</div>
+<script src="{% static 'confirmCode.js' %}"></script>
+</body>
+</html>
