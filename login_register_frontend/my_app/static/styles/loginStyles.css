@@ -1,0 +1,151 @@
+@font-face {
+    font-family: Billabong;
+    src: url('../fonts/billabong_regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #232424;
+        color: white;
+    }
+
+    #forgotPassword {
+        color: #2499f2 !important;
+    }
+
+    .box {
+        border-color: rgb(52, 50, 50) !important;
+    }
+
+    .noUnderline {
+        color: #2499f2 !important;
+    }
+
+    .textInput {
+        background-color: lightgray !important;
+    }
+}
+
+body {
+    font-family: 'Arial';
+    text-align: center;
+}
+
+.Megagram {
+    font-family: Billabong;
+    font-weight: 100;
+    font-size: 4.2em;
+    user-select: none;
+    cursor: pointer;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 24.375em;
+    height: 31.25em;
+    border-color: lightgray;
+    border-width: 0.0125em;
+    border-style: solid;
+}
+
+.textInput {
+    width: 17.9375em;
+    height: 1.875em;
+    margin-top: 0.5em;
+    background-color: #fafafa;
+    border-radius: 0.125em;
+    border-width: 0.0125em;
+    padding-left: 0.4375em;
+    padding-top: 0.375em;
+    padding-bottom: 0.375em;
+}
+
+.textInput::placeholder {
+    color: #636364;
+    opacity: 1;
+    font-size: 0.84375em;
+}
+
+.blueButton {
+    background-color: #82bbf5;
+    color: white;
+    width: 23em;
+    height: 2.125em;
+    border-radius: 0.4375em;
+    border: none;
+    font-weight: bold;
+    padding: 0.4em 0.8em;
+    font-size: 0.78125em;
+    margin-top: 1.125em;
+}
+
+#OR {
+    display: inline;
+    color: #696b69;
+    font-weight: bold;
+    font-size: 0.8125em;
+}
+
+.orLine {
+    display: inline;
+    top: 0.625em;
+    color: lightgray;
+    margin-right: 0.5em;
+}
+
+#forgotPassword {
+    color: darkblue;
+    font-size: 0.84375em;
+    margin-top: 0;
+}
+
+.noUnderline {
+    text-decoration: none;
+}
+
+.dropbtn {
+    background-color: white;
+    color: gray;
+    font-size: 0.875em;
+    border: none;
+    margin-top: 0.5em;
+    width: 3.75em;
+}
+
+.togglePassword {
+    position: absolute;
+    right: 0em;
+    top: 1.1em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9375em;
+}
+
+.textInput:focus {
+    outline: none;
+    border: 0.0625em solid gray;
+}
+
+.noUnderline:visited {
+    color: darkblue;
+}
+
+@media screen and (max-width: 87.5em) {
+    #loginPhotoSlideshow {
+        position: fixed;
+        margin-right: 10em;
+    }
+}
+
+@media screen and (max-width: 68.75em) {
+    #loginPhotoSlideshow {
+        display: none;
+    }
+}

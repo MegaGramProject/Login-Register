@@ -109,7 +109,13 @@ def send_email(request):
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
             server.login("megagram664@gmail.com", "daqr zlkq vvil exfi")
             server.sendmail("megagram664@gmail.com", email, message.as_string())
-            return Response({"confirmation_code": confirmation_code}, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "confirmation_code": confirmation_code
+                },
+                status=status.HTTP_201_CREATED
+            )
+                
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -129,7 +135,12 @@ def send_text(request, number):
             from_= os.environ['twilioPhoneNumber'],
             to=to
         )
-        return Response({"confirmation_code": confirmation_code}, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "confirmation_code": confirmation_code
+            },
+            status=status.HTTP_201_CREATED
+        )
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -139,16 +150,35 @@ def does_user_exist(request):
     if request.data.get('username'):
         try:
             user = User.objects.get(username = request.data['username'])
-            return Response({"salt": user.salt, "hashed_password":user.hashed_password})
+            return Response(
+                {
+                    "salt": user.salt,
+                    "hashed_password":user.hashed_password
+                }
+            )
         except:
-            return Response({"user_exists": False})
-    
+            return Response(
+                {
+                    "user_exists": False
+                }
+            )
+
     else:
         try:
             user = User.objects.get(contact_info = request.data['contact_info'])
-            return Response({"salt": user.salt, "hashed_password":user.hashed_password, "username":user.username})
+            return Response(
+                {
+                    "salt": user.salt,
+                    "hashed_password":user.hashed_password,
+                    "username":user.username
+                }
+            )
         except:
-            return Response({"user_exists": False})
+            return Response(
+                {
+                    "user_exists": False
+                }
+            )
 
 
 @api_view(['POST'])
@@ -168,11 +198,23 @@ def verify_captcha(request):
     
     if response.ok:
         if response.json()['success']:
-            return Response({"verified": True})
+            return Response(
+                {
+                    "verified": True
+                }
+            )
         else:
-            return Response({"verified": False})
+            return Response(
+                {
+                    "verified": False
+                }
+            )
     else:
-        return Response({"error": "Failed to verify reCAPTCHA"})
+        return Response(
+            {
+                "error": "Failed to verify reCAPTCHA"
+            }
+        )
     
 
 @api_view(['GET'])
@@ -187,17 +229,24 @@ def get_relevant_user_info_from_username(request, username):
     try:
         user = User.objects.get(username = username)
     except user.DoesNotExist:
-        return Response({'output': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {
+                'output': 'user does not exist'
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
-    return Response({
-        'username': user.username,
-        'full_name': user.full_name,
-        'date_of_birth': user.date_of_birth,
-        'created': user.created,
-        'is_verified': user.is_verified,
-        'account_based_in': user.account_based_in,
-        'is_private': user.is_private
-        })
+    return Response(
+        {
+            'username': user.username,
+            'full_name': user.full_name,
+            'date_of_birth': user.date_of_birth,
+            'created': user.created,
+            'is_verified': user.is_verified,
+            'account_based_in': user.account_based_in,
+            'is_private': user.is_private
+        }
+    )
 
 
 @api_view(['POST'])
@@ -224,15 +273,22 @@ def get_relevant_user_info_from_username_including_contact_info(request, usernam
     try:
         user = User.objects.get(username = username)
     except user.DoesNotExist:
-        return Response({'output': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {
+                'output': 'user does not exist'
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
     
-    return Response({
-        'username': user.username,
-        'full_name': user.full_name,
-        'date_of_birth': user.date_of_birth,
-        'created': user.created,
-        'is_verified': user.is_verified,
-        'account_based_in': user.account_based_in,
-        'is_private': user.is_private,
-        'contact_info': user.contact_info
-        })
+    return Response(
+        {
+            'username': user.username,
+            'full_name': user.full_name,
+            'date_of_birth': user.date_of_birth,
+            'created': user.created,
+            'is_verified': user.is_verified,
+            'account_based_in': user.account_based_in,
+            'is_private': user.is_private,
+            'contact_info': user.contact_info
+        }
+    )

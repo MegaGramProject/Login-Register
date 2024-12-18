@@ -7,135 +7,110 @@
     {% load static %}
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
     <title>Login</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <style>
-    @media screen and (max-width:1400px) {
-    #loginPhotoSlideshow {
-        position: fixed;
-        right: 10em;
-                        }          }
-                    
-    @media screen and (max-width:1100px) {
-    #loginPhotoSlideshow {
-    display: none;       }
-    #loginBox {
-        margin-right: 28em;
-        right: 0em;
-            }
-    footer {
-        margin-left: 28em;
-        width: 50em;
-    }
-    .dropdown {
-        margin-left: 28em;
-    }
-    }
-    </style>
+
+    <link rel="stylesheet" href="{% static 'styles/loginStyles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="{% static 'scripts/loginScript.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
+
 <body>
-    <div id="loadingScreen" style="width: 30em; height: 30em; display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-style: solid; border-radius: 1000px; border-width: 0.1em; border-color: lightgray;">
-        <h1 class="Megagram" style="font-size: 4.2em;">Megagram</h1>
+    <div id="loadingScreen" style="width: 30em; height: 30em; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    border-style: solid; border-radius: 15em; border-width: 0.1em; border-color: lightgray;">
+        <h1 class="Megagram">Megagram</h1>
         <img src="{% static 'images/megagramLoading.png' %}" style="height:55%; width:55%; margin-left: 2em; object-fit:contain;">
     </div>
-    <div id="loginBox" style="display:none; flex-direction:column; justify-content:center; align-items:center;">
-    <div style="display:flex; justify-content:center; align-items:center;">
-    <div id="loginPhotoSlideshow" style="position: relative;">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: true;" src="{% static 'images/instagramLoginPhoto.png' %}">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="{% static 'images/instagramLoginPhoto2.png' %}">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="{% static 'images/instagramLoginPhoto3.png' %}">
-        <img class="slide" style="position: absolute; top: -28.75em; right: -42.5em; width: 33.44em; height: 50em; object-fit: contain; display: none;" src="{% static 'images/instagramLoginPhoto4.png' %}">
+
+    <div id="loginScreen" style="display: none; flex-direction: column; justify-content: center; align-items: center;">
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <div id="loginPhotoSlideshow" style="height: 50em; width: 33.44em; position: relative; margin-right: -30em;">
+                <img class="slide" style="height: 100%; width: 100%; position: absolute; top: 7%; left: 0%;
+                object-fit: contain; opacity: 0;" src="{% static 'images/instagramLoginPhoto.png' %}">
+                <img class="slide" style="height: 100%; width: 100%; position: absolute; top: 7%; left: 0%;
+                object-fit: contain;  opacity: 0;" src="{% static 'images/instagramLoginPhoto2.png' %}">
+                <img class="slide" style="height: 100%; width: 100%; position: absolute; top: 7%; left: 0%;
+                object-fit: contain;  opacity: 0;" src="{% static 'images/instagramLoginPhoto3.png' %}">
+                <img class="slide" style="height: 100%; width: 100%; position: absolute; top: 7%; left: 0%;
+                object-fit: contain;  opacity: 0;" src="{% static 'images/instagramLoginPhoto4.png' %}">
+            </div>
+
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-left: 31.25em">
+                <div class="box" style="margin-top:10em; height: 36em;">
+                    <h1 class="Megagram">Megagram</h1>
+
+                    <div style="position: relative;">
+                        <input type="text" id="numberNameEmail" class="textInput" placeholder="Phone number, username, or email"
+                        style="font-size: 0.94em;">
+                        <p id="userContainerInfo" style="font-size: 0.625em; position: absolute; left: 0.375em;
+                        top: -0.125em; color: gray; display: none;">Phone number, username, or email</p>
+                    </div>
+
+                    <br>
+
+                    <div style="position: relative;">
+                        <input type="password" id="password" class="textInput" placeholder="Password" style="font-size: 0.94em;">
+                        <button style="display: none;" id="togglePassword" class="togglePassword">Show</button>
+                        <p id="passwordContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em;
+                        top: -0.125em; color: gray; display: none;">Password</p>
+                    </div>
+
+                    <br>
+
+                    <div class="g-recaptcha" data-sitekey="6Lf9bfYpAAAAAHDspCvL869y03gQ8SIkesqJwfB-" data-callback="onSubmittingRecaptchaResults"></div>
+                    <p id="recaptchaErrorMessage" style="font-size:small; color: #ba3240; display: none;"></p>
+                    <button type="button" class="blueButton" id="loginButton">Log in</button>
+                    <p id="errorMessage" style="font-size:small; color: #ba3240; display: none;"></p>
+
+                    <br>
+
+                    <div>
+                        <p class="orLine">───────────</p><p id="OR">OR</p>
+                        <p class="orLine" style="margin-left:0.5em;">───────────</p>
+                    </div>
+
+                    <br>
+                    <a href="http://localhost:3001/forgotPassword" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
+                </div>
+
+                <div class="box" style="height:50%; margin-top:0.5em;">
+                    <p style="font-size:small;">Don't have an account? <a href="http://localhost:8000/signUp" id="signupButton"
+                    class="noUnderline" style="color:#2499f2; font-weight:500;">
+                            Sign up</a>
+                    </p>
+                    <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline"
+                    style="color:#2499f2; font-weight:500;">
+                        Click here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <footer style="margin-top: 16em; text-align: center; color: gray; font-size: 0.88em;">
+            Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray.
+        </footer>
+        
+        <select style="margin-top: 1em; margin-bottom: 3em; padding: 0.8em 0.8em;" onchange="setLanguage(this.value)">
+            <option value="" disabled selected>Choose Language</option>
+            <option value="العربية">العربية</option>
+            <option value="বাংলা">বাংলা</option>
+            <option value="Deutsch">Deutsch</option>
+            <option value="English">English</option>
+            <option value="Español">Español</option>
+            <option value="Français">Français</option>
+            <option value="हिंदी">हिंदी</option>
+            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+            <option value="Italiano">Italiano</option>
+            <option value="日本語">日本語</option>
+            <option value="Русский">Русский</option>
+            <option value="中国人">中国人</option>
+        </select>
     </div>
-    <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; margin-left: 31.25em">
-    <div class="box" style="margin-top:10em; height: 36em;">
-        <h1 class="Megagram" style="font-size: 4.2em;">Megagram</h1>
-        <form>
-        <div class="userContainer" style="position:relative;">
-        <input type="text" id="numberNameEmail" class="textInput" placeholder="Phone number, username, or email" style="font-size: 0.94em;">
-        <p id="userContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.125em; color: gray; display: none;">Phone number, username, or email</p>
-        </div>
-        <br>
-        <div class="passwordContainer" style="position:relative;">
-            <input type="password" id="password" class="textInput" placeholder="Password" style="font-size: 0.94em;">
-            <button id="togglePassword" class="togglePassword">Show</button>
-            <p id="passwordContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.125em; color: gray; display: none;">Password</p>
-        </div>
-        <br>
-        <div class="g-recaptcha" data-sitekey="6Lf9bfYpAAAAAHDspCvL869y03gQ8SIkesqJwfB-" data-callback="onSubmit"></div>
-        <button type="button" class="blueButton" id="loginButton">Log in</button>
-        </form>
-        <p id="incorrectPassword" style="font-size:small; color: red; display: none;">Your password is incorrect</p>
-        <p id="userNotFound" style="font-size:small; color: red; display: none;">User not found</p>
-        <br>
-        <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:0.5em;">_________________</p></div>
-        <br>
-        <div style="display:flex;  justify-content:center; align-items:center;">
-        <img class="facebookIcon" id="facebookIcon" src="{% static 'images/facebookIcon.png' %}">
-        <p class="facebookGoogleYouTubeLogin">Log in with <a href="https://www.facebook.com" class="noUnderline">FB</a>/<a href="https://www.google.com" class="noUnderline">Google</a>/<a href="https://www.apple.com" class="noUnderline">Apple</a></p>
-        <img class="googleIcon" id="googleIcon" src="{% static 'images/googleIcon.png' %}">
-        <img class="appleIcon" id="appleIcon" src="{% static 'images/appleIcon.png' %}">
-        </div>
-        <a href="http://localhost:3001/forgotPassword" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
-    </div>
-
-    <div class="box" style="height:50%; margin-top:0.5em;">
-        <p style="font-size:small;">Don't have an account? <a href="#" id="signupButton" class="noUnderline" style="color:#2499f2; font-weight:500;">Sign up</a></p>
-        <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Click here</a></p>
-    </div>
-    <p style="font-size:0.96em;">Get the app.</p>
-    <div style="margin-bottom:15.63em; display: flex; justify-content:center; gap:0.63em;">
-        <img style="height:1.5em; width:1.5em;" src="{% static 'images/appleIcon.png' %}" class="appleIcon" id="appleDropdown">
-        <div id="appleDevices" class="dropdown-content" style="margin-left: -4.38em; margin-top: 0em;">
-            <p>iPhone-Swift</p>
-            <p>iPhone-Flutter</p>
-            <p>iPhone-React-Native</p>
-            <p>Macbook-Swift</p>
-            <p>Macbook-Flutter</p>
-            <p>Macbook-React-Native</p>
-        </div>
-        <img class="androidIcon" src="{% static 'images/androidIcon.png' %}" id="androidDropdown">
-        <div id="androidDevices" class="dropdown-content" style="margin-left: -4.38em; margin-top: 0em;">
-            <p>Android-Flutter</p>
-            <p>Android-React-Native</p>
-        </div>
-        <img class="windowsIcon" src="{% static 'images/windowsIcon.webp' %}" id="windowsDropdown">
-        <div id="windowsDevices" class="dropdown-content" style="margin-left: -4.38em; margin-top: 0em;">
-            <p>Windows-Flutter</p>
-            <p>Windows-React-Native</p>
-        </div>
-    </div>
-</div>
-</div>
 
 
-<footer class="footnote" style="margin-top:4em; text-align: center;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
-<div class="dropdown">
-    <button class="dropbtn">
-    <div style="display: flex; justify-content: center; align-items:center; gap: 0.1em;">
-        <p id="language" style="margin-top: 0em;">English</p><img class="dropdownV" src="{% static 'images/dropdownV.png' %}" style="margin-top:-0.63em">
-    </div>
-</button>
-<div id="languageList" class="dropdown-content">
-    <p class="lang" onclick="setLanguage('العربية')">العربية</p>
-    <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
-    <p class="lang" onclick="setLanguage('Deutsch')">Deutsch</p>
-    <p class="lang" onclick="setLanguage('English')">English</p>
-    <p class="lang" onclick="setLanguage('Español')">Español</p>
-    <p class="lang" onclick="setLanguage('Français')">Français</p>
-    <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
-    <p class="lang" onclick="setLanguage('Bahasa Indonesia')">Bahasa Indonesia</p>
-    <p class="lang" onclick="setLanguage('Italiano')">Italiano</p>
-    <p class="lang" onclick="setLanguage('日本語')">日本語</p>
-    <p class="lang" onclick="setLanguage('Русский')">Русский</p>
-    <p class="lang" onclick="setLanguage('中国人')">中国人</p>
-</div>
-</div>
-
-</div>
-
-
-<script src="{% static 'loginScript.js' %}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
+
 </html>
 
