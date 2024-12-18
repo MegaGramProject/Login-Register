@@ -75,28 +75,33 @@ def send_email(request):
     message["Subject"] = f"{confirmation_code} is your Megagram code"
     message["From"] = "megagram664@gmail.com"
     message["To"] = email
-    text =f"""\
-    Hi, Someone tried to sign up for a Megagram account with {email} If it was you, enter this confirmation code in the website:
+    summary_text =f"""\
+    Hi, Someone tried to sign up for a Megagram account with {email}. If it was you, enter this confirmation code in the website:
     {confirmation_code}
     """
     html =f"""\
     <html>
-    <body>
-    <img src="https://static.vecteezy.com/system/resources/thumbnails/025/067/762/small_2x/4k-beautiful-colorful-abstract-wallpaper-photo.jpg" alt="Megagram" style="height:13em; width: 36em; object-fit: contain; margin-left:650px;">
-    <div style="width: 560px; font-family:Arial; line-height:1.4; font-size:23px; margin-left: 630px;">
-        <p>Hi,</p>
-        <p></p>Someone tried to sign up for a Megagram account with {email} If it was you, enter this confirmation code in the website:</p>
-        <p style="font-weight:bold; font-size: 30px; color:#4b4d4b; text-align: center;">{confirmation_code}</p>
-    </div>
-    <p style="color:gray; margin-top: 75px; text-align: center; width:777px; margin-left: 500px;">This email is for Megagram Account Registration. This message was sent to {email}.</p>
-    </body>
+        <body>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: start; gap: 1em;">
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/025/067/762/small_2x/4k-beautiful-colorful-abstract-wallpaper-photo.jpg" alt="Megagram"
+                style="height:13em; width: 40em;">
+
+                <br/>
+                
+                <div style="display: flex; flex-direction: column; font-family: Arial; width: 42em;">
+                    <h2>Hi,</h2>
+                    <p style="font-size: 1.1em;">Someone tried to sign up for a Megagram account with {email}. If it was you, enter this confirmation code in the website:</p>
+                    <p style="font-weight:bold; font-size: 1.7em; color:#4b4d4b; text-align: center;">{confirmation_code}</p>
+                    <small style="color:gray; margin-top: 3em;">This email is for Megagram Account Registration. This message was sent to {email}.</small>
+                </div>
+            </div>
+        </body>
     </html>
     """
-    part1 = MIMEText(text, "plain")
+    part1 = MIMEText(summary_text, "plain")
     part2 = MIMEText(html, "html")
     message.attach(part1)
     message.attach(part2)
-
 
     context = ssl.create_default_context()
 
@@ -120,9 +125,10 @@ def send_text(request, number):
 
     try:
         client.messages.create(
-        body=messageBody,
-        from_= os.environ['twilioPhoneNumber'],
-        to=to)
+            body=messageBody,
+            from_= os.environ['twilioPhoneNumber'],
+            to=to
+        )
         return Response({"confirmation_code": confirmation_code}, status=status.HTTP_201_CREATED)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -172,10 +178,7 @@ def verify_captcha(request):
 @api_view(['GET'])
 def get_usernames_and_full_names_of_all(request):
     users = User.objects.all()
-    output = []
-    for user in users:
-        output.append([user.username, user.full_name])
-
+    output = [[user.username, user.full_name] for user in users]
     return Response(output)
         
 
@@ -185,7 +188,6 @@ def get_relevant_user_info_from_username(request, username):
         user = User.objects.get(username = username)
     except user.DoesNotExist:
         return Response({'output': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
-    
     
     return Response({
         'username': user.username,
@@ -206,7 +208,11 @@ def get_relevant_user_info_of_multiple_users(request):
         for user in list_of_users:
             if(user not in user_info_mappings):
                 user_object = User.objects.get(username = user)
-                user_info_mappings[user] = {'full_name': user_object.full_name, 'is_verified': user_object.is_verified, 'is_private': user_object.is_private}
+                user_info_mappings[user] = {
+                    'full_name': user_object.full_name,
+                    'is_verified': user_object.is_verified,
+                    'is_private': user_object.is_private
+                }
         
         return Response(user_info_mappings)
     
@@ -219,7 +225,6 @@ def get_relevant_user_info_from_username_including_contact_info(request, usernam
         user = User.objects.get(username = username)
     except user.DoesNotExist:
         return Response({'output': 'user does not exist'}, status=status.HTTP_404_NOT_FOUND)
-    
     
     return Response({
         'username': user.username,
