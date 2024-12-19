@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="ru") {
             currentLanguageLongForm = "Русский";
         }
-        let signUpURL = "http://localhost:8000/signUp?language=" + currentLanguageLongForm;
+        let signUpURL = "http://localhost:8000/signup?language=" + currentLanguageLongForm;
         window.location.href = signUpURL;
     });
 

@@ -1,38 +1,37 @@
 import { DEEP_TRANSLATE_API_KEY, GOOGLE_RECAPTCHA_SECRET } from './config.js';
 
 $(document).ready(function() {
+    /*
+        at the bottom of this function will be a function
+        called 'toBeExecutedWhenDocumentIsReady()',
+        which contains all the code to be executed when
+        document is ready
+    */
     const numberNameEmail = $('#numberNameEmail');
     const password = $('#password');
     const loginButton = $('#loginButton');
     const togglePassword = $('#togglePassword');
     const passwordContainerInfo = $('#passwordContainerInfo');
     const loginPhotos = $(".slide").get();
-    const signupButton = $('#signupButton');
+    const signupLink = $('#signupLink');
     const errorMessage = $('#errorMessage');
     const recaptchaErrorMessage = $('#recaptchaErrorMessage');
     const bcrypt = dcodeIO.bcrypt; //this is used for hashing the user-inputted password
     let recaptchaIsVerified = false;
     let slideIdx = 0;
-    let currLanguage;
-
-    setTimeout(function() {
-        $('#loadingScreen').css('display', 'none');
-        $('#loginScreen').css('display', '');
-    }, 740);
-
+    let currLanguage = "en";
 
     const loginUser = async function() {
         if (isValidEmail(numberNameEmail.val()) || isValidNumber(numberNameEmail.val())) {
-            const data = {
-                "contactInfo": numberNameEmail.val()
-            };
-            const userVerifyURL = "http://localhost:8001/doesUserExist/";
+            const userVerifyURL = "http://localhost:8001/doesUserExist";
             const postOptions = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    "contact_info": numberNameEmail.val()
+                })
             };
             
             try {
@@ -75,22 +74,22 @@ $(document).ready(function() {
                         errorMessage.text("Incorrect password");
                     }
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 errorMessage.css('display', '');
                 errorMessage.text("Trouble connecting to the server");
             }
         }
         else {
-            const data = {
-                "username": numberNameEmail.val()
-            };
-            const userVerifyURL = "http://localhost:8001/doesUserExist/";
+            const userVerifyURL = "http://localhost:8001/doesUserExist";
             const postOptions = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    "username": numberNameEmail.val()
+                })
             };
     
             try {
@@ -139,10 +138,10 @@ $(document).ready(function() {
         }
     }
 
-    signupButton.on("click", function() {
+    signupLink.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            window.location.href = "http://localhost:8000/signUp";
+            window.location.href = "http://localhost:8000/signup";
             return;
         }
         else if (currLanguage==="es") {
@@ -178,7 +177,7 @@ $(document).ready(function() {
         else if(currLanguage==="ru") {
             currentLanguageLongForm = "Русский";
         }
-        window.location.href = `http://localhost:8000/signUp?language=${currentLanguageLongForm}`;
+        window.location.href = `http://localhost:8000/signup?language=${currentLanguageLongForm}`;
     });
 
     const setLanguage = function (lang) {
@@ -228,7 +227,11 @@ $(document).ready(function() {
         }
 
         const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
-        const data = {"q":"","source":"","target":""};
+        const data = {
+            q: "",
+            source: "",
+            target: ""
+        };
         data["source"] = currLanguage;
         data["target"] = newLanguage;
         const options = {
@@ -296,13 +299,6 @@ $(document).ready(function() {
         });
 
         currLanguage = newLanguage;
-    }
-
-    const queryString = window.location.search.substring(1);
-    const params = new URLSearchParams(queryString);
-    let lingo = params.get("language");
-    if (lingo) {
-        setLanguage(lingo);
     }
 
     const isValidEmail = function (email) {
@@ -420,9 +416,6 @@ $(document).ready(function() {
     
         incrementOpacity();
     }
-    
-
-    setTimeout(displayFirstLoginPhoto(),2000);
 
 
     const displayLoginPhotos = function() {
@@ -449,19 +442,18 @@ $(document).ready(function() {
 
 
     const onSubmittingRecaptchaResults = function(token)  {
-        const data = {
-            'secret': GOOGLE_RECAPTCHA_SECRET,
-            'response': token
-        };
         const options = {
             method: 'POST',
             headers:{
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                'secret': GOOGLE_RECAPTCHA_SECRET,
+                'response': token
+            })
         };
 
-        fetch("http://localhost:8001/verifyCaptcha/", options)
+        fetch("http://localhost:8001/verifyCaptcha", options)
         .then(response => {
             if (!response.ok) {
                 recaptchaErrorMessage.css('display', '');
@@ -478,12 +470,29 @@ $(document).ready(function() {
                 recaptchaErrorMessage.css('display', '');
                 recaptchaErrorMessage.text('You did not pass the test');
             }
-        }).catch(error => {
+        }).catch(_ => {
             recaptchaErrorMessage.css('display', '');
-            recaptchaErrorMessage.text('Trouble connecting to the server');
+            recaptchaErrorMessage.text('Trouble connecting to the server to assess the results of your test');
         });
     }
 
+    window.setLanguage = setLanguage;
     window.onSubmittingRecaptchaResults = onSubmittingRecaptchaResults;
+
+    function toBeExecutedWhenDocumentIsReady() {
+        setTimeout(function() {
+            $('#loadingScreen').css('display', 'none');
+            $('#loginScreen').css('display', '');
+        }, 740);
+        displayFirstLoginPhoto();
+
+        const queryString = window.location.search.substring(1);
+        const params = new URLSearchParams(queryString);
+        let lingo = params.get("language");
+        if (lingo) {
+            setLanguage(lingo);
+        }
+    }
+    toBeExecutedWhenDocumentIsReady();
 
 });

@@ -1,126 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Rishav Ray">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
     <title>Register</title>
     <link rel="stylesheet" href="{% static 'styles/registerStyles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="{% static 'scripts/registerScript.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
 </head>
+
 <body>
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <div class="box" style="margin-top:0.9375em; height:43.75em;">
-        <h1 class="Megagram" style="font-size:4.375em;">Megagram</h1>
-        <p style="color:#6b6c6e; font-weight: bold; font-size: 1.125em; margin-top: -1.25em;">Sign up to see photos and videos</p>
-        <p style="color:#6b6c6e; font-weight: bold; margin-top: -1.5625em; font-size: 1.125em;">from your friends.</p>
-        <div style="display:flex;  justify-content:center; align-items:center;">
-        <img class="facebookIcon" id="facebookIcon" src="{% static 'images/facebookIcon.png' %}">
-        <p class="facebookGoogleYouTubeLogin">Continue with <a href="https://www.facebook.com" class="noUnderline">FB</a>/<a href="https://www.google.com" class="noUnderline">Google</a>/<a href="https://www.apple.com" class="noUnderline">Apple</a></p>
-        <img class="googleIcon" id="googleIcon" src="{% static 'images/googleIcon.png' %}">
-        <img class="appleIcon" id="appleIcon" src="{% static 'images/appleIcon.png' %}">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="box" style="margin-top: 0.9375em; gap: 0.39em;">
+            <h1 id="Megagram">Megagram</h1>
+            <img src="{% static 'images/favicon.ico' %}" style="height: 6em; width: 6em; pointer-events: none; margin-top: -1em;">
+            <p style="color:#6b6c6e; font-weight: bold; font-size: 1.125em; max-width: 74%;">
+                Sign up to see photos and videos from your friends.
+            </p>
+            <div>
+                <p class="orLine">───────────</p><p id="OR">OR</p><p class="orLine" style="margin-left:0.5em;">───────────</p>
+            </div>
+
+            <br>
+
+            <div class="numberEmailContainer" style="position:relative;">
+                <input type="text" class="textInput" id="numberEmail"
+                maxlength="320" placeholder="Mobile Number or Email" style="padding-left:0.75em;
+                padding-top: 0.46875em; padding-bottom: 0.46875em; font-size: 0.875em;">
+                <p id="numberEmailContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em;
+                top: -0.125em; color: gray; display: none;">Mobile Number or Email</p>
+                <img id="checkmark1" class="checkmark" src="{% static 'images/checkmark.png' %}" style="position: absolute;
+                height:1.85em; width:1.85em; object-fit: contain; right: 0.1em;">
+                <img id="wrong1" class="wrong" src="{% static 'images/wrong.png' %}" style="position: absolute; height:1.87em;
+                width:1.87em;object-fit:contain;right: 0.1em;">
+            </div>
+            <div class="fullNameContainer" style="position:relative;">
+                <input type="text" class="textInput" id="fullName"
+                maxlength="50" placeholder="Full Name" style="padding-left:0.75em;
+                padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size:0.875em;">
+                <p id="fullNameContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em;
+                top: -0.625em; color: gray; display: none;">Full Name</p>
+                <img id="checkmark2" class="checkmark" src="{% static 'images/checkmark.png' %}" style="right:-3em; top: 0.625em;">
+                <img id="wrong2" class="wrong" src="{% static 'images/wrong.png' %}" style="right:-3em; top: 0.625em;">
+            </div>
+            <div class="usernameContainer" style="position:relative;">
+                <input type="text" class="textInput" id="username" placeholder="Username"
+                maxlength="30" style="padding-left:0.75em;
+                padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size:0.875em;">
+                <p id="usernameContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em;
+                top: -0.625em; color: gray; display: none;">Username</p>
+                <img id="checkmark3" class="checkmark" src="{% static 'images/checkmark.png' %}" style="right:-3em; top: 0.625em;">
+                <img id="wrong3" class="wrong" src="{% static 'images/wrong.png' %}" style="right:-3em; top: 0.625em;">
+            </div>
+            <div class="passwordContainer" style="position:relative;">
+                <input maxlength="128" type="password" class="textInput" id="password" placeholder="Password" style="padding-left:0.75em;
+                padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size: 0.875em;">
+                <button id="togglefPassword" class="togglePassword" style="margin-top:-0.625em;">Show</button>
+                <p id="passwordContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em;
+                top: -0.625em; color: gray; display: none;">Password</p>
+                <img id="checkmark4" class="checkmark" src="{% static 'images/checkmark.png' %}" style="right:-3em; top: 0.625em;">
+                <img id="wrong4" class="wrong" src="{% static 'images/wrong.png' %}" style="right:-3em; top: 0.625em;">
+            </div>
+            <div id="passwordStrengthContainer" style="width:16.75em; height:0.4375em; background-color: lightgray; display:none;">
+                <div id="passwordStrength" style="width:0; height:0.4375em;"></div>
+            </div>
+            <button class="blueButton" id="signupButton">Sign up</button>
+            <p id="numberEmailTakenError" class="errorMessage"">
+                Your number/email is taken.
+            </p>
+            <p id="numberEmailInvalidError" class="errorMessage">
+                Your number/email is invalid. Numbers should have no spaces/dashes.
+                If it's a non-US phone-number, it must start with the country code, and no '+'.
+            </p>
+            <p id="emailTakenError" class="errorMessage"">
+                Your email is taken.
+            </p>
+            <p id="fullNameInvalidError" class="errorMessage"">
+                Your full name must contain at-least 1 space, with none at the start. Letters and spaces only. 50 chars max.
+            </p>
+            <p id="usernameTakenError" class="errorMessage"">
+                Your username is taken.
+            </p>
+            <p id="usernameInvalidError" class="errorMessage"">
+                Usernames can only contain letters, periods, and underscores. 30 chars max.
+            </p>
+            <p id="passwordInvalidError" class="errorMessage"">
+                Your password, which has a max-character-limit of 128, is too weak.
+            </p>
+
+            <p id="otherError" class="errorMessage""></p>
+            <br>
+            <br>
         </div>
-        <div><p class="orLine">_________________</p><p class="OR">OR</p><p class="orLine" style="margin-left:0.5em;">_________________</p></div>
-        <br>
-        <div class="numberEmailContainer" style="position:relative;">
-        <input type="text" class="textInput" id="numberEmail" placeholder="Mobile Number or Email" style="padding-left:0.75em; padding-top: 0.46875em; padding-bottom: 0.46875em; font-size: 0.875em;">
-        <p id="numberEmailContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.125em; color: gray; display: none;">Mobile Number or Email</p>
-        <img id="checkmark1" class="checkmark" src="{% static 'images/checkmark.png' %}" style="height:1.85em;width:1.85em; object-fit: contain; right: 1.6875em;">
-        <img id="wrong1" class="wrong" src="{% static 'images/wrong.png' %}" style="height:1.87em;width:1.87em;object-fit:contain;right:1.6875em;">
+
+        <div class="box" style="height:6em; margin-top:0.5em;">
+            <p style="font-size:0.75em;">Have an account? <a id="loginText" class="noUnderline" style="color:#2499f2;
+            font-weight:500; cursor: pointer;">Log in</a></p>
+            <p style="font-size:0.75em;">Browse without an account? <a href="https://www.google.com" class="noUnderline"
+                style="color:#2499f2; font-weight:500;">Click here</a></p>
         </div>
-        <div class="fullNameContainer" style="position:relative;">
-            <input type="text" class="textInput" id="fullName" placeholder="Full Name" style="padding-left:0.75em; padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size:0.875em;">
-            <p id="fullNameContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.625em; color: gray; display: none;">Full Name</p>
-            <img id="checkmark2" class="checkmark" src="{% static 'images/checkmark.png' %}" style="right:-2.6875em; top: 0.625em;">
-            <img id="wrong2" class="wrong" src="{% static 'images/wrong.png' %}" style="right:-2.6875em; top: 0.625em;">
-        </div>
-        <div class="usernameContainer" style="position:relative;">
-            <input type="text" class="textInput" id="username" placeholder="Username" style="padding-left:0.75em; padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size:0.875em;">
-            <p id="usernameContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.625em; color: gray; display: none;">Username</p>
-            <img id="checkmark3" class="checkmark" src="{% static 'images/checkmark.png' %}" style="right:-2.6875em; top: 0.625em;">
-            <img id="wrong3" class="wrong" src="{% static 'images/wrong.png' %}" style="right:-2.6875em; top: 0.625em;">
-        </div>
-        <div id="usernameSuggestions" style="display:none;">
-            <button id="usernameSuggestion1" class="usernameSuggestion">user1</button>
-            <button id="usernameSuggestion2" class="usernameSuggestion">user2</button>
-        </div>
-        <div class="passwordContainer" style="position:relative;">
-            <input type="password" class="textInput" id="password" placeholder="Password" style="padding-left:0.75em; padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size: 0.875em;">
-            <button id="togglePassword" class="togglePassword" style="margin-top:-0.625em;">Show</button>
-            <p id="passwordContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em; top: -0.625em; color: gray; display: none;">Password</p>
-            <img id="checkmark4" class="checkmark" src="{% static 'images/checkmark.png' %}" style="right:1.0625em; top: 0.625em;">
-            <img id="wrong4" class="wrong" src="{% static 'images/wrong.png' %}" style="right:1.0625em; top: 0.625em;">
-        </div>
-        <div id="passwordStrengthContainer" style="width:18.75em; height:0.4375em; background-color: lightgray; display:none;">
-            <div id="passwordStrength" style="width:0; height:0.4375em;"></div>
-        </div>
-        <button class="blueButton" id="signupButton">Sign up</button>
-        <p id="numberEmailTakenError" style="font-size:medium;color:red; display:none;">Your number/email is taken.</p>
-        <p id="numberEmailInvalidError" style="font-size:small;color:red; display:none;">Your number/email is invalid. Numbers should have no spaces/dashes. If it's a non-US phone-number, it must start with the country code, and no '+'.</p>
-        <p id="emailTakenError" style="font-size:medium;color:red; display:none;">Your email is taken.</p>
-        <p id="fullNameInvalidError" style="font-size:medium;color:red; display:none;">Your full name must contain at-least 1 space, with none at the start. Letters only.</p>
-        <p id="usernameTakenError" style="font-size:medium;color:red; display:none;">Your username is taken.</p>
-        <p id="usernameInvalidError" style="font-size:medium;color:red; display:none;">Usernames can only contain letters, periods, and underscores.</p>
-        <p id="passwordInvalidError" style="font-size:medium;color:red; display:none;">Your password is too weak.</p>
-        <br>
-        <br>
+
+        <footer style="margin-top: 16em; text-align: center; color: gray; font-size: 0.88em;">
+            Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray.
+        </footer>
+        
+        <select style="margin-top: 1em; margin-bottom: 3em; padding: 0.8em 0.8em; outline: none;" onchange="setLanguage(this.value)">
+            <option value="" disabled selected>Choose Language</option>
+            <option value="العربية">العربية</option>
+            <option value="বাংলা">বাংলা</option>
+            <option value="Deutsch">Deutsch</option>
+            <option value="English">English</option>
+            <option value="Español">Español</option>
+            <option value="Français">Français</option>
+            <option value="हिंदी">हिंदी</option>
+            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+            <option value="Italiano">Italiano</option>
+            <option value="日本語">日本語</option>
+            <option value="Русский">Русский</option>
+            <option value="中国人">中国人</option>
+        </select>
     </div>
 
-    <div class="box" style="height:50%; margin-top:0.5em;">
-        <p style="font-size:0.75em;">Have an account? <a href="#" id="loginText" class="noUnderline" style="color:#2499f2; font-weight:500;">Log in</a></p>
-        <p style="font-size:0.75em;">Browse without an account? <a href="https://www.google.com" class="noUnderline" style="color:#2499f2; font-weight:500;">Click here</a></p>
-    </div>
-    <p style="font-size:0.9625em;">Get the app.</p>
-    <div style="display: flex; justify-content:center; gap:0.625em; margin-bottom: 21.875em;">
-        <img style="height:1.5em; width:1.5em;" src="{% static 'images/appleIcon.png' %}" class="appleIcon" id="appleDropdown">
-        <div id="appleDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0;">
-            <p>iPhone-Swift</p>
-            <p>iPhone-Flutter</p>
-            <p>iPhone-React-Native</p>
-            <p>Macbook-Swift</p>
-            <p>Macbook-Flutter</p>
-            <p>Macbook-React-Native</p>
-        </div>
-        <img class="androidIcon" src="{% static 'images/androidIcon.png' %}" id="androidDropdown">
-        <div id="androidDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0;">
-            <p>Android-Flutter</p>
-            <p>Android-React-Native</p>
-        </div>
-        <img class="windowsIcon" src="{% static 'images/windowsIcon.webp' %}" id="windowsDropdown">
-        <div id="windowsDevices" class="dropdown-content" style="margin-left: -4.375em; margin-top: 0;">
-            <p>Windows-Flutter</p>
-            <p>Windows-React-Native</p>
-        </div>
-    </div>
-    <img src="{% static 'images/instagramGif.webp' %}" style="height:5em; width:5em; margin-top: -18.75em; margin-bottom: 15.625em; object-fit: contain; pointer-events: none;">
-    <footer class="footnote" style="margin-top:-9.375em;">An enhanced version of Instagram, created as a personal project and powered by Rishav Ray</footer>
-    <div class="dropdown">
-        <button class="dropbtn">
-            <div style="display: flex; justify-content: center; align-items:center; gap: 0.1em;">
-                <p id="language" style="margin-top: 0;">English</p>
-                <img class="dropdownV" src="{% static 'images/dropdownV.png' %}" style="margin-top:-0.75em;">
-            </div>
-        </button>
-        <div class="dropdown-content">
-            <p class="lang" onclick="setLanguage('العربية')">العربية</p>
-            <p class="lang" onclick="setLanguage('বাংলা')">বাংলা</p>
-            <p class="lang" onclick="setLanguage('Deutsch')">Deutsch</p>
-            <p class="lang" onclick="setLanguage('English')">English</p>
-            <p class="lang" onclick="setLanguage('Español')">Español</p>
-            <p class="lang" onclick="setLanguage('Français')">Français</p>
-            <p class="lang" onclick="setLanguage('हिंदी')">हिंदी</p>
-            <p class="lang" onclick="setLanguage('Bahasa Indonesia')">Bahasa Indonesia</p>
-            <p class="lang" onclick="setLanguage('Italiano')">Italiano</p>
-            <p class="lang" onclick="setLanguage('日本語')">日本語</p>
-            <p class="lang" onclick="setLanguage('Русский')">Русский</p>
-            <p class="lang" onclick="setLanguage('中国人')">中国人</p>
-        
-        </div>
-    </div>
-    <script src="{% static 'scripts/registerScript.js' %}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
-    </body>
-    </html>
+</body>
+
+</html>
     
 

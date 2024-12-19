@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Rishav Ray">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
     <title>Login</title>
@@ -58,8 +58,10 @@
 
                     <br>
 
-                    <div class="g-recaptcha" data-sitekey="6Lf9bfYpAAAAAHDspCvL869y03gQ8SIkesqJwfB-" data-callback="onSubmittingRecaptchaResults"></div>
+                    <div class="g-recaptcha" data-sitekey="6Lf9bfYpAAAAAHDspCvL869y03gQ8SIkesqJwfB-"
+                    data-callback="onSubmittingRecaptchaResults"></div>
                     <p id="recaptchaErrorMessage" style="font-size:small; color: #ba3240; display: none;"></p>
+
                     <button type="button" class="blueButton" id="loginButton">Log in</button>
                     <p id="errorMessage" style="font-size:small; color: #ba3240; display: none;"></p>
 
@@ -75,8 +77,8 @@
                 </div>
 
                 <div class="box" style="height:50%; margin-top:0.5em;">
-                    <p style="font-size:small;">Don't have an account? <a href="http://localhost:8000/signUp" id="signupButton"
-                    class="noUnderline" style="color:#2499f2; font-weight:500;">
+                    <p style="font-size:small;">Don't have an account? <a id="signupLink"
+                    class="noUnderline" style="color:#2499f2; font-weight:500; cursor: pointer;">
                             Sign up</a>
                     </p>
                     <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline"
@@ -92,7 +94,7 @@
             Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray.
         </footer>
         
-        <select style="margin-top: 1em; margin-bottom: 3em; padding: 0.8em 0.8em;" onchange="setLanguage(this.value)">
+        <select style="margin-top: 1em; margin-bottom: 3em; padding: 0.8em 0.8em; outline: none;" onchange="setLanguage(this.value)">
             <option value="" disabled selected>Choose Language</option>
             <option value="العربية">العربية</option>
             <option value="বাংলা">বাংলা</option>
@@ -108,9 +110,6 @@
             <option value="中国人">中国人</option>
         </select>
     </div>
-
-
 </body>
-
 </html>
 

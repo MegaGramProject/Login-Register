@@ -7,8 +7,8 @@
 
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #232424;
-        color: white;
+        background-color: #232424 !important;
+        color: white !important;
     }
 
     #forgotPassword {
@@ -17,6 +17,7 @@
 
     .box {
         border-color: rgb(52, 50, 50) !important;
+        background-color: #343333 !important;
     }
 
     .noUnderline {
@@ -25,6 +26,11 @@
 
     .textInput {
         background-color: lightgray !important;
+    }
+
+    select {
+        background-color: #232424 !important;
+        color: white !important;
     }
 }
 
@@ -47,7 +53,6 @@ body {
     align-items: center;
     justify-content: space-evenly;
     width: 24.375em;
-    height: 31.25em;
     border-color: lightgray;
     border-width: 0.0125em;
     border-style: solid;
@@ -148,4 +153,11 @@ body {
     #loginPhotoSlideshow {
         display: none;
     }
+}
+
+.errorMessage {
+    font-size:small;
+    color: #ba3240;
+    display: none;
+    max-width: 70%;
 }
