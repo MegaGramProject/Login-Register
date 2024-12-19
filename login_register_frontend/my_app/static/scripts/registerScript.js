@@ -271,12 +271,15 @@ $(document).ready(function() {
                         .then(response => {
                             if (!response.ok) {
                                 console.error('Translation network response not ok');
+                                return;
                             }
                             return response.json();
                         }).then(data => {
-                            node.textContent = data['data']['translations']['translatedText'];
-                        }).catch(error => {
-                            console.error('Error:', error);
+                            if(typeof data !== 'undefined') {
+                                node.textContent = data['data']['translations']['translatedText'];
+                            }
+                        }).catch(_ => {
+                            console.error('Trouble connecting to the server to translate the page');
                         });
                     }
                 }
@@ -289,12 +292,15 @@ $(document).ready(function() {
         .then(response => {
             if (!response.ok) {
                 console.error('Translation network response not ok');
+                return;
             }
             return response.json();
         }).then(data => {
-            numberEmail.attr('placeholder', data['data']['translations']['translatedText']);
-        }).catch(error => {
-            console.error('Error:', error);
+            if(typeof data !== 'undefined') {
+                numberEmail.attr('placeholder', data['data']['translations']['translatedText']);
+            }
+        }).catch(_ => {
+            console.error('Trouble connecting to the server to translate the page');
         });
 
         data["q"] = fullName.attr('placeholder');
@@ -303,12 +309,15 @@ $(document).ready(function() {
         .then(response => {
             if (!response.ok) {
                 console.error('Translation network response not ok');
+                return;
             }
             return response.json();
         }).then(data => {
-            fullName.attr('placeholder', data['data']['translations']['translatedText']);
-        }).catch(error => {
-            console.error('Error:', error);
+            if(typeof data !== 'undefined') {
+                fullName.attr('placeholder', data['data']['translations']['translatedText']);
+            }
+        }).catch(_ => {
+            console.error('Trouble connecting to the server to translate the page');
         });
 
         data["q"] = username.attr('placeholder');
@@ -317,12 +326,15 @@ $(document).ready(function() {
         .then(response => {
             if (!response.ok) {
                 console.error('Translation network response not ok');
+                return;
             }
             return response.json();
         }).then(data => {
-            username.attr('placeholder',  data['data']['translations']['translatedText']);
-        }).catch(error => {
-            console.error('Error:', error);
+            if(typeof data !== 'undefined') {
+                username.attr('placeholder',  data['data']['translations']['translatedText']);
+            }
+        }).catch(_ => {
+            console.error('Trouble connecting to the server to translate the page');
         });
 
         data["q"] = password.attr('placeholder');
@@ -331,12 +343,15 @@ $(document).ready(function() {
         .then(response => {
             if (!response.ok) {
                 console.error('Translation network response not ok');
+                return;
             }
             return response.json();
         }).then(data => {
-            password.attr('placeholder', data['data']['translations']['translatedText']);
-        }).catch(error => {
-            console.error('Error:', error);
+            if(typeof data !== 'undefined') {
+                password.attr('placeholder', data['data']['translations']['translatedText']);
+            }
+        }).catch(_ => {
+            console.error('Trouble connecting to the server to translate the page');
         });
 
         currLanguage = newLanguage;
@@ -601,21 +616,20 @@ $(document).ready(function() {
         else if(currLanguage==="ru") {
             currentLanguageLongForm = "Русский";
         }
-        let ageCheckUrl;
+
         if (isValidEmail(numberEmail.val())) {
-            ageCheckUrl= "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + numberEmail.val();
+            sessionStorage.setItem("email", numberEmail.val());
         }
         else {
-            ageCheckUrl = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + numberEmail.val();
+            sessionStorage.setItem("number", numberEmail.val());
         }
 
-        sessionStorage.setItem("numberEmail", numberEmail.val());
         sessionStorage.setItem("fullName", fullName.val());
         sessionStorage.setItem("username", username.val());
         const salt = getSalt();
         sessionStorage.setItem("salt", salt);
         sessionStorage.setItem("hashedPassword", getHashedPassword(password.val(), salt));
-        window.location.href = ageCheckUrl;
+        window.location.href = `http://localhost:8000/ageCheck?language=${currentLanguageLongForm}`;
     }
         
 
@@ -693,8 +707,7 @@ $(document).ready(function() {
                         usernameInvalidError.css('display', 'none');
                     }
                 }
-            }
-            )
+            });
         }
         else if(currentInput==password && !$.contains(password[0], event.target)) {
             if (getPasswordValidity(password.val()) > 0.65){
@@ -748,8 +761,11 @@ $(document).ready(function() {
     window.setLanguage = setLanguage;
 
     function toBeExecutedWhenDocumentIsReady() {
-        if(sessionStorage.getItem("numberEmail")) {
-            numberEmail.val(sessionStorage.getItem("numberEmail"));
+        if(sessionStorage.getItem("number")) {
+            numberEmail.val(sessionStorage.getItem("number"));
+        }
+        if(sessionStorage.getItem("email")) {
+            numberEmail.val(sessionStorage.getItem("email"));
         }
         if(sessionStorage.getItem("fullName")) {
             fullName.val(sessionStorage.getItem("fullName"));

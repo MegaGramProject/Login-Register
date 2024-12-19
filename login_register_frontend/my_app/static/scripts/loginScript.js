@@ -258,12 +258,15 @@ $(document).ready(function() {
                         .then(response => {
                             if (!response.ok) {
                                 console.error('Translation network response not ok');
+                                return;
                             }
                             return response.json();
                         }).then(data => {
-                            node.textContent = data['data']['translations']['translatedText'];
-                        }).catch(error => {
-                            console.error('Error:', error);
+                            if(typeof data !== 'undefined') {
+                                node.textContent = data['data']['translations']['translatedText'];
+                            }
+                        }).catch(_ => {
+                            console.error('Trouble connecting to the server to translate the page');
                         });
                     }
                 }
@@ -276,12 +279,15 @@ $(document).ready(function() {
         .then(response => {
             if (!response.ok) {
                 console.error('Translation network response not ok');
+                return;
             }
             return response.json();
         }).then(data => {
-            numberNameEmail.attr('placeholder', data['data']['translations']['translatedText']);
-        }).catch(error => {
-            console.error('Error:', error);
+            if(typeof data !=='undefined') {
+                numberNameEmail.attr('placeholder', data['data']['translations']['translatedText']);
+            }
+        }).catch(_ => {
+            console.error('Trouble connecting to the server to translate the page');
         });
 
         data["q"] = password.attr('placeholder');
@@ -290,12 +296,15 @@ $(document).ready(function() {
         .then(response => {
             if (!response.ok) {
                 console.error('Translation network response not ok');
+                return;
             }
             return response.json();
         }).then(data => {
-            password.attr('placeholder', data['data']['translations']['translatedText']);
-        }).catch(error => {
-            console.error('Error:', error);
+            if(typeof data !=='undefined') {
+                password.attr('placeholder', data['data']['translations']['translatedText']);
+            }
+        }).catch(_ => {
+            console.error('Trouble connecting to the server to translate the page');
         });
 
         currLanguage = newLanguage;
@@ -458,9 +467,13 @@ $(document).ready(function() {
             if (!response.ok) {
                 recaptchaErrorMessage.css('display', '');
                 recaptchaErrorMessage.text('The server could not assess the results of your test');
+                return;
             }
             return response.json();
         }).then(data => {
+            if(typeof data === 'undefined') {
+                return;
+            }
             if (data["verified"]==true) {
                 recaptchaErrorMessage.css('display', 'none');
                 recaptchaIsVerified = true;

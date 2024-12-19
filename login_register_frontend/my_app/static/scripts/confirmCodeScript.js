@@ -1,64 +1,52 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const appleDropdown = document.getElementById("appleDropdown");
-    const androidDropdown = document.getElementById("androidDropdown");
-    const windowsDropdown = document.getElementById("windowsDropdown");
-    const appleDevices = document.getElementById("appleDevices");
-    const androidDevices = document.getElementById("androidDevices");
-    const windowsDevices = document.getElementById("windowsDevices");
-    const language = document.getElementById("language");
-    const lang = document.getElementById("lang");
-    const loginText = document.getElementById("loginText");
-    let currLanguage = "en";
-    const goBackButton = document.getElementById("goBackButton");
-    const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
-    const data = {"q":"","source":"","target":""};
-    const options = {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'x-rapidapi-host': 'deep-translate1.p.rapidapi.com',
-        'x-rapidapi-key': '14da2e3b7emsh5cd3496c28a4400p16208cjsn947339fe37a4'
-        },
-        body: null
-    };
-    const nextButton = document.getElementById("nextButton");
-    const confirmCode = document.getElementById("confirmCode");
+import { DEEP_TRANSLATE_API_KEY } from './config.js';
+
+$(document).ready(function() {
+    /*
+        at the bottom of this function will be a function
+        called 'toBeExecutedWhenDocumentIsReady()',
+        which contains all the code to be executed when
+        document is ready
+    */
+    const loginText = $("#loginText");
+    const goBackButton = $("#goBackButton");
+    const nextButton = $("#nextButton");
+    const timeRemaining = $('#timeRemaining');
+    const confirmCode = $("#confirmCode");
+    const resendCode = $("#resendCode");
+    const errorMessage = $("#errorMessage");
     const username = sessionStorage.getItem("username");
     const salt = sessionStorage.getItem("salt");
     const hashedPassword = sessionStorage.getItem("hashedPassword");
     const fullName = sessionStorage.getItem("fullName");
     const dateOfBirth = sessionStorage.getItem("dateOfBirth");
-    let confirmationCodeValue = document.getElementById("confirmationCodeValue").textContent;
-    const resendCode = document.getElementById("resendCode");
-    const incorrectCode = document.getElementById("incorrectCode");
-    const timeRemaining = document.getElementById("timeRemaining");
-    const tooLateCode = document.getElementById("tooLateCode");
-    const networkFailure = document.getElementById("networkFailure");
+    const queryString = window.location.search.substring(1);
+    const params = new URLSearchParams(queryString);
+    let currLanguage = "en";
     let timeRemainingValue = 59;
-    let intervalId;
+    let correctCodeValue = $("#correctCodeValue").text();
+    let intervalIdForTimeRemaining;
 
-    showTimeRemaining = function() {
+    const updateTimeRemaining = function() {
         if(timeRemainingValue==0) {
-            timeRemaining.innerText = "Time's up!";
+            timeRemaining.text("Time's up!");
+            clearInterval(intervalIdForTimeRemaining);
         }
         else {
-            timeRemaining.innerText = timeRemainingValue.toString() + "s";
+            timeRemaining.text(timeRemainingValue.toString() + "s");
             timeRemainingValue -=1;
         }
     }
 
-    intervalId = setInterval(showTimeRemaining, 1000);
+    resendCode.on("click", function() {
+        errorMessage.css('display', 'none');
 
-
-    resendCode.addEventListener("click", function() {
-        const queryString = window.location.search.substring(1);
-        const params = new URLSearchParams(queryString);
         if (params.get("email")) {
-            const emailURL = "http://localhost:8001/sendEmail/";
+            const emailURL = "http://localhost:8001/sendEmail";
             const data = {"email": params.get("email")};
             const headers = new Headers({
                 'Content-Type': 'application/json'
             });
+
             fetch(emailURL, {
                 method: 'POST',
                 headers: headers,
@@ -68,42 +56,57 @@ document.addEventListener('DOMContentLoaded', function() {
                     return response.json();
                 }
                 else {
-                    throw new Error('Failed to send email');
+                    errorMessage.css('display', 'inline-block');
+                    errorMessage.text('The server could not resend the email');
                 }
             }).then(data => {
-                confirmationCodeValue = data["confirmationCode"];
-                timeRemainingValue = 60;
-            }).catch(error => {
-                console.error(error);
+                if(typeof data !== 'undefined') {
+                    correctCodeValue = data["confirmation_code"];
+                    clearInterval(intervalIdForTimeRemaining);
+                    timeRemaining.text('60s');
+                    timeRemainingValue = 59;
+                    intervalIdForTimeRemaining = setInterval(updateTimeRemaining, 1000);
+                }
+            }).catch(_ => {
+                errorMessage.css('display', 'inline-block');
+                errorMessage.text('Trouble connecting to the server to resend the email.');
             });
         }
+
         else {
-            const textURL = "http://localhost:8001/sendText/"+params.get("number");
+            const textURL = "http://localhost:8001/sendText"+params.get("number");
             const headers = {'Accept': 'application/json'}
             fetch(textURL, {
-                method: 'GET',
+                method: 'POST',
                 headers: headers,
             }).then(response => {
                 if(response.status === 201) {
                     return response.json();
                 }
                 else {
-                    throw new Error('Failed to send text');
+                    errorMessage.css('display', 'inline-block');
+                    errorMessage.text('The server could not resend the text');
                 }
             }).then(data => {
-                confirmationCodeValue = data["confirmationCode"];
-                timeRemainingValue = 60;
-            }).catch(error => {
-                console.error(error);
+                if(typeof data !== 'undefined') {
+                    correctCodeValue = data["confirmation_code"];
+                    clearInterval(intervalIdForTimeRemaining);
+                    timeRemaining.text('60s');
+                    timeRemainingValue = 59;
+                    intervalIdForTimeRemaining = setInterval(updateTimeRemaining, 1000);
+                }
+            }).catch(_ => {
+                errorMessage.css('display', 'inline-block');
+                errorMessage.text('Trouble connecting to the server to resend the text.');
             });
         }
-        
     });
 
-    loginText.addEventListener("click", function() {
+    loginText.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            currentLanguageLongForm = "English";
+            window.location.href = 'http://localhost:8000/login';
+            return;
         }
         else if (currLanguage==="es") {
             currentLanguageLongForm = "Español";
@@ -138,12 +141,14 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="ru") {
             currentLanguageLongForm = "Русский";
         }
-        window.location.href = "http://localhost:8000/login?language=" + currentLanguageLongForm;
+
+        window.location.href = `http://localhost:8000/login?language=${currentLanguageLongForm}`;
     });
 
 
-    setLanguage = function (lang) {
-        newLanguage = "";
+    const setLanguage = function (lang) {
+        return;
+        let newLanguage = "";
         if (lang==="English"){
             newLanguage = "en";
         }
@@ -177,27 +182,40 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(lang==="日本語") {
             newLanguage = "ja";
         }
-        else if(lang==="Русский") {
-            newLanguage = "ru";
-        }
         else {
-            return;
-        }
-        if (currLanguage === newLanguage) {
-            return;
+            newLanguage = "ru";
         }
         if(!currLanguage) {
             currLanguage = "en";
         }
+        if (currLanguage === newLanguage) {
+            return;
+        }
+
+        const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
+        const data = {
+            q: "",
+            source: "",
+            target: ""
+        };
+        const options = {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'x-rapidapi-host': 'deep-translate1.p.rapidapi.com',
+            'x-rapidapi-key': DEEP_TRANSLATE_API_KEY
+            },
+            body: null
+        };
         data["source"] = currLanguage;
         data["target"] = newLanguage;
 
         const allElements = document.querySelectorAll('*');
-        language.innerText = lang;
         const elementsText = [];
         allElements.forEach(element => {
             const text = element.innerText.trim();
-            if (text !== '' && (element.className !=="lang" && element.id!=="language") && (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
+            if (text !== '' &&
+            (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
             element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button") &&
             element.className!=="orLine" || element.tagName.toLowerCase()=="a") {
                 for (let node of element.childNodes) {
@@ -207,13 +225,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         fetch(apiUrl, options)
                         .then(response => {
                             if (!response.ok) {
-                                throw new Error('Network response was not ok');
+                                console.error('Translation network response not ok');
                             }
                             return response.json();
                         }).then(data => {
-                            node.textContent = data['data']['translations']['translatedText'];
+                            if(typeof data !==' undefined') {
+                                node.textContent = data['data']['translations']['translatedText'];
+                            }
                         }).catch(error => {
-                            console.error('Error:', error);
+                            console.error('Trouble connecting to the server to translate the page');
                         });
                     }
                 }
@@ -223,20 +243,11 @@ document.addEventListener('DOMContentLoaded', function() {
         currLanguage = newLanguage;
     }
 
-    const queryString = window.location.search.substring(1);
-    const params = new URLSearchParams(queryString);
-    const lingo = params.get("language");
-    if (lingo) {
-        setLanguage(lingo);
-    } else {
-        setLanguage("English");
-    }
-
-
-    goBackButton.addEventListener("click", function() {
+    goBackButton.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            currentLanguageLongForm = "English";
+            window.location.href = 'http://localhost:8000/ageCheck'
+            return;
         }
         else if (currLanguage==="es") {
             currentLanguageLongForm = "Español";
@@ -271,46 +282,26 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(currLanguage==="ru") {
             currentLanguageLongForm = "Русский";
         }
-        let ageCheckUrl;
-        const queryString = window.location.search.substring(1);
-        const params = new URLSearchParams(queryString);
-        if (params.get("email")) {
-            ageCheckUrl= "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&email=" + params.get("email");
-        }
-        else {
-            ageCheckUrl = "http://localhost:8000/ageCheck?language=" + currentLanguageLongForm + "&number=" + params.get("number");
-        }
-        window.location.href = ageCheckUrl;
 
+        window.location.href = `http://localhost:8000/ageCheck?language=${currentLanguageLongForm}`;
     });
 
+    confirmCode.on('input', function() {
+        if(confirmCode.val().length > 5) {
+            nextButton.css('background-color', '$347aeb');
+            nextButton.css('cursor', 'pointer');
+            nextButton.on('click', function() {
+                errorMessage.css('display', 'none');
 
-    appleDropdown.addEventListener("click", function(event) {
-        event.stopPropagation();
-        appleDevices.style.display = 'inline-block';
-    });
-
-    androidDropdown.addEventListener("click", function(event) {
-        event.stopPropagation();
-        androidDevices.style.display = 'inline-block';
-    });
-
-    windowsDropdown.addEventListener("click", function(event) {
-        event.stopPropagation();
-        windowsDevices.style.display = 'inline-block';
-    });
-
-    confirmCode.addEventListener('input', function() {
-        if(confirmCode.value.length > 5) {
-            nextButton.style.backgroundColor = '#347aeb';
-            nextButton.style.cursor = 'pointer';
-            nextButton.onclick = async function() {
-                if (confirmationCodeValue==confirmCode.value && timeRemainingValue>0) {
-                    const createUserURL = "http://localhost:8001/createUser/";
-                    const userData = {"salt":salt,"hashedPassword":hashedPassword,"username":username, "fullName":fullName};
-                    userData["dateOfBirth"] = dateOfBirth;
-                    const queryString = window.location.search.substring(1);
-                    const params = new URLSearchParams(queryString);
+                if (correctCodeValue==parseInt(confirmCode.val()) && timeRemainingValue>0) {
+                    const createUserURL = "http://localhost:8001/createUser";
+                    const userData = {
+                        "salt":salt,
+                        "hashedPassword":hashedPassword,
+                        "username":username,
+                        "fullName":fullName,
+                        "dateOfBirth":dateOfBirth
+                    };
                     if (params.get("email")) {
                         userData["contactInfo"] = params.get("email");
                     }
@@ -324,71 +315,83 @@ document.addEventListener('DOMContentLoaded', function() {
                         },
                         body: JSON.stringify(userData)
                     };
+
                     fetch(createUserURL, headers)
                     .then(response => {
                         if (!response.ok) {
-                            networkFailure.style.display = 'inline-block';
-                            incorrectCode.style.display =  'none';
-                            tooLateCode.style.display = 'none';
-                            throw new Error('Network response was not ok');
+                            errorMessage.css('display', 'inline-block');
+                            errorMessage.text('The server had trouble creating your account.');
+                            return;
                         }
+
                         const getTokensURL = "http://localhost:8003/cookies/getTokens";
-                        const data = {"username": username};
+                        const data = {
+                            "username": username
+                        };
                         headers["body"] = JSON.stringify(data);
                         headers["credentials"] = 'include';
                         fetch(getTokensURL, headers)
                         .then(response => {
                             if (!response.ok) {
-                                networkFailure.style.display = 'inline-block';
-                                incorrectCode.style.display =  'none';
-                                tooLateCode.style.display = 'none';
-                                throw new Error('Network response was not ok');
+                                errorMessage.css('display', 'inline-block');
+                                errorMessage.text('Your account has been created successfully, but the server had trouble logging you in');
+                                return;
                             }
                             return response.text();
                         })
                         .then(data => {
+                            if(typeof data === 'undefined') {
+                                return;
+                            }
                             if(data==="Cookies set successfully") {
-                                incorrectCode.style.display =  'none';
-                                tooLateCode.style.display = 'none';
-                                networkFailure.style.display = 'none';
+                                incorrectCode.css('display', 'none');
+                                tooLateCode.css('display', 'none');
+                                networkFailure.css('display', 'none');
                                 window.location.href = 'http://localhost:3100/'+username;
                             }
+                            else {
+                                errorMessage.css('display', 'inline-block');
+                                errorMessage.text('Your account has been created successfully, but the server had trouble logging you in');
+                            }
+                        })
+                        .catch(_ => {
+                            errorMessage.css('display', 'inline-block');
+                            errorMessage.text(`Your account has been created successfully, but there was trouble connecting to the
+                            server to log you in.`);
                         });
+                    })
+                    .catch(_ => {
+                        errorMessage.css('display', 'inline-block');
+                        errorMessage.text('There was trouble connecting to the server to create your account.')
                     });
                 }
-                else if(confirmationCodeValue==confirmCode.value) {
-                    tooLateCode.style.display = 'inline-block';
-                    incorrectCode.style.display =  'none';
-                    networkFailure.style.display = 'none';
+                else if(correctCodeValue==parseInt(confirmCode.val())) {
+                    errorMessage.css('display', 'inline-block');
+                    errorMessage.text('Your code is correct, but unfortunately it was given too late.');
                 }
                 else {
-                    incorrectCode.style.display =  'inline-block';
-                    tooLateCode.style.display = 'none';
-                    networkFailure.style.display = 'none';
+                    errorMessage.css('display', 'inline-block');
+                    errorMessage.text('Incorrect code');
                 }
-            }
+            });
         }
         else {
-            nextButton.style.backgroundColor =  '#82bbf5';
-            nextButton.style.cursor = 'initial';
-            nextButton.onclick = null;
+            nextButton.css('background-color', '#82bbf5');
+            nextButton.css('cursor', '');
+            nextButton.on('click', null);
         }
     });
 
+    window.setLanguage = setLanguage;
 
-    document.addEventListener('click', function (event) {
-        if (!appleDevices.contains(event.target) && appleDevices.style.display !== 'none') {
-            appleDevices.style.display = 'none';
+    function toBeExecutedWhenDocumentIsReady() {
+        intervalIdForTimeRemaining = setInterval(updateTimeRemaining, 1000);
+
+        const lingo = params.get("language");
+        if (lingo) {
+            setLanguage(lingo);
         }
-        if (!androidDevices.contains(event.target) && androidDevices.style.display !== 'none') {
-            androidDevices.style.display = 'none';
-        }
-        if (!windowsDevices.contains(event.target) && windowsDevices.style.display !== 'none') {
-            windowsDevices.style.display = 'none';
-        }
-    });
+    }
 
-
-
-
+    toBeExecutedWhenDocumentIsReady();
 });

@@ -139,12 +139,15 @@ $(document).ready(function() {
                         .then(response => {
                             if (!response.ok) {
                                 console.error('Translation network response not ok');
+                                return;
                             }
                             return response.json();
                         }).then(data => {
-                            node.textContent = data['data']['translations']['translatedText'];
-                        }).catch(error => {
-                            console.error('Error:', error);
+                            if(typeof data !== 'undefined') {
+                                node.textContent = data['data']['translations']['translatedText'];
+                            }
+                        }).catch(_ => {
+                            console.error('Trouble connecting to the server to translate the page');
                         });
                     }
                 }
@@ -256,13 +259,11 @@ $(document).ready(function() {
         }
 
         let confirmCodeUrl;
-        const queryString = window.location.search.substring(1);
-        const params = new URLSearchParams(queryString);
-        if (params.get("email")) {
-            confirmCodeUrl= "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&email=" + params.get("email");
+        if (sessionStorage.getItem("email")) {
+            confirmCodeUrl= "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&email=" + sessionStorage.getItem("email");
         }
         else {
-            confirmCodeUrl = "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&number=" + params.get("number");
+            confirmCodeUrl = "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&number=" + sessionStorage.getItem("number");
         }
         sessionStorage.setItem("dateOfBirth", birthMonth.val() + birthDay.val() + birthYear.val());
 

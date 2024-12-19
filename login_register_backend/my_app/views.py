@@ -120,7 +120,7 @@ def send_email(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def send_text(request, number):
     confirmation_code = random.randint(100000, 999999)
     account_sid = os.environ['account_sid']

@@ -1,7 +1,4 @@
 from django.shortcuts import render
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 import requests
 import json
 from django.http import HttpResponse
@@ -29,19 +26,19 @@ def confirm_code(request):
         headers = {'Content-Type': 'application/json'}
         response = requests.post(api_url, headers=headers, data=json.dumps(data))
         if response.status_code == 201:
-            confirmation_code = response.json().get('confirmationCode')
-            context['confirmation_code'] = confirmation_code
+            correct_code_value = response.json().get('confirmation_code')
+            context['correct_code_value'] = correct_code_value
             return render(request, "confirmCode.html", context)
         else:
             return HttpResponse("confirmation-code failed")
     
-    else:
+    elif context['number'] != 'N/A':
         api_url = f"http://localhost:8001/sendText/{context['number']}"
         headers = {'Accept': 'application/json'}
-        response = requests.get(api_url, headers=headers)
+        response = requests.post(api_url, headers=headers)
         if response.status_code == 201:
-            confirmation_code = response.json().get('confirmation_code')
-            context['confirmation_code'] = confirmation_code
+            correct_code_value = response.json().get('confirmation_code')
+            context['correct_code_value'] = correct_code_value
             return render(request, "confirmCode.html", context)
         else:
             return HttpResponse("confirmation-code failed")
