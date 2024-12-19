@@ -24,6 +24,10 @@
         color: #2499f2 !important;
     }
 
+    .noUnderline:hover {
+        color: darkgreen !important;
+    }
+
     .textInput {
         background-color: lightgray !important;
     }
@@ -113,6 +117,11 @@ body {
     text-decoration: none;
 }
 
+.noUnderline:hover {
+    text-decoration: underline;
+    color: darkgreen;
+}
+
 .dropbtn {
     background-color: white;
     color: gray;
@@ -138,9 +147,6 @@ body {
     border: 0.0625em solid gray;
 }
 
-.noUnderline:visited {
-    color: darkblue;
-}
 
 @media screen and (max-width: 87.5em) {
     #loginPhotoSlideshow {

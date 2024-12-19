@@ -10,9 +10,9 @@
 
     <link rel="stylesheet" href="{% static 'styles/loginStyles.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="module" src="{% static 'scripts/loginScript.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script type="module" src="{% static 'scripts/loginScript.js' %}"></script>
 </head>
 
 <body>
@@ -95,7 +95,7 @@
         </footer>
         
         <select style="margin-top: 1em; margin-bottom: 3em; padding: 0.8em 0.8em; outline: none;" onchange="setLanguage(this.value)">
-            <option value="" disabled selected>Choose Language</option>
+            <option value="" disabled selected>Change Language</option>
             <option value="العربية">العربية</option>
             <option value="বাংলা">বাংলা</option>
             <option value="Deutsch">Deutsch</option>

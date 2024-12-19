@@ -257,7 +257,7 @@ $(document).ready(function() {
                         fetch(apiUrl, options)
                         .then(response => {
                             if (!response.ok) {
-                                throw new Error('Network response was not ok');
+                                console.error('Translation network response not ok');
                             }
                             return response.json();
                         }).then(data => {
@@ -275,7 +275,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                console.error('Translation network response not ok');
             }
             return response.json();
         }).then(data => {
@@ -289,7 +289,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                console.error('Translation network response not ok');
             }
             return response.json();
         }).then(data => {

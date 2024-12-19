@@ -20,6 +20,10 @@
         color: #2499f2 !important;
     }
 
+    .noUnderline:hover {
+        color: darkgreen !important;
+    }
+
     .textInput {
         background-color: lightgray !important;
     }
@@ -103,6 +107,11 @@ body {
     text-decoration: none;
 }
 
+.noUnderline:hover {
+    text-decoration: underline;
+    color: darkgreen;
+}
+
 .togglePassword {
     position: absolute;
     right: 1.75em;
@@ -140,10 +149,6 @@ body {
     right: -2em;
     pointer-events: none;
     display: none;
-}
-
-.noUnderline:visited {
-    color: darkblue;
 }
 
 .errorMessage {
