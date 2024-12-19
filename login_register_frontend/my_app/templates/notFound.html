@@ -1,0 +1,79 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
+    <title>Page Not Found</title>
+    
+    <link rel="stylesheet" href="{% static 'styles/notFoundStyles.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/5.1.0/parallax.min.js"></script>
+    <script type="module" src="{% static 'scripts/notFoundScript.js' %}"></script>
+</head>
+
+<body>
+    
+    <nav>
+        <div class="menu">
+            <p onclick="takeUserToHomePage()" class="website_name" style="font-family: Billabong; font-size: 3em;
+            background-color: white; color: black">Megagram</p>
+            <img onclick="takeUserToHomePage()" src="{% static 'images/favicon.ico' %}" style="height: 4em; width: 4em; cursor: pointer;">
+            <img onclick="takeUserToHomePage()" src="{% static 'images/megagramFavicon.png' %}" style="height: 4em; width: 4em; cursor: pointer;">
+            <img onclick="takeUserToHomePage()" src="{% static 'images/megagramLoading.png' %}" style="height: 7em; width: 7em; margin-top: 2em; cursor: pointer;">
+        </div>
+    </nav>
+    
+    <section class="wrapper">
+        <div class="container">
+            <div id="scene" class="scene" data-hover-only="false">
+                <div class="circle" data-depth="1.2">
+                </div>
+    
+                <div class="one" data-depth="0.9">
+                    <div class="content">
+                        <span class="piece neonText" style="padding: 0.5em 1em;">WE</span>
+                        <span class="piece neonText" style="padding: 0.5em 1em;">GOT LOST</span>
+                        <span class="piece neonText" style="padding: 0.5em 1em;">TOO!</span>
+                    </div>
+                </div>
+    
+                <div class="two" data-depth="0.60">
+                    <div class="content">
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                    </div>
+                </div>
+    
+                <div class="three" data-depth="0.40">
+                    <div class="content">
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                        <span class="piece"></span>
+                    </div>
+                </div>
+    
+                <p class="p404" data-depth="0.50">404</p>
+                <p class="p404" data-depth="0.1">404</p>
+    
+            </div>
+    
+            <div class="text">
+                <article>
+                    <p>Uh oh! Looks like you got lost. Life happens. <br>Go back to the homepage if you dare!</p>
+                    <button onclick="takeUserToHomePage()">i dare!</button>
+                    <p style="position: absolute; top: 150%; color: white; font-size: 0.68em;">
+                        Credit to <a href="https://rafaelalucas.com/" target="_blank" style="color: #5091fa">Rafaela Lucas</a>
+                        for this Super Awesome UI Template!
+                    </p>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+</body>
+
+</html>
+
+

@@ -42,3 +42,10 @@ def confirm_code(request):
             return render(request, "confirmCode.html", context)
         else:
             return HttpResponse("confirmation-code failed")
+    
+    else:
+        return render(request, "notFound.html")
+        
+
+def not_found(request):
+    return render(request, "notFound.html")
