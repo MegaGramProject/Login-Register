@@ -60,7 +60,7 @@
             <div class="passwordContainer" style="position:relative;">
                 <input maxlength="128" type="password" class="textInput" id="password" placeholder="Password" style="padding-left:0.75em;
                 padding-top: 0.46875em; padding-bottom: 0.46875em; margin-top: -0.09375em; font-size: 0.875em;">
-                <button id="togglefPassword" class="togglePassword" style="margin-top:-0.625em;">Show</button>
+                <button id="togglePassword" class="togglePassword" style="margin-top:-0.625em;">Show</button>
                 <p id="passwordContainerInfo" style="font-size: 0.625em; display: inline; position: absolute; left: 0.375em;
                 top: -0.625em; color: gray; display: none;">Password</p>
                 <img id="checkmark4" class="checkmark" src="{% static 'images/checkmark.png' %}" style="right:-3em; top: 0.625em;">
@@ -69,6 +69,7 @@
             <div id="passwordStrengthContainer" style="width:16.75em; height:0.4375em; background-color: lightgray; display:none;">
                 <div id="passwordStrength" style="width:0; height:0.4375em;"></div>
             </div>
+
             <button class="blueButton" id="signupButton">Sign up</button>
             <p id="numberEmailTakenError" class="errorMessage"">
                 Your number/email is taken.

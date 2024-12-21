@@ -40,16 +40,30 @@ $(document).ready(function() {
     let numberEmailError;
     let usernameError;
     let currentInput;
-    let numberEmailTakenCache = {};
+    const numberEmailTakenCache = {};
     /*
         above is a dict where keys are numbers/emails whose taken status has already been
         fetched and values are true if the number/email is taken, false otherwise
     */
-    let usernameTakenCache = {};
+    const usernameTakenCache = {};
     /*
         above is a dict where keys are usernames whose taken status has already been
         fetched and values are true if the username is taken, false otherwise
     */
+    const languageCodeToLongFormMappings = {
+        en: "English",
+        fr: "Français",
+        es: "Español",
+        hi: "हिंदी",
+        bn: "বাংলা",
+        "zh-CN": "中国人",
+        ar: "العربية",
+        de: "Deutsch",
+        id: "Bahasa Indonesia",
+        it: "Italiano",
+        ja: "日本語",
+        ru: "Русский"
+    };
 
 
     loginText.on("click", function() {
@@ -58,40 +72,9 @@ $(document).ready(function() {
             window.location.href = "http://localhost:8000/login";
             return;
         }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
+        else {
+            currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else if(currLanguage==="ru") {
-            currentLanguageLongForm = "Русский";
-        }
-
         window.location.href = `http://localhost:8000/login?language=${currentLanguageLongForm}`;
     });
 
@@ -193,7 +176,6 @@ $(document).ready(function() {
     });
 
     const setLanguage = function (lang) {
-        return;
         let newLanguage = "";
         if (lang==="English"){
             newLanguage = "en";
@@ -257,12 +239,11 @@ $(document).ready(function() {
         data["target"] = newLanguage;
 
         const allElements = document.querySelectorAll('*');
-        const elementsText = [];
         allElements.forEach(element => {
             const text = element.innerText.trim();
             if (text !== '' && (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
-            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button") &&
-            element.className!=="orLine" || element.tagName.toLowerCase()=="a") {
+            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button" ||
+            element.tagName.toLowerCase()=="a") && element.className!=="orLine") {
                 for (let node of element.childNodes) {
                     if (node.nodeType === Node.TEXT_NODE) {
                         data["q"] = node.textContent;
@@ -270,7 +251,7 @@ $(document).ready(function() {
                         fetch(apiUrl, options)
                         .then(response => {
                             if (!response.ok) {
-                                console.error('Translation network response not ok');
+                                console.error(`The server had trouble translating the text: '${node.textContent}'`);
                                 return;
                             }
                             return response.json();
@@ -279,7 +260,7 @@ $(document).ready(function() {
                                 node.textContent = data['data']['translations']['translatedText'];
                             }
                         }).catch(_ => {
-                            console.error('Trouble connecting to the server to translate the page');
+                            console.error(`Trouble connecting to the server to translate the text: '${node.textContent}'`);
                         });
                     }
                 }
@@ -291,7 +272,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                console.error('Translation network response not ok');
+                console.error(`The server had trouble translating the text: '${numberEmail.attr('placeholder')}'`);
                 return;
             }
             return response.json();
@@ -300,7 +281,7 @@ $(document).ready(function() {
                 numberEmail.attr('placeholder', data['data']['translations']['translatedText']);
             }
         }).catch(_ => {
-            console.error('Trouble connecting to the server to translate the page');
+            console.error(`Trouble connecting to the server to translate the text: '${numberEmail.attr('placeholder')}'`);
         });
 
         data["q"] = fullName.attr('placeholder');
@@ -308,7 +289,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                console.error('Translation network response not ok');
+                console.error(`The server had trouble translating the text: '${fullName.attr('placeholder')}'`);
                 return;
             }
             return response.json();
@@ -317,7 +298,7 @@ $(document).ready(function() {
                 fullName.attr('placeholder', data['data']['translations']['translatedText']);
             }
         }).catch(_ => {
-            console.error('Trouble connecting to the server to translate the page');
+            console.error(`Trouble connecting to the server to translate the text: '${fullName.attr('placeholder')}'`);
         });
 
         data["q"] = username.attr('placeholder');
@@ -325,7 +306,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                console.error('Translation network response not ok');
+                console.error(`The server had trouble translating the text: '${username.attr('placeholder')}'`);
                 return;
             }
             return response.json();
@@ -334,7 +315,7 @@ $(document).ready(function() {
                 username.attr('placeholder',  data['data']['translations']['translatedText']);
             }
         }).catch(_ => {
-            console.error('Trouble connecting to the server to translate the page');
+            console.error(`Trouble connecting to the server to translate the text: '${username.attr('placeholder')}'`);
         });
 
         data["q"] = password.attr('placeholder');
@@ -342,7 +323,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                console.error('Translation network response not ok');
+                console.error(`The server had trouble translating the text: '${password.attr('placeholder')}'`);
                 return;
             }
             return response.json();
@@ -351,9 +332,15 @@ $(document).ready(function() {
                 password.attr('placeholder', data['data']['translations']['translatedText']);
             }
         }).catch(_ => {
-            console.error('Trouble connecting to the server to translate the page');
+            console.error(`Trouble connecting to the server to translate the text: '${password.attr('placeholder')}'`);
         });
 
+        if(newLanguage==='en') {
+            history.pushState(null, 'Register', 'http://localhost:8000/signup');
+        }
+        else {
+            history.pushState(null, 'Register', `http://localhost:8000/signup?language=${languageCodeToLongFormMappings[newLanguage]}`);
+        }
         currLanguage = newLanguage;
     }
 
@@ -561,61 +548,25 @@ $(document).ready(function() {
                 else {
                     signupButton.css('background-color', '#82bbf5');
                     signupButton.css('cursor', '');
-                    signupButton.on("click", null);
+                    signupButton.off("click");
                     return;
                 }
             }
             else {
                 signupButton.css('background-color', '#82bbf5');
                 signupButton.css('cursor', '');
-                signupButton.on("click", null);
+                signupButton.off("click");
                 return;
             }
         }
         else {
             signupButton.css('background-color', '#82bbf5');
             signupButton.css('cursor', '');
-            signupButton.on("click", null);
+            signupButton.off("click");
             return;
         }
 
-        let currentLanguageLongForm;
-        if (currLanguage==="en") {
-            currentLanguageLongForm = "English";
-        }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
-        }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else if(currLanguage==="ru") {
-            currentLanguageLongForm = "Русский";
-        }
+        let currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
 
         if (isValidEmail(numberEmail.val())) {
             sessionStorage.setItem("email", numberEmail.val());
@@ -735,26 +686,27 @@ $(document).ready(function() {
                         if(usernameIsValid) {
                             signupButton.css('background-color', '#347aeb');
                             signupButton.css('cursor', 'pointer');
+                            signupButton.off("click");
                             signupButton.on("click", () => takeUserToNextPage());
                         }
                         else {
                             signupButton.css('background-color', '#82bbf5');
                             signupButton.css('cursor', '');
-                            signupButton.on("click", null);
+                            signupButton.off("click");
                         }
                     });
                 }
                 else {
                     signupButton.css('background-color', '#82bbf5');
                     signupButton.css('cursor', '');
-                    signupButton.on("click", null);
+                    signupButton.off("click");
                 }
             });
         }
         else {
             signupButton.css('background-color', '#82bbf5');
             signupButton.css('cursor', '');
-            signupButton.on("click", null);
+            signupButton.off("click");
         }
     });
 

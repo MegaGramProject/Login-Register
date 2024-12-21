@@ -25,6 +25,20 @@ $(document).ready(function() {
     let timeRemainingValue = 59;
     let correctCodeValue = $("#correctCodeValue").text();
     let intervalIdForTimeRemaining;
+    const languageCodeToLongFormMappings = {
+        en: "English",
+        fr: "Français",
+        es: "Español",
+        hi: "हिंदी",
+        bn: "বাংলা",
+        "zh-CN": "中国人",
+        ar: "العربية",
+        de: "Deutsch",
+        id: "Bahasa Indonesia",
+        it: "Italiano",
+        ja: "日本語",
+        ru: "Русский"
+    };
 
     const updateTimeRemaining = function() {
         if(timeRemainingValue==0) {
@@ -108,38 +122,8 @@ $(document).ready(function() {
             window.location.href = 'http://localhost:8000/login';
             return;
         }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
-        }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else if(currLanguage==="ru") {
-            currentLanguageLongForm = "Русский";
+        else {
+            currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
         window.location.href = `http://localhost:8000/login?language=${currentLanguageLongForm}`;
@@ -147,7 +131,6 @@ $(document).ready(function() {
 
 
     const setLanguage = function (lang) {
-        return;
         let newLanguage = "";
         if (lang==="English"){
             newLanguage = "en";
@@ -211,13 +194,11 @@ $(document).ready(function() {
         data["target"] = newLanguage;
 
         const allElements = document.querySelectorAll('*');
-        const elementsText = [];
         allElements.forEach(element => {
             const text = element.innerText.trim();
-            if (text !== '' &&
-            (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
-            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button") &&
-            element.className!=="orLine" || element.tagName.toLowerCase()=="a") {
+            if (text !== '' && (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
+            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button" || element.tagName.toLowerCase()=="a") &&
+            element.className!=="orLine") {
                 for (let node of element.childNodes) {
                     if (node.nodeType === Node.TEXT_NODE) {
                         data["q"] = node.textContent;
@@ -225,21 +206,29 @@ $(document).ready(function() {
                         fetch(apiUrl, options)
                         .then(response => {
                             if (!response.ok) {
-                                console.error('Translation network response not ok');
+                                console.error(`The server had trouble translating the text: '${node.textContent}'`);
+                                return;
                             }
                             return response.json();
                         }).then(data => {
-                            if(typeof data !==' undefined') {
+                            if(typeof data !== 'undefined') {
                                 node.textContent = data['data']['translations']['translatedText'];
                             }
-                        }).catch(error => {
-                            console.error('Trouble connecting to the server to translate the page');
+                        }).catch(_ => {
+                            console.error(`Trouble connecting to the server to translate the text: '${node.textContent}'`);
                         });
                     }
                 }
             }
         });
 
+        if(newLanguage==='en') {
+            history.pushState(null, 'Confirm Code', 'http://localhost:8000/confirmCode');
+        }
+        else {
+            history.pushState(null, 'Confirm Code',
+            `http://localhost:8000/confirmCode?language=${languageCodeToLongFormMappings[newLanguage]}`);
+        }
         currLanguage = newLanguage;
     }
 
@@ -249,38 +238,8 @@ $(document).ready(function() {
             window.location.href = 'http://localhost:8000/ageCheck'
             return;
         }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
-        }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else if(currLanguage==="ru") {
-            currentLanguageLongForm = "Русский";
+        else {
+            currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
         window.location.href = `http://localhost:8000/ageCheck?language=${currentLanguageLongForm}`;
@@ -290,23 +249,24 @@ $(document).ready(function() {
         if(confirmCode.val().length > 5) {
             nextButton.css('background-color', '$347aeb');
             nextButton.css('cursor', 'pointer');
+            nextButton.off('click');
             nextButton.on('click', function() {
                 errorMessage.css('display', 'none');
-
+                nextButton.css('display', 'none');
                 if (correctCodeValue==parseInt(confirmCode.val()) && timeRemainingValue>0) {
                     const createUserURL = "http://localhost:8001/createUser";
                     const userData = {
                         "salt":salt,
-                        "hashedPassword":hashedPassword,
+                        "hashed_password":hashedPassword,
                         "username":username,
-                        "fullName":fullName,
-                        "dateOfBirth":dateOfBirth
+                        "full_name":fullName,
+                        "date_of_birth":dateOfBirth
                     };
                     if (params.get("email")) {
-                        userData["contactInfo"] = params.get("email");
+                        userData["contact_info"] = params.get("email");
                     }
                     else {
-                        userData["contactInfo"] = params.get("number");
+                        userData["contact_info"] = params.get("number");
                     }
                     const headers  = {
                         method: 'POST',
@@ -321,6 +281,7 @@ $(document).ready(function() {
                         if (!response.ok) {
                             errorMessage.css('display', 'inline-block');
                             errorMessage.text('The server had trouble creating your account.');
+                            nextButton.css('display', 'inline-block');
                             return;
                         }
 
@@ -335,6 +296,7 @@ $(document).ready(function() {
                             if (!response.ok) {
                                 errorMessage.css('display', 'inline-block');
                                 errorMessage.text('Your account has been created successfully, but the server had trouble logging you in');
+                                nextButton.css('display', 'inline-block');
                                 return;
                             }
                             return response.text();
@@ -352,33 +314,38 @@ $(document).ready(function() {
                             else {
                                 errorMessage.css('display', 'inline-block');
                                 errorMessage.text('Your account has been created successfully, but the server had trouble logging you in');
+                                nextButton.css('display', 'inline-block');
                             }
                         })
                         .catch(_ => {
                             errorMessage.css('display', 'inline-block');
                             errorMessage.text(`Your account has been created successfully, but there was trouble connecting to the
                             server to log you in.`);
+                            nextButton.css('display', 'inline-block');
                         });
                     })
                     .catch(_ => {
                         errorMessage.css('display', 'inline-block');
-                        errorMessage.text('There was trouble connecting to the server to create your account.')
+                        errorMessage.text('There was trouble connecting to the server to create your account.');
+                        nextButton.css('display', 'inline-block');
                     });
                 }
                 else if(correctCodeValue==parseInt(confirmCode.val())) {
                     errorMessage.css('display', 'inline-block');
                     errorMessage.text('Your code is correct, but unfortunately it was given too late.');
+                    nextButton.css('display', 'inline-block');
                 }
                 else {
                     errorMessage.css('display', 'inline-block');
                     errorMessage.text('Incorrect code');
+                    nextButton.css('display', 'inline-block');
                 }
             });
         }
         else {
             nextButton.css('background-color', '#82bbf5');
             nextButton.css('cursor', '');
-            nextButton.on('click', null);
+            nextButton.off('click');
         }
     });
 

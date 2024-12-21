@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Rishav Ray">
+    <meta name="google-signin-client_id" content="43485011077-027qkbinu13lr1esvh85v5oolgf33dhn.apps.googleusercontent.com">
     {% load static %}
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
     <title>Login</title>
@@ -11,6 +12,7 @@
     <link rel="stylesheet" href="{% static 'styles/loginStyles.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <!--script src="https://accounts.google.com/gsi/client" async></script> <!--This is for Google O-Auth-->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script type="module" src="{% static 'scripts/loginScript.js' %}"></script>
 </head>
@@ -58,22 +60,27 @@
 
                     <br>
 
-                    <div class="g-recaptcha" data-sitekey="6Lf9bfYpAAAAAHDspCvL869y03gQ8SIkesqJwfB-"
-                    data-callback="onSubmittingRecaptchaResults"></div>
-                    <p id="recaptchaErrorMessage" style="font-size:small; color: #ba3240; display: none;"></p>
+                    <div class="g-recaptcha"
+                    data-sitekey="6Lc2v6EqAAAAAHTzpnopxnHFxUr-PNljcui_it3K"
+                    data-callback='onSubmittingRecaptchaResults'
+                    data-action='submit'>
+                    </div>
+
+                    <p id="recaptchaErrorMessage" class="errorMessage"></p>
 
                     <button type="button" class="blueButton" id="loginButton">Log in</button>
-                    <p id="errorMessage" style="font-size:small; color: #ba3240; display: none;"></p>
+                    <p id="errorMessage" class="errorMessage"></p>
 
-                    <br>
-
-                    <div>
+                    <div style="margin-top: 1.5em; margin-bottom: 1.5em;">
                         <p class="orLine">───────────</p><p id="OR">OR</p>
                         <p class="orLine" style="margin-left:0.5em;">───────────</p>
                     </div>
 
-                    <br>
-                    <a href="http://localhost:3001/forgotPassword" class="noUnderline"><p id="forgotPassword">Forgot Password?</p></a>
+                    <button id="signInWithGoogle"></button>
+
+                    <a id="forgotPassword" href="http://localhost:3001/forgotPassword" class="noUnderline" style="margin-top: 1.3em;">
+                        Forgot Password?
+                    </a>
                 </div>
 
                 <div class="box" style="height:50%; margin-top:0.5em;">

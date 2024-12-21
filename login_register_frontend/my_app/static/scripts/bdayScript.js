@@ -19,6 +19,20 @@ $(document).ready(function() {
     const errorMessage = $("#errorMessage");
     const darkScreen = $("#darkScreen");
     let currLanguage = "en";
+    const languageCodeToLongFormMappings = {
+        en: "English",
+        fr: "Français",
+        es: "Español",
+        hi: "हिंदी",
+        bn: "বাংলা",
+        "zh-CN": "中国人",
+        ar: "العربية",
+        de: "Deutsch",
+        id: "Bahasa Indonesia",
+        it: "Italiano",
+        ja: "日本語",
+        ru: "Русский"
+    };
 
     loginText.on("click", function() {
         let currentLanguageLongForm;
@@ -26,38 +40,8 @@ $(document).ready(function() {
             window.location.href = "http://localhost:8000/login";
             return;
         }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
-        }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else if(currLanguage==="ru") {
-            currentLanguageLongForm = "Русский";
+        else {
+            currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
         window.location.href = `http://localhost:8000/login?language=${currentLanguageLongForm}`;
@@ -65,8 +49,7 @@ $(document).ready(function() {
 
 
     const setLanguage = function (lang) {
-        return;
-        let newLanguage;
+        let newLanguage = "";
         if (lang==="English"){
             newLanguage = "en";
         }
@@ -125,12 +108,11 @@ $(document).ready(function() {
 
         const allElements = document.querySelectorAll('*');
         language.innerText = lang;
-        const elementsText = [];
         allElements.forEach(element => {
             const text = element.innerText.trim();
             if (text !== '' && (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
-            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button") &&
-            element.className!=="orLine" || element.tagName.toLowerCase()=="a") {
+            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button" || element.tagName.toLowerCase()=="a") &&
+            element.className!=="orLine") {
                 for (let node of element.childNodes) {
                     if (node.nodeType === Node.TEXT_NODE) {
                         data["q"] = node.textContent;
@@ -138,7 +120,7 @@ $(document).ready(function() {
                         fetch(apiUrl, options)
                         .then(response => {
                             if (!response.ok) {
-                                console.error('Translation network response not ok');
+                                console.error(`The server had trouble translating the text: '${node.textContent}'`);
                                 return;
                             }
                             return response.json();
@@ -147,13 +129,19 @@ $(document).ready(function() {
                                 node.textContent = data['data']['translations']['translatedText'];
                             }
                         }).catch(_ => {
-                            console.error('Trouble connecting to the server to translate the page');
+                            console.error(`Trouble connecting to the server to translate the text: '${node.textContent}'`);
                         });
                     }
                 }
             }
         });
 
+        if(newLanguage==='en') {
+            history.pushState(null, 'Age Check', 'http://localhost:8000/ageCheck');
+        }
+        else {
+            history.pushState(null, 'Age Check', `http://localhost:8000/ageCheck?language=${languageCodeToLongFormMappings[newLanguage]}`);
+        }
         currLanguage = newLanguage;
     }
     
@@ -164,38 +152,8 @@ $(document).ready(function() {
             window.location.href = 'http://localhost:8000/signup';
             return;
         }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
-        }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else if(currLanguage==="ru") {
-            currentLanguageLongForm = "Русский";
+        else {
+            currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
         window.location.href = `http://localhost:8000/signup?language=${currentLanguageLongForm}`;
@@ -220,50 +178,15 @@ $(document).ready(function() {
         nextButton.css('display', 'none');
         goBackText.css('display', 'none');
 
-        let currentLanguageLongForm;
-        if (currLanguage==="en") {
-            currentLanguageLongForm = "English";
-        }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
-        }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else {
-            currentLanguageLongForm = "Русский";
-        }
-
+        let currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         let confirmCodeUrl;
         if (sessionStorage.getItem("email")) {
-            confirmCodeUrl= "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&email=" + sessionStorage.getItem("email");
+            confirmCodeUrl= "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&email=" +
+            sessionStorage.getItem("email");
         }
         else {
-            confirmCodeUrl = "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&number=" + sessionStorage.getItem("number");
+            confirmCodeUrl = "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&number=" +
+            sessionStorage.getItem("number");
         }
         sessionStorage.setItem("dateOfBirth", birthMonth.val() + birthDay.val() + birthYear.val());
 
@@ -283,65 +206,71 @@ $(document).ready(function() {
     }
 
     birthMonth.on('input', function() {
-        if(birthMonth.val() && birthDay.val() && birthYear.val() && isValidAge(birthMonth.val(), parseInt(birthDay.val(),10), parseInt(birthYear.val(),10))) {
+        if(birthMonth.val() && birthDay.val() && birthYear.val() && isValidAge(birthMonth.val(), parseInt(birthDay.val(),10),
+        parseInt(birthYear.val(),10))) {
             errorMessage.css('display', 'none');
             nextButton.css('background-color', '#347aeb');
             nextButton.css('cursor', 'pointer');
+            nextButton.off('click');
             nextButton.on('click', () => takeUserToFinalPage());
         }
         else if(birthMonth.val() && birthDay.val() && birthYear.val()) {
             errorMessage.css('display', 'inline-block');
             nextButton.css('background-color', '#82bbf5');
             nextButton.css('cursor', '');
-            nextButton.on('click', null);
+            nextButton.off('click');
         }
         else {
             errorMessage.css('display', 'none');
             nextButton.css('background-color', '#82bbf5');
             nextButton.css('cursor', '');
-            nextButton.on('click', null);
+            nextButton.off('click');
         }
     });
 
     birthDay.on('input', function() {
-        if(birthMonth.val() && birthDay.val() && birthYear.val() && isValidAge(birthMonth.val(), parseInt(birthDay.val(),10), parseInt(birthYear.val(),10))) {
+        if(birthMonth.val() && birthDay.val() && birthYear.val() && isValidAge(birthMonth.val(), parseInt(birthDay.val(),10),
+        parseInt(birthYear.val(),10))) {
             errorMessage.css('display', 'none');
             nextButton.css('background-color', '#347aeb');
             nextButton.css('cursor', 'pointer');
+            nextButton.off('click');
             nextButton.on('click', () => takeUserToFinalPage());
         }
         else if(birthMonth.val() && birthDay.val() && birthYear.val()) {
             errorMessage.css('display', 'inline-block');
             nextButton.css('background-color', '#82bbf5');
             nextButton.css('cursor', '');
-            nextButton.on('click', null);
+            nextButton.off('click');
         }
         else {
             errorMessage.css('display', 'none');
             nextButton.css('background-color', '#82bbf5');
             nextButton.css('cursor', '');
-            nextButton.on('click', null);
+            nextButton.off('click');
         }
     });
     
     birthYear.on('input', function() {
-        if(birthMonth.val() && birthDay.val() && birthYear.val() && isValidAge(birthMonth.val(), parseInt(birthDay.val(),10), parseInt(birthYear.val(),10))) {
+        if(birthMonth.val() && birthDay.val() && birthYear.val() && isValidAge(birthMonth.val(), parseInt(birthDay.val(),10),
+        parseInt(birthYear.val(),10))) {
             errorMessage.css('display', 'none');
             nextButton.css('background-color', '#347aeb');
             nextButton.css('cursor', 'pointer');
+            nextButton.off('click');
             nextButton.on('click', () => takeUserToFinalPage());
         }
         else if (birthMonth.val() && birthDay.val() && birthYear.val()) {
             errorMessage.css('display', 'inline-block');
             nextButton.css('background-color', '#82bbf5');
             nextButton.css('cursor', '');
-            nextButton.on('click', null);
+            nextButton.off('click');
         }
         else {
             errorMessage.css('display', 'none');
             nextButton.css('background-color', '#82bbf5');
             nextButton.css('cursor', '');
-            nextButton.on('click', null);
+            nextButton.off('click');
         }
     });
 
@@ -358,14 +287,13 @@ $(document).ready(function() {
         return inputDate <= tenYearsAgo;
     };
     
-
-
     window.setLanguage = setLanguage;
 
     function toBeExecutedWhenDocumentIsReady() {
         if (sessionStorage.getItem("dateOfBirth")) {
             birthMonth.val(sessionStorage.getItem("dateOfBirth").substring(0, 3));
-            birthYear.val(sessionStorage.getItem("dateOfBirth").slice(-4));
+            birthDay.val(sessionStorage.getItem("dateOfBirth").substring(3, 5));
+            birthYear.val(sessionStorage.getItem("dateOfBirth").substring(5, 9));
         }
 
         const queryString = window.location.search.substring(1);

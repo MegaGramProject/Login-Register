@@ -20,121 +20,90 @@ $(document).ready(function() {
     let recaptchaIsVerified = false;
     let slideIdx = 0;
     let currLanguage = "en";
+    const languageCodeToLongFormMappings = {
+        en: "English",
+        fr: "Français",
+        es: "Español",
+        hi: "हिंदी",
+        bn: "বাংলা",
+        "zh-CN": "中国人",
+        ar: "العربية",
+        de: "Deutsch",
+        id: "Bahasa Indonesia",
+        it: "Italiano",
+        ja: "日本語",
+        ru: "Русский"
+    };
+    
 
     const loginUser = async function() {
+        const postOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
         if (isValidEmail(numberNameEmail.val()) || isValidNumber(numberNameEmail.val())) {
-            const userVerifyURL = "http://localhost:8001/doesUserExist";
-            const postOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "contact_info": numberNameEmail.val()
-                })
-            };
-            
-            try {
-                const response = await fetch(userVerifyURL, postOptions);
-                const data = await response.json();
-                const salt = data['salt'];
-                
-                if (typeof salt === 'undefined') {
-                    errorMessage.css('display', '');
-                    errorMessage.text("User not found");
-                }
-                else {
-                    const hashedPassword = data['hashedPassword'];
-                    if (bcrypt.hashSync(password.val(), salt) === hashedPassword) {
-                        errorMessage.css('display', 'none');
-                        postOptions.body = JSON.stringify(
-                            {
-                            "username": data['username']
-                            }
-                        );
-
-                        postOptions.credentials = 'include';
-                        const tokenResponse = await fetch('http://localhost:8003/cookies/getTokensAfterLogin', postOptions);
-                        if (!tokenResponse.ok) {
-                            errorMessage.css('display', '');
-                            errorMessage.text("Your info is correct, but the server is having problems logging you in right now.");
-                        }
-
-                        const responseData = await tokenResponse.text();
-                        if (responseData === "Cookies set successfully") {
-                            window.location.href = "http://localhost:3100/" + data['username'];
-                        }
-                        else {
-                            errorMessage.css('display', '');
-                            errorMessage.text("Your info is correct, but the server is having problems logging you in right now.");
-                        }
-                    }
-                    else {
-                        errorMessage.css('display', '');
-                        errorMessage.text("Incorrect password");
-                    }
-                }
-            }
-            catch (error) {
-                errorMessage.css('display', '');
-                errorMessage.text("Trouble connecting to the server");
-            }
+            postOptions.body = JSON.stringify({
+                "contact_info": numberNameEmail.val()
+            });
         }
         else {
-            const userVerifyURL = "http://localhost:8001/doesUserExist";
-            const postOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "username": numberNameEmail.val()
-                })
-            };
-    
-            try {
-                const response = await fetch(userVerifyURL, postOptions);
-                const data = await response.json();
-                const salt = data['salt'];
-    
-                if (typeof salt === 'undefined') {
-                    errorMessage.css('display', '');
-                    errorMessage.text("User not found");
-                }
-                else {
-                    const hashedPassword = data['hashedPassword'];
-                    if (bcrypt.hashSync(password.val(), salt) === hashedPassword) {
-                        errorMessage.css('display', 'none');
-                        postOptions.body = JSON.stringify(
-                            {
-                                "username": numberNameEmail.val()
-                            }
-                        );
-                        postOptions.credentials = 'include';
-    
+            postOptions.body = JSON.stringify({
+                "username": numberNameEmail.val()
+            });
+        }
+
+        try {
+            const response = await fetch("http://localhost:8001/doesUserExist", postOptions);
+            const data = await response.json();
+            const salt = data['salt'];
+            
+            if (typeof salt === 'undefined') {
+                errorMessage.css('display', 'inline-block');
+                errorMessage.text("User not found");
+            }
+            else {
+                const hashedPassword = data['hashed_password'];
+                if (bcrypt.hashSync(password.val(), salt) === hashedPassword) {
+                    errorMessage.css('display', 'none');
+                    postOptions.body = JSON.stringify(
+                        {
+                        "username": data['username']
+                        }
+                    );
+                    postOptions.credentials = 'include';
+                    try {
                         const tokenResponse = await fetch('http://localhost:8003/cookies/getTokensAfterLogin', postOptions);
                         if (!tokenResponse.ok) {
-                            errorMessage.css('display', '');
-                            errorMessage.text("Your info is correct, but the server is having problems logging you in right now.");
+                            errorMessage.css('display', 'inline-block');
+                            errorMessage.text("Your info is correct, but the server is having problems logging you in.");
+                            return;
                         }
                         const responseData = await tokenResponse.text();
                         if (responseData === "Cookies set successfully") {
                             window.location.href = "http://localhost:3100/" + data['username'];
                         }
                         else {
-                            errorMessage.css('display', '');
-                            errorMessage.text("Your info is correct, but the server is having problems logging you in right now.");
+                            errorMessage.css('display', 'inline-block');
+                            errorMessage.text("Your info is correct, but the server is having problems logging you in.");
                         }
                     }
-                    else {
-                        errorMessage.css('display', '');
-                        errorMessage.text("Incorrect password");
+                    catch (error) {
+                        errorMessage.css('display', 'inline-block');
+                        errorMessage.text("Your info is correct, but there's trouble connecting to the server for logging you in.");
                     }
                 }
-            } catch (error) {
-                errorMessage.css('display', '');
-                errorMessage.text("Trouble connecting to the server");
+                else {
+                    errorMessage.css('display', 'inline-block');
+                    errorMessage.text("Incorrect password");
+                }
             }
+        }
+        catch (error) {
+            errorMessage.css('display', 'inline-block');
+            errorMessage.text("Trouble connecting to the server to validate your details");
         }
     }
 
@@ -144,45 +113,14 @@ $(document).ready(function() {
             window.location.href = "http://localhost:8000/signup";
             return;
         }
-        else if (currLanguage==="es") {
-            currentLanguageLongForm = "Español";
-        }
-        else if(currLanguage==="fr") {
-            currentLanguageLongForm = "Français";
-        }
-        else if(currLanguage==="hi") {
-            currentLanguageLongForm = "हिंदी";
-        }
-        else if(currLanguage==="bn") {
-            currentLanguageLongForm = "বাংলা";
-        }
-        else if(currLanguage==="zh-CN"){
-            currentLanguageLongForm = "中国人";
-        }
-        else if(currLanguage==="ar") {
-            currentLanguageLongForm = "العربية";
-        }
-        else if(currLanguage==="de") {
-            currentLanguageLongForm = "Deutsch";
-        }
-        else if(currLanguage==="id") {
-            currentLanguageLongForm = "Bahasa Indonesia";
-        }
-        else if(currLanguage==="it"){
-            currentLanguageLongForm = "Italiano";
-        }
-        else if(currLanguage==="ja") {
-            currentLanguageLongForm = "日本語";
-        }
-        else if(currLanguage==="ru") {
-            currentLanguageLongForm = "Русский";
+        else {
+            currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
         window.location.href = `http://localhost:8000/signup?language=${currentLanguageLongForm}`;
     });
 
     const setLanguage = function (lang) {
-        return;
-        newLanguage = "";
+        let newLanguage = "";
         if (lang==="English"){
             newLanguage = "en";
         }
@@ -244,12 +182,11 @@ $(document).ready(function() {
             body: null
         };
         const allElements = document.querySelectorAll('*');
-        const elementsText = [];
         allElements.forEach(element => {
             const text = element.innerText.trim();
             if (text !== '' && (element.tagName.toLowerCase()==="p" || element.tagName.toLowerCase()==="footer" ||
-            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button") &&
-            element.className!=="orLine" || element.tagName.toLowerCase()=="a") {
+            element.tagName.toLowerCase()==="input" || element.tagName.toLowerCase()==="button" ||
+            element.tagName.toLowerCase()=="a") && element.className!=="orLine") {
                 for (let node of element.childNodes) {
                     if (node.nodeType === Node.TEXT_NODE) {
                         data["q"] = node.textContent;
@@ -257,7 +194,7 @@ $(document).ready(function() {
                         fetch(apiUrl, options)
                         .then(response => {
                             if (!response.ok) {
-                                console.error('Translation network response not ok');
+                                console.error(`The server had trouble translating the text: '${node.textContent}'`);
                                 return;
                             }
                             return response.json();
@@ -266,7 +203,7 @@ $(document).ready(function() {
                                 node.textContent = data['data']['translations']['translatedText'];
                             }
                         }).catch(_ => {
-                            console.error('Trouble connecting to the server to translate the page');
+                            console.error(`Trouble connecting to the server to translate the text: '${node.textContent}'`);
                         });
                     }
                 }
@@ -278,7 +215,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                console.error('Translation network response not ok');
+                console.error(`The server had trouble translating the text: '${numberNameEmail.attr('placeholder')}'`);
                 return;
             }
             return response.json();
@@ -287,7 +224,7 @@ $(document).ready(function() {
                 numberNameEmail.attr('placeholder', data['data']['translations']['translatedText']);
             }
         }).catch(_ => {
-            console.error('Trouble connecting to the server to translate the page');
+            console.error(`Trouble connecting to the server to translate the text: '${numberNameEmail.attr('placeholder')}'`);
         });
 
         data["q"] = password.attr('placeholder');
@@ -295,7 +232,7 @@ $(document).ready(function() {
         fetch(apiUrl, options)
         .then(response => {
             if (!response.ok) {
-                console.error('Translation network response not ok');
+                console.error(`The server had trouble translating the text: '${password.attr('placeholder')}'`);
                 return;
             }
             return response.json();
@@ -304,9 +241,15 @@ $(document).ready(function() {
                 password.attr('placeholder', data['data']['translations']['translatedText']);
             }
         }).catch(_ => {
-            console.error('Trouble connecting to the server to translate the page');
+            console.error(`Trouble connecting to the server to translate the text: '${password.attr('placeholder')}'`);
         });
 
+        if(newLanguage==='en') {
+            history.pushState(null, 'Login', 'http://localhost:8000/login');
+        }
+        else {
+            history.pushState(null, 'Login', `http://localhost:8000/login?language=${languageCodeToLongFormMappings[newLanguage]}`);
+        }
         currLanguage = newLanguage;
     }
 
@@ -360,9 +303,8 @@ $(document).ready(function() {
 
     numberNameEmail.on('input', function () {
         if(numberNameEmail.val().length > 0) {
-            $('#userContainerInfo').css('display', '');
+            $('#userContainerInfo').css('display', 'inline-block');
             numberNameEmail.css('padding-top', '8.5px');
-
         }
         else {
             $('#userContainerInfo').css('display', 'none');
@@ -374,8 +316,8 @@ $(document).ready(function() {
 
     password.on("input", function() {
         if (password.val().length > 0) {
-            togglePassword.css('display', '');
-            passwordContainerInfo.css('display', '');
+            togglePassword.css('display', 'inline-block');
+            passwordContainerInfo.css('display', 'inline-block');
             password.css('padding-top', '8.5px');
         }
         else {
@@ -392,12 +334,11 @@ $(document).ready(function() {
         &&  password.val().length > 0 && recaptchaIsVerified) {
             loginButton.css('background-color', '#347aeb');
             loginButton.css('cursor', 'pointer');
+            loginButton.off("click");
             loginButton.on("click", loginUser);
         }
         else {
-            loginButton.css('background-color', '#82bbf5');
-            loginButton.css('cursor', '');
-            loginButton.on("click", null);
+           updateUIBecauseUserIsNotReadyToLogin();
         }
     }
 
@@ -413,9 +354,9 @@ $(document).ready(function() {
     
     const displayFirstLoginPhoto = function() {
         let incrementOpacity = function() {
-            const currOpacity = parseFloat(loginPhotos[slideIdx].style.opacity);
+            const currOpacity = parseFloat(loginPhotos[0].style.opacity);
             if (currOpacity < 1) {
-                loginPhotos[slideIdx].style.opacity = (currOpacity + 0.01).toString();
+                loginPhotos[0].style.opacity = (currOpacity + 0.01).toString();
                 setTimeout(incrementOpacity, 50);
             }
             else {
@@ -438,6 +379,8 @@ $(document).ready(function() {
 
         const newPhoto = loginPhotos[slideIdx];
         newPhoto.style.opacity = "0";
+        currentPhoto.style.opacity = "1";
+
         let enableTransition = function() {
             if (parseFloat(newPhoto.style.opacity) < 1) {
                 newPhoto.style.opacity = (parseFloat(newPhoto.style.opacity) + 0.01).toString();
@@ -465,8 +408,10 @@ $(document).ready(function() {
         fetch("http://localhost:8001/verifyCaptcha", options)
         .then(response => {
             if (!response.ok) {
-                recaptchaErrorMessage.css('display', '');
+                recaptchaErrorMessage.css('display', 'inline-block');
                 recaptchaErrorMessage.text('The server could not assess the results of your test');
+                recaptchaIsVerified = false;
+                updateUIBecauseUserIsNotReadyToLogin();
                 return;
             }
             return response.json();
@@ -480,22 +425,42 @@ $(document).ready(function() {
                 checkIfReadyToLogin();
             }
             else {
-                recaptchaErrorMessage.css('display', '');
+                recaptchaErrorMessage.css('display', 'inline-block');
                 recaptchaErrorMessage.text('You did not pass the test');
+                recaptchaIsVerified = false;
+                updateUIBecauseUserIsNotReadyToLogin();
             }
         }).catch(_ => {
-            recaptchaErrorMessage.css('display', '');
+            recaptchaErrorMessage.css('display', 'inline-block');
             recaptchaErrorMessage.text('Trouble connecting to the server to assess the results of your test');
+            recaptchaIsVerified = false;
+            updateUIBecauseUserIsNotReadyToLogin();
         });
+    }
+
+    function updateUIBecauseUserIsNotReadyToLogin() {
+        loginButton.css('background-color', '#82bbf5');
+        loginButton.css('cursor', '');
+        loginButton.off("click");
+    }
+
+    function onSigningInWithGoogle(googleUser) {
+        //this code is executed after the user gets redirected.
+        var profile = googleUser.getBasicProfile();
+        console.log('ID: ' + profile.getId());
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail());
     }
 
     window.setLanguage = setLanguage;
     window.onSubmittingRecaptchaResults = onSubmittingRecaptchaResults;
+    window.onSigningInWithGoogle = onSigningInWithGoogle;
 
     function toBeExecutedWhenDocumentIsReady() {
-        setTimeout(function() {
+        setTimeout(() => {
             $('#loadingScreen').css('display', 'none');
-            $('#loginScreen').css('display', '');
+            $('#loginScreen').css('display', 'inline-block');
         }, 740);
         displayFirstLoginPhoto();
 
@@ -505,6 +470,18 @@ $(document).ready(function() {
         if (lingo) {
             setLanguage(lingo);
         }
+
+        /* The following code will be uncommented once this website runs on HTTPS.
+        google.accounts.id.initialize({
+            client_id: '43485011077-027qkbinu13lr1esvh85v5oolgf33dhn.apps.googleusercontent.com',
+            callback: onSigningInWithGoogle,
+        });
+        
+        google.accounts.id.renderButton(
+            document.getElementById('signInWithGoogle'),
+            { theme: 'outline', size: 'large' }
+        );
+        */
     }
     toBeExecutedWhenDocumentIsReady();
 
