@@ -14,5 +14,7 @@ urlpatterns = [
     path("getUsernamesAndFullNamesOfAll", views.get_usernames_and_full_names_of_all, name="Get Usernames and Full-Names of All"),
     path("getRelevantUserInfoFromUsername/<str:username>", views.get_relevant_user_info_from_username, name="Get Relevant User-Info from Username"),
     path("getRelevantUserInfoOfMultipleUsers", views.get_relevant_user_info_of_multiple_users, name="Get Relevant User-Info Of Multiple Users"),
-    path("getRelevantUserInfoFromUsernameIncludingContactInfo/<str:username>", views.get_relevant_user_info_from_username_including_contact_info, name="Get Relevant User-Info From Username(including Contact-Info)")
+    path("getRelevantUserInfoFromUsernameIncludingContactInfo/<str:username>",
+    views.get_relevant_user_info_from_username_including_contact_info,
+    name="Get Relevant User-Info From Username(including Contact-Info)")
 ]

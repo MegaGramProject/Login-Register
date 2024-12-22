@@ -1,7 +1,9 @@
 from pathlib import Path
-import os
+from dotenv import load_dotenv
 from decouple import config
 
+# Load environment variables from .env
+load_dotenv()
 
 # BASE_DIR represents the file-path of the grandparent directory(login_register_backend) of this file.
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -56,8 +58,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Megagram',
-        'USER': os.environ.get('LOCAL_MYSQL_USERNAME'),
-        'PASSWORD': os.environ.get('LOCAL_MYSQL_PASSWORD'),
+        'USER': config('LOCAL_MYSQL_USER'),
+        'PASSWORD': config('LOCAL_MYSQL_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '3306',
     }
