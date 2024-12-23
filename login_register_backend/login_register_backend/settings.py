@@ -6,7 +6,6 @@ from decouple import config
 load_dotenv()
 
 # BASE_DIR represents the file-path of the grandparent directory(login_register_backend) of this file.
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -14,13 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 
-# DEBUG is a boolean which is True if Debug-mode is turned on, False otherwise. It is recommended for it to be False for production.
+# DEBUG is a boolean which is True if Debug-mode is turned on, False otherwise. It is supposed to be False for production.
 DEBUG = True
 
 
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+]
 
 
 INSTALLED_APPS = [
@@ -54,14 +54,19 @@ ROOT_URLCONF = 'login_register_backend.urls'
 WSGI_APPLICATION = 'login_register_backend.wsgi.application'
 
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        #'NAME': 'rishavr$Megagram',
+        #'USER': config('PYTHON_ANYWHERE_MYSQL_USER'),
+        #'PASSWORD': config('PYTHON_ANYWHERE_MYSQL_PASSWORD'),
+        #'HOST': config('PYTHON_ANYWHERE_MYSQL_HOST'),
         'NAME': 'Megagram',
         'USER': config('LOCAL_MYSQL_USER'),
         'PASSWORD': config('LOCAL_MYSQL_PASSWORD'),
         'HOST': 'localhost',
-        'PORT': '3306',
+        'POST': 3306
     }
 }
 

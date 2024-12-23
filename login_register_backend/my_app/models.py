@@ -11,7 +11,7 @@ class User(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(db_column='isVerified', default=False)
     is_private = models.BooleanField(db_column='isPrivate', default=False)
-    account_based_in = models.TextField(db_column='accountBasedIn', blank=True)
+    account_based_in = models.TextField(db_column='accountBasedIn', blank=True, default='N/A')
 
     def __str__(self):
         return self.username

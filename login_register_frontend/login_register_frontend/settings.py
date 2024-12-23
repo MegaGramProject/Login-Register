@@ -1,6 +1,10 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 from decouple import config
+
+# Load environment variables from .env
+load_dotenv()
 
 
 # BASE_DIR represents the file-path of the grandparent directory(login_register_backend) of this file.
@@ -18,7 +22,10 @@ DEBUG = True
 
 #ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 #This is a security measure to prevent HTTP Host header attacks
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'worthy-caring-walrus.ngrok-free.app',
+    'localhost'
+]
 
 
 # Application definition
@@ -36,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -70,8 +78,20 @@ TEMPLATES = [
 # When running a production server, you need to explicitly point to the WSGI callable in your wsgi.py file
 WSGI_APPLICATION = 'login_register_frontend.wsgi.application'
 
-# Location of 'static' directory
-STATIC_URL = os.path.join(BASE_DIR,'my_app/static/')
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage", #Compresses static-file-sizes for efficiency
+    },
+}
+
+
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = os.path.join(BASE_DIR, 'my_app', 'static')
+
+
+# The URL to use when referring to static files (where they will be served from)
+STATIC_URL = '/static/'
 
 
 # All models created with Django without an explicitly defined primary key will use a BigAutoField as the default primary key.
