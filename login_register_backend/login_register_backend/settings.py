@@ -20,7 +20,19 @@ DEBUG = True
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1'
 ]
+
+
+#redirects all connections to HTTPs
+SECURE_SSL_REDIRECT = False
+
+
+SESSION_COOKIE_SECURE = True
+
+
+CSRF_COOKIE_SECURE = True
 
 
 INSTALLED_APPS = [
@@ -58,10 +70,6 @@ WSGI_APPLICATION = 'login_register_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        #'NAME': 'rishavr$Megagram',
-        #'USER': config('PYTHON_ANYWHERE_MYSQL_USER'),
-        #'PASSWORD': config('PYTHON_ANYWHERE_MYSQL_PASSWORD'),
-        #'HOST': config('PYTHON_ANYWHERE_MYSQL_HOST'),
         'NAME': 'Megagram',
         'USER': config('LOCAL_MYSQL_USER'),
         'PASSWORD': config('LOCAL_MYSQL_PASSWORD'),

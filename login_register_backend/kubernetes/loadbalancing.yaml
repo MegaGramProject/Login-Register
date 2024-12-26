@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-register-backend-service
+spec:
+  selector:
+    app: login-register-backend
+  ports:
+  - protocol: TCP
+    port: 8001  # Service exposes this port
+    targetPort: 8001 # Maps to the container's port
+    nodePort: 30000  # Port exposed on the node
+  type: LoadBalancer

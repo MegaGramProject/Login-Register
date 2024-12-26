@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-register-backend-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: login-register-backend
+  template:
+    metadata:
+      labels:
+        app: login-register-backend
+    spec:
+      containers:
+      - name: login-register-backend-container
+        image: rishavry/django-app:latest
+        ports:
+        - containerPort: 8001
+
