@@ -20,8 +20,7 @@ DEBUG = True
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1'
+    config('ALLOWED_HOST')
 ]
 
 

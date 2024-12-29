@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: login-register-backend-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: login-register-backend
@@ -14,7 +14,18 @@ spec:
     spec:
       containers:
       - name: login-register-backend-container
-        image: rishavry/django-app:latest
+        image: rishavry/login-register-backend:v1
         ports:
         - containerPort: 8001
-
+        envFrom:
+        - secretRef:
+            name: env-secrets
+        volumeMounts:
+        - name: google-credentials-json-secret-volume
+          mountPath: /app/megagram-428802-9481f000861d.json
+          subPath: megagram-428802-9481f000861d.json
+          readOnly: true
+      volumes:
+      - name: google-credentials-json-secret-volume
+        secret:
+          secretName: google-credentials-json-secret
