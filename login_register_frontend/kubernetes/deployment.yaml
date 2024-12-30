@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-register-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-register-frontend
+  template:
+    metadata:
+      labels:
+        app: login-register-frontend
+    spec:
+      containers:
+      - name: login-register-frontend-container
+        image: rishavry/login-register-frontend:v0
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: login-register-frontend-env-secrets

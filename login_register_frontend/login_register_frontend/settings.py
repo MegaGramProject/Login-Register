@@ -3,32 +3,24 @@ import os
 from dotenv import load_dotenv
 from decouple import config
 
-# Load environment variables from .env
 load_dotenv()
 
-
 # BASE_DIR represents the file-path of the grandparent directory(login_register_backend) of this file.
-# Build paths inside the project like this: os.path.join(BASE_DIR, 'subdir').
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = config('LOGIN_REGISTER_FRONTEND_DJANGO_SECRET_KEY')
 
-
-#DEBUG is a boolean which is True if Debug-mode is turned on, False otherwise. It is recommended for it to be False for production.
+# SECURITY WARNING: Don't run with debug turned on in production!
 DEBUG = True
 
-
-#ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
-#This is a security measure to prevent HTTP Host header attacks
+# ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
+# This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
-    'worthy-caring-walrus.ngrok-free.app',
-    'localhost'
+    config('ALLOWED_HOST')
 ]
 
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,9 +32,7 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -53,15 +43,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'login_register_frontend.urls'
-
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True, # templates-directory is in my_app which is an app.
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -73,29 +61,30 @@ TEMPLATES = [
     },
 ]
 
-
-# In production, you need a WSGI-compatible server(e.g Gunicorn, uWSGI, etc) to serve a Python Django/Flask/etc project.
-# When running a production server, you need to explicitly point to the WSGI callable in your wsgi.py file
 WSGI_APPLICATION = 'login_register_frontend.wsgi.application'
 
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage", #Compresses static-file-sizes for efficiency
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",  # Compress static-file sizes for efficiency
     },
 }
 
-
-# The absolute path to the directory where collectstatic will collect static files for deployment.
+# Absolute path to the directory where collectstatic will collect static files for deployment.
 STATIC_ROOT = os.path.join(BASE_DIR, 'my_app', 'static')
 
+# URL to use when referring to static files (where they will be served from)
+STATIC_URL = '/loginregister-static/'
 
-# The URL to use when referring to static files (where they will be served from)
-STATIC_URL = '/static/'
+CORS_ALLOW_ALL_ORIGINS = True 
 
-
-# All models created with Django without an explicitly defined primary key will use a BigAutoField as the default primary key.
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-CORS_ALLOW_ALL_ORIGINS = True
+# Security settings for production
+SECURE_SSL_REDIRECT = False  # Redirect all HTTP requests to HTTPS
+CSRF_COOKIE_SECURE = True  # Ensure the CSRF cookie is only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Ensure the session cookie is only sent over HTTPS
+SECURE_HSTS_SECONDS = 31536000  # Set HTTP Strict Transport Security (HSTS) header to 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Preload HSTS for browsers that support it
+SECURE_BROWSER_XSS_FILTER = True  # Enable the browser's XSS filter
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking by denying the page to be framed
+X_CONTENT_TYPE_OPTIONS = 'nosniff'  # Prevent browsers from interpreting files as a different MIME type

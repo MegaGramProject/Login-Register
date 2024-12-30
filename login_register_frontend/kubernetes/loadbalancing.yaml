@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-register-frontend-load-balancing
+spec:
+  selector:
+    app: login-register-frontend
+  ports:
+  - protocol: TCP
+    port: 8000  # Port of this Load-Balancer Service
+    targetPort: 8000 # Maps to the container's port
+  type: LoadBalancer
+  loadBalancerIP: 34.172.22.111  # login-register-frontend-load-balancing-static-ip
