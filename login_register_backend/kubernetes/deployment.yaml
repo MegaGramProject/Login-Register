@@ -19,7 +19,7 @@ spec:
         - containerPort: 8001
         envFrom:
         - secretRef:
-            name: env-secrets
+            name: login-register-backend-env-secrets
         volumeMounts:
         - name: google-credentials-json-secret-volume
           mountPath: /app/megagram-428802-9481f000861d.json

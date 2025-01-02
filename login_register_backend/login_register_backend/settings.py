@@ -1,16 +1,13 @@
 from pathlib import Path
-from dotenv import load_dotenv
-from decouple import config
+import os
 
-# Load environment variables from .env
-load_dotenv()
 
 # BASE_DIR represents the file-path of the grandparent directory(login_register_backend) of this file.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get('LOGIN_REGISTER_BACKEND_DJANGO_SECRET_KEY', 'dev-placeholder')
 
 
 # DEBUG is a boolean which is True if Debug-mode is turned on, False otherwise. It is supposed to be False for production.
@@ -20,18 +17,9 @@ DEBUG = True
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
-    config('ALLOWED_HOST')
+    os.environ.get('ALLOWED_HOST'),
+    'localhost'
 ]
-
-
-#redirects all connections to HTTPs
-SECURE_SSL_REDIRECT = False
-
-
-SESSION_COOKIE_SECURE = True
-
-
-CSRF_COOKIE_SECURE = True
 
 
 INSTALLED_APPS = [
@@ -70,17 +58,30 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Megagram',
-        'USER': config('LOCAL_MYSQL_USER'),
-        'PASSWORD': config('LOCAL_MYSQL_PASSWORD'),
+        'USER': os.environ.get('LOCAL_MYSQL_USER'),
+        'PASSWORD': os.environ.get('LOCAL_MYSQL_PASSWORD'),
         'HOST': 'localhost',
         'POST': 3306
-    }
+    },
+
+    'local-psql': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'Megagram',
+        'USER': os.environ.get('LOCAL_PSQL_USER'),
+        'PASSWORD': os.environ.get('LOCAL_PSQL_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': 5432,
+    },
+    
+    'google-cloud-mysql': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'Megagram',
+        'USER': os.environ.get('GOOGLE_CLOUD_MYSQL_USER'),
+        'PASSWORD': os.environ.get('GOOGLE_CLOUD_MYSQL_PASSWORD'),
+        'HOST': os.environ.get('GOOGLE_CLOUD_MYSQL_HOST'),
+        'PORT': 3306
+    },
 }
-
-
-# All models created with Django without an explicitly defined primary key will use a BigAutoField as the default primary key.
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
@@ -105,3 +106,16 @@ TEMPLATES = [
         },
     },
 ]
+
+DATABASE_ROUTERS = ['my_app.database_router.DatabaseRouter']
+
+# Security settings for production
+SECURE_SSL_REDIRECT = False  # Redirect all HTTP requests to HTTPS
+CSRF_COOKIE_SECURE = True  # Ensure the CSRF cookie is only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Ensure the session cookie is only sent over HTTPS
+SECURE_HSTS_SECONDS = 31536000  # Set HTTP Strict Transport Security (HSTS) header to 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Preload HSTS for browsers that support it
+SECURE_BROWSER_XSS_FILTER = True  # Enable the browser's XSS filter
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking by denying the page to be framed
+X_CONTENT_TYPE_OPTIONS = 'nosniff'  # Prevent browsers from interpreting files as a different MIME type

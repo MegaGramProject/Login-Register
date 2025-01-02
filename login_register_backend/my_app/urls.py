@@ -16,5 +16,7 @@ urlpatterns = [
     path("getRelevantUserInfoOfMultipleUsers", views.get_relevant_user_info_of_multiple_users, name="Get Relevant User-Info Of Multiple Users"),
     path("getRelevantUserInfoFromUsernameIncludingContactInfo/<str:username>",
     views.get_relevant_user_info_from_username_including_contact_info,
-    name="Get Relevant User-Info From Username(including Contact-Info)")
+    name="Get Relevant User-Info From Username(including Contact-Info)"),
+    path("getCSRFToken/<str:purpose>", views.getCSRFToken, name="Get CSRF Token"),
+    path("translateTextWithRapidApi", views.translate_text_with_rapid_api, name="Translate Text with RapidAPI")
 ]

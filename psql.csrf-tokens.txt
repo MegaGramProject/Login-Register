@@ -1,0 +1,58 @@
+SELECT cron.schedule(
+    'delete_expired_csrf_tokens',           -- Name of the cron job
+    '*/1 * * * *',                          -- Cron expression to run every minute
+    $$
+    DELETE FROM csrf_tokens 
+       WHERE expiration_date <= NOW() - INTERVAL '1 minute';
+    $$  -- Delete expired tokens
+);
+
+
+
+______--------__________-------------______________--------__________-------------______________--------__________-------------______________--------__________-------------________
+
+
+
+CREATE OR REPLACE FUNCTION start_deleting_expired_csrf_tokens() 
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if the cron job already exists, if not create it
+    IF NOT EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'delete_expired_csrf_tokens') THEN
+        PERFORM cron.schedule(
+            'delete_expired_csrf_tokens',
+            '*/1 * * * *', -- Run every minute
+            $$
+            DELETE FROM csrf_tokens
+                WHERE expiration_date <= NOW() - INTERVAL '1 minute';
+            $$
+        );
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger on insert to start the cron job if no job exists
+CREATE TRIGGER start_deleting_expired_csrf_tokens_on_insert
+AFTER INSERT ON csrf_tokens
+FOR EACH ROW EXECUTE FUNCTION start_deleting_expired_csrf_tokens();
+
+
+______--------__________-------------______________--------__________-------------______________--------__________-------------______________
+
+
+CREATE OR REPLACE FUNCTION stop_deleting_expired_csrf_tokens() 
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if there are no rows left in the table
+    IF NOT EXISTS (SELECT 1 FROM csrf_tokens) THEN
+        -- Stop the cron job
+        PERFORM cron.unschedule('delete_expired_csrf_tokens');
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger on delete to stop the cron job if no rows are left
+CREATE TRIGGER stop_deleting_expired_csrf_tokens_on_delete
+AFTER DELETE ON csrf_tokens
+FOR EACH ROW EXECUTE FUNCTION stop_deleting_expired_csrf_tokens();
