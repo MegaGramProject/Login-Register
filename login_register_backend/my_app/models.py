@@ -10,9 +10,9 @@ class User(models.Model):
     contact_info = models.TextField(db_column='contactInfo')
     date_of_birth = models.TextField(db_column='dateOfBirth')
     created = models.DateTimeField(auto_now_add=True)
-    is_verified = models.BooleanField(db_column='isVerified', default=False)
-    is_private = models.BooleanField(db_column='isPrivate', default=False)
-    account_based_in = models.TextField(db_column='accountBasedIn', blank=True, default='N/A')
+    is_verified = models.BooleanField(db_column='isVerified')
+    is_private = models.BooleanField(db_column='isPrivate')
+    account_based_in = models.TextField(db_column='accountBasedIn')
 
     class Meta:
         app_label = 'default' #(local-mysql)

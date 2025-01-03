@@ -18,17 +18,61 @@ import base64
 from django.core.management.utils import get_random_secret_key
 import hashlib
 import json
+import redis
+import uuid
+
+
+redis_client = redis.Redis(
+    host='redis-14251.c261.us-east-1-4.ec2.redns.redis-cloud.com',
+    port=14251,
+    decode_responses=True,
+    username="rishavry",
+    password=os.environ.get('AWS_REDIS_PASSWORD')
+)
+
+languages_available_for_translation = set([
+    "English",
+    "Français",
+    "Español",
+    "हिंदी",
+    "বাংলা",
+    "中国人",
+    "العربية",
+    "Deutsch",
+    "Bahasa Indonesia",
+    "Italiano",
+    "日本語",
+    "Русский"
+])
+
+language_code_to_long_form_mappings = {
+    'en': "English",
+    'fr': "Français",
+    'es': "Español",
+    'hi': "हिंदी",
+    'bn': "বাংলা",
+    'zh-CN': "中国人",
+    'ar': "العربية",
+    'de': "Deutsch",
+    'id': "Bahasa Indonesia",
+    'it': "Italiano",
+    'ja': "日本語",
+    'ru': "Русский"
+    };
+
 
 @api_view(['POST'])
 def create_user(request):
-    #require csrf token
+    #validate anti-csrf-token
     if(request.data.get('username')):
-        csrf_token_cookie = 'createUser'+request.data['username']
-        if csrf_token_cookie in request.COOKIES:
+        csrf_token_cookie_suffix = 'createUser'+request.data['username']
+        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+        if csrf_token_cookie is not None:
             csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
             try:
                 correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
                 correct_csrf_token.csrf_token_salt):
                     return Response(status=status.HTTP_403_FORBIDDEN)
             except CsrfToken.DoesNotExist:
@@ -43,8 +87,8 @@ def create_user(request):
     request.data.get('hashed_password') and request.data.get('contact_info') and request.data.get('date_of_birth')):
 
         client = kms_v1.KeyManagementServiceClient()
-        if contactInfoIsTaken(client, request.data['contact_info']):
-            return Response({'message': 'Contact-Info taken by someone else'}, status=status.HTTP_409_CONFLICT)
+        if is_contact_info_taken(client, request.data['contact_info']):
+            return Response(status=status.HTTP_409_CONFLICT)
 
         new_user_data = {
             'username': request.data['username'],
@@ -53,6 +97,9 @@ def create_user(request):
             'hashed_password': request.data['hashed_password'],
             'contact_info': 'TEMPORARY',
             'date_of_birth': 'TEMPORARY',
+            'account_based_in': 'TEMPORARY'
+            'is_verified': False,
+            'is_private': False,
         }
 
         serializer = UserSerializer(data=new_user_data)
@@ -80,31 +127,63 @@ def create_user(request):
                     date_of_birth_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
                     new_user_data['date_of_birth'] = date_of_birth_encrypted_base64_string
 
+                    account_based_in_plaintext = 'N/A'
                     if(request.data.get('account_based_in')):
                         account_based_in_plaintext = request.data['account_based_in']
-                        response = client.encrypt(name=new_encryption_key_name,
-                        plaintext=account_based_in_plaintext.encode("utf-8"))
-                        account_based_in_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                        new_user_data['account_based_in'] = account_based_in_encrypted_base64_string
+
+                    response = client.encrypt(name=new_encryption_key_name,
+                    plaintext=account_based_in_plaintext.encode("utf-8"))
+                    account_based_in_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
+                    new_user_data['account_based_in'] = account_based_in_encrypted_base64_string
                 else:
                     new_user_data['date_of_birth'] = request.data['date_of_birth']
                     if request.data.get('account_based_in'):
                         new_user_data['account_based_in'] = request.data['account_based_in']
+                    else:
+                        new_user_data['account_based_in'] = 'N/A'
 
             else:
-                #by default is_private is false
+                new_user_data['is_private'] = False
                 new_user_data['date_of_birth'] = request.data['date_of_birth']
                 if request.data.get('account_based_in'):
                     new_user_data['account_based_in'] = request.data['account_based_in']
+                else:
+                    new_user_data['account_based_in'] = 'N/A'
             
             if request.data.get('is_verified'):
                 new_user_data['is_verified'] = request.data['is_verified']
+            else:
+                new_user_data['is_verified'] = False
             
             user = User.objects.get(id = newly_saved_user_id)
             serializer2 = UserSerializer(user, data=new_user_data, partial=True)
+
             if serializer2.is_valid():
                 serializer2.save()
-                return Response(newly_saved_user_id)
+
+                del new_user_data['username']
+                new_user_data['id'] = newly_saved_user_id
+                new_user_data['created'] = newly_saved_user.created
+                redis_client.hset('Usernames and their Info', new_user_data['username'], json.dumps(new_user_data))
+
+                auth_and_refresh_token_for_new_user = generate_tokens_for_new_user(newly_saved_user_id)
+                response = Response(newly_saved_user_id)
+                response.set_cookie(
+                    key='authToken'+newly_saved_user_id,
+                    value=auth_and_refresh_token_for_new_user[0],
+                    httponly=True,
+                    samesite='Strict',
+                    max_age=60*45 #45 min
+                )
+                response.set_cookie(
+                    key='refreshToken'+newly_saved_user_id,
+                    value=auth_and_refresh_token_for_new_user[1],
+                    httponly=True,
+                    samesite='Strict',
+                    max_age=60*10080 #10,080 min (1 week)
+                )
+                return response
+
             return Response(serializer2.errors, status=status.HTTP_400_BAD_REQUEST)
             
         else:
@@ -115,15 +194,14 @@ def create_user(request):
 
 
 @api_view(['PATCH'])
-def update_user(request, username):
-    #require user-authentication token
+def update_user(request, id):
+    #validate user-auth token
     refresh_auth_token = False
-    user_auth_token_cookie = 'authToken'+username
+    user_auth_token_cookie = 'authToken'+id
     if user_auth_token_cookie in request.COOKIES:
         user_auth_token_cookie_val = request.COOKIES[user_auth_token_cookie]
         try:
-            user_id = get_user_id_from_username(username)
-            correct_user_token = UserAuthToken.objects.get(user_id=user_id)
+            correct_user_token = UserAuthToken.objects.get(user_id=id)
         except UserAuthToken.DoesNotExist:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
@@ -133,7 +211,7 @@ def update_user(request, username):
         
         if correct_user_token.auth_token_expiry <= datetime.datetime.utcnow():
             if correct_user_token.refresh_token_expiry > datetime.datetime.utcnow():
-                user_refresh_token_cookie = 'refreshToken'+username
+                user_refresh_token_cookie = 'refreshToken'+id
                 if user_refresh_token_cookie in request.COOKIES:
                     user_refresh_token_cookie_val = request.COOKIES[user_refresh_token_cookie]
                     if correct_user_token.hashed_refresh_token == hash_salted_token(user_refresh_token_cookie_val,
@@ -150,9 +228,10 @@ def update_user(request, username):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     try:
-        user = User.objects.get(username = username)
+        user = User.objects.get(id = id)
+        original_username = user.username
         client = kms_v1.KeyManagementServiceClient()
-        encryption_key_name = client.crypto_key_path('megagram-428802', 'global', 'usersTableMySQL',  str(user.id))
+        encryption_key_name = client.crypto_key_path('megagram-428802', 'global', 'usersTableMySQL',  str(id))
 
         update_user_data = {}
         for key in request.data:
@@ -181,9 +260,8 @@ def update_user(request, username):
                 update_user_data[key] = request.data[key]
 
         
-
         current_is_private = user.is_private
-        update_is_private = request.data['is_private']
+        update_is_private = request.data.get('is_private')
         if(current_is_private != update_is_private):
             if(update_is_private is True):
                 if 'date_of_birth' not in update_user_data:
@@ -211,12 +289,29 @@ def update_user(request, username):
 
         serializer = UserSerializer(user, data=update_user_data, partial=True)
         if serializer.is_valid():
-            newly_saved_user = serializer.save()
-            response = Response(newly_saved_user.id)
+            updated_user = serializer.save()
+
+            updated_user_info = {
+                'id': updated_user.id,
+                'created': updated_user.created,
+                'full_name': updated_user.full_name,
+                'salt': updated_user.salt,
+                'hashed_password': updated_user.hashed_password,
+                'contact_info': updated_user.contact_info,
+                'date_of_birth': updated_user.date_of_birth,
+                'account_based_in': updated_user.account_based_in,
+                'is_verified': updated_user.is_verified,
+                'is_private': updated_user.is_private
+            }
+            if 'username' in request.data: #(if username was changed)
+                redis_client.hdel('Usernames and their Info', original_username)
+            redis_client.hset('Usernames and their Info', updated_user.username, json.dumps(updated_user_info))
+
+            response = Response(updated_user.id)
             if refresh_auth_token:
-                 new_auth_token = refresh_user_auth_token(newly_saved_user.id)
+                 new_auth_token = refresh_user_auth_token(updated_user.id)
                  response.set_cookie(
-                    key='authToken'+username,
+                    key='authToken'+id,
                     value=new_auth_token,
                     httponly=True,
                     samesite='Strict',
@@ -230,35 +325,30 @@ def update_user(request, username):
 
 @api_view(['GET'])
 def get_full_name(request, username):
-    try:
-        user = User.objects.get(username = username)
-    except User.DoesNotExist:
+    user_info = redis_client.hget('Usernames and their Info', username)
+    if user_info is None:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    return Response(user.full_name)
+    user_info = json.loads(user_info)    
+    return Response(user_info['full_name'])
 
 
 @api_view(['GET'])
 def is_account_private(request, username):
-    try:
-        user = User.objects.get(username = username)
-    except User.DoesNotExist:
+    user_info = redis_client.hget('Usernames and their Info', username)
+    if user_info is None:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    return Response(user.is_private)
+    user_info = json.loads(user_info)    
+    return Response(user_info['is_private'])
 
 
 @api_view(['DELETE'])
-def remove_user(request, username):
-    #require user-authentication token
-    refresh_auth_token = False
-    user_id = -1
-    user_auth_token_cookie = 'authToken'+username
+def remove_user(request, id):
+    #validate user-auth token
+    user_auth_token_cookie = 'authToken'+id
     if user_auth_token_cookie in request.COOKIES:
         user_auth_token_cookie_val = request.COOKIES[user_auth_token_cookie]
         try:
-            user_id = get_user_id_from_username(username)
-            correct_user_token = UserAuthToken.objects.get(user_id=user_id)
+            correct_user_token = UserAuthToken.objects.get(user_id=id)
         except UserAuthToken.DoesNotExist:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
@@ -268,12 +358,12 @@ def remove_user(request, username):
         
         if correct_user_token.auth_token_expiry <= datetime.datetime.utcnow():
             if correct_user_token.refresh_token_expiry > datetime.datetime.utcnow():
-                user_refresh_token_cookie = 'refreshToken'+username
+                user_refresh_token_cookie = 'refreshToken'+id
                 if user_refresh_token_cookie in request.COOKIES:
                     user_refresh_token_cookie_val = request.COOKIES[user_refresh_token_cookie]
                     if correct_user_token.hashed_refresh_token == hash_salted_token(user_refresh_token_cookie_val,
                     correct_user_token.refresh_token_salt):
-                        refresh_auth_token = True
+                        #do not refresh token here, since user is to be deleted
                     else:
                         return Response(status=status.HTTP_403_FORBIDDEN)
                 else:
@@ -285,34 +375,51 @@ def remove_user(request, username):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     try:
-        user = User.objects.get(username = username)
+        user = User.objects.get(id = id)
     except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        #this code will not be reached because of user-authentication earlier in this function
     
     user.delete()
-    response = Response(status=status.HTTP_204_NO_CONTENT)
-    if refresh_auth_token:
-        new_auth_token = refresh_user_auth_token(user_id)
-        response.set_cookie(
-            key='authToken'+username,
-            value=new_auth_token,
-            httponly=True,
-            samesite='Strict',
-            max_age=60*45 #45 min
-        )
+
+    redis_client.hdel('Usernames and their Info', user.username)
+
+    try:
+        user_auth_token = UserAuthToken.objects.get(user_id = id)
+    except UserAuthToken.DoesNotExist:
+        #this code will not be reached because of user-authentication earlier in this function
+    
+    user_auth_token.delete()
+    response = Response(True, status=status.HTTP_204_NO_CONTENT)
+    response.set_cookie(
+        key='authToken'+id,
+        value='',
+        httponly=True,
+        samesite='Strict',
+        max_age=0
+    )
+    response.set_cookie(
+        key='refreshToken'+id,
+        value='',
+        httponly=True,
+        samesite='Strict',
+        max_age=0
+    )
     return response
 
 
 @api_view(['POST'])
-def send_email(request):
-    #require csrf token
+def send_confirmation_code_email(request):
+    #validate anti-csrf-token
     if(request.data.get('email')):
-        csrf_token_cookie = 'sendEmail'+request.data['email']
-        if csrf_token_cookie in request.COOKIES:
+        csrf_token_cookie_suffix = 'sendConfirmationCodeEmail'+request.data['email']
+        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+        if csrf_token_cookie is not None:
             csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
             try:
                 correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val, correct_csrf_token.csrf_token_salt):
+                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+                correct_csrf_token.csrf_token_salt):
                     return Response(status=status.HTTP_403_FORBIDDEN)
             except CsrfToken.DoesNotExist:
                 return Response(status=status.HTTP_403_FORBIDDEN)
@@ -363,18 +470,20 @@ def send_email(request):
             )
                 
     except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
-def send_text(request, number):
-    #require csrf token
-    csrf_token_cookie = 'sendText'+number
-    if csrf_token_cookie in request.COOKIES:
+def send_confirmation_code_text(request, number):
+    #validate anti-csrf-token
+    csrf_token_cookie_suffix = 'sendConfirmationCodeText'+number
+    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+    if csrf_token_cookie is not None:
         csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
         try:
             correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-            if correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
             correct_csrf_token.csrf_token_salt):
                 return Response(status=status.HTTP_403_FORBIDDEN)
         except CsrfToken.DoesNotExist:
@@ -382,14 +491,13 @@ def send_text(request, number):
     else:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-
     confirmation_code = random.randint(100000, 999999)
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
     auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
     client = Client(account_sid, auth_token)
     to = number
     messageBody = f'''{confirmation_code}\n\nHi, Someone tried to sign up for a Megagram account with {to}.
-    If it was you, enter the 6-digit confirmation code mentioned at the start.'''
+    If it was you, enter the 6-digit confirmation code mentioned in the beginning of this message.'''
     try:
         client.messages.create(
             body=messageBody,
@@ -403,19 +511,21 @@ def send_text(request, number):
             status=status.HTTP_201_CREATED
         )
     except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
 def does_user_exist(request):
     if request.data.get('username'):
-        #require csrf token
-        csrf_token_cookie = 'doesUserExist'+request.data['username']
-        if csrf_token_cookie in request.COOKIES:
+        #validate anti-csrf-token
+        csrf_token_cookie_suffix = 'doesUsernameExist'+request.data['username']
+        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+        if csrf_token_cookie is not None:
             csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
             try:
                 correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
                 correct_csrf_token.csrf_token_salt):
                     return Response(status=status.HTTP_403_FORBIDDEN)
             except CsrfToken.DoesNotExist:
@@ -424,11 +534,12 @@ def does_user_exist(request):
             return Response(status=status.HTTP_403_FORBIDDEN)
             
         try:
-            user = User.objects.get(username = request.data['username'])
+            user_info = redis_client.hget('Usernames and their Info', request.data['username'])
+            user_info = json.loads(user_info)
             return Response(
                 {
-                    "salt": user.salt,
-                    "hashed_password":user.hashed_password
+                    "salt": user_info['salt'],
+                    "hashed_password": user_info['hashed_password']
                 }
             )
         except:
@@ -439,13 +550,15 @@ def does_user_exist(request):
             )
 
     elif request.data.get('contact_info'):
-        #require csrf token
-        csrf_token_cookie = 'doesUserExist'+request.data['contact_info']
-        if csrf_token_cookie in request.COOKIES:
+        #validate anti-csrf-token
+        csrf_token_cookie_suffix = 'doesUserContactInfoExist'+request.data['contact_info']
+        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+        if csrf_token_cookie is not None:
             csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
             try:
                 correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
                 correct_csrf_token.csrf_token_salt):
                     return Response(status=status.HTTP_403_FORBIDDEN)
             except CsrfToken.DoesNotExist:
@@ -454,25 +567,25 @@ def does_user_exist(request):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         contact_info = request.data['contact_info']
-        users = list(User.objects.values_list('id', 'contact_info'))
+        info_for_each_user = redis_client.hgetall('Usernames and their Info')
         client = kms_v1.KeyManagementServiceClient()
 
-        for user in users:
+        for user_info in info_for_each_user:
+            user_info = json.loads(user_info)
             decrypted_contact_info = decrypt_data(
                 client,
                 'megagram-428802',
                 'global',
                 'usersTableMySQL',
-                user[0],
-                base64.b64decode(user[1])
+                user_info['id'],
+                base64.b64decode(user_info['contact_info'])
             )
             if contact_info==decrypted_contact_info:
-                user_object = User.objects.get(id = user[0])
                 return Response(
                     {
-                        "salt": user_object.salt,
-                        "hashed_password":user_object.hashed_password,
-                        "username":user_object.username
+                        "salt": user_info['salt'],
+                        "hashed_password":user_info['hashed_password'],
+                        "username":user_info['username']
                     }
                 )
 
@@ -527,127 +640,115 @@ def verify_captcha(request):
                     }
                 )
     except:
-        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response(
+            {
+                "verified": False
+            }
+        )
     
 
 @api_view(['GET'])
 def get_usernames_and_full_names_of_all(request):
-    users = User.objects.all()
-    output = [[user.username, user.full_name] for user in users]
+    info_for_each_user = redis_client.hgetall('Usernames and their Info')
+    output = []
+    for username in info_for_each_user:
+        user_info = json.loads(info_for_each_user[username])
+        output.append([username, user_info['full_name']])
     return Response(output)
         
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username(request, username):
-    #require user-authentication token
-    refresh_auth_token = False
-    user_id = -1
-    user_auth_token_cookie = 'authToken'+username
-    if user_auth_token_cookie in request.COOKIES:
-        user_auth_token_cookie_val = request.COOKIES[user_auth_token_cookie]
+    #validate anti-csrf-token
+    csrf_token_cookie_suffix = 'getRelevantInfoFromUsername'+username
+    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+    if csrf_token_cookie is not None:
+        csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
         try:
-            user_id = get_user_id_from_username(username)
-            correct_user_token = UserAuthToken.objects.get(user_id=user_id)
-        except UserAuthToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-        if correct_user_token.hashed_auth_token != hash_salted_token(user_auth_token_cookie_val,
-        correct_user_token.auth_token_salt):
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        
-        if correct_user_token.auth_token_expiry <= datetime.datetime.utcnow():
-            if correct_user_token.refresh_token_expiry > datetime.datetime.utcnow():
-                user_refresh_token_cookie = 'refreshToken'+username
-                if user_refresh_token_cookie in request.COOKIES:
-                    user_refresh_token_cookie_val = request.COOKIES[user_refresh_token_cookie]
-                    if correct_user_token.hashed_refresh_token == hash_salted_token(user_refresh_token_cookie_val,
-                    correct_user_token.refresh_token_salt):
-                        refresh_auth_token = True
-                    else:
-                        return Response(status=status.HTTP_403_FORBIDDEN)
-                else:
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            else:
+            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
+            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+            correct_csrf_token.csrf_token_salt):
                 return Response(status=status.HTTP_403_FORBIDDEN)
-
+        except CsrfToken.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
     else:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-    try:
-        user = User.objects.get(username = username)
-    except User.DoesNotExist:
-        return Response(
-            {
-                'output': 'user does not exist'
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    user_info = redis_client.hget('Usernames and their Info', username)
+    user_info = json.loads(user_info)
     
     decrypted_date_of_birth = ""
     decrypted_account_based_in = ""
 
-    if user.is_private:
+    if user_info['is_private']:
         client = kms_v1.KeyManagementServiceClient()
 
-        encrypted_date_of_birth = user.date_of_birth
+        encrypted_date_of_birth = user_info['date_of_birth']
         decrypted_date_of_birth = decrypt_data(
             client,
             'megagram-428802',
             'global',
             'usersTableMySQL',
-            user.id,
-            base64.b64decode(user.date_of_birth)
+            user_info['id'],
+            base64.b64decode(user_info['date_of_birth'])
         )
 
-        encrypted_account_based_in = user.account_based_in
+        encrypted_account_based_in = user_info['account_based_in']
         decrypted_account_based_in = decrypt_data(
             client,
             'megagram-428802',
             'global',
             'usersTableMySQL',
-            user.id,
-            base64.b64decode(user.account_based_in)
+            user_info['id'],
+            base64.b64decode(user_info['account_based_in'])
         )
 
     else:
-        decrypted_date_of_birth = user.date_of_birth
-        decrypted_account_based_in = user.account_based_in
+        decrypted_date_of_birth = user_info['date_of_birth']
+        decrypted_account_based_in = user_info['account_based_in']
     
-    response = Response(
+    return Response(
         {
-            'username': user.username,
-            'full_name': user.full_name,
+            'username': user_info['username'],
+            'full_name': user_info['full_name'],
             'date_of_birth': decrypted_date_of_birth,
-            'created': user.created,
-            'is_verified': user.is_verified,
+            'created': user_info['created'],
+            'is_verified': user_info['is_verified'],
             'account_based_in': decrypted_account_based_in,
-            'is_private': user.is_private
+            'is_private': user_info['is_private']
         }
     )
-    if refresh_auth_token:
-        new_auth_token = refresh_user_auth_token(user_id)
-        response.set_cookie(
-            key='authToken'+username,
-            value=new_auth_token,
-            httponly=True,
-            samesite='Strict',
-            max_age=60*45 #45 min
-        )
-
-    return response
 
 @api_view(['POST'])
 def get_relevant_user_info_of_multiple_users(request):
-    if(request.data.get('listOfUsers')):
-        list_of_users = request.data['listOfUsers']
+    #validate anti-csrf-token
+    csrf_token_cookie_suffix = 'getRelevantInfoFromMultipleUsers'
+    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+    if csrf_token_cookie is not None:
+        csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
+        try:
+            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
+            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+            correct_csrf_token.csrf_token_salt):
+                return Response(status=status.HTTP_403_FORBIDDEN)
+        except CsrfToken.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    if(request.data.get('list_of_usernames')):
+        set_of_usernames = set(request.data['list_of_usernames'])
         user_info_mappings = {}
-        for user in list_of_users:
-            if(user not in user_info_mappings):
-                user_object = User.objects.get(username = user)
-                user_info_mappings[user] = {
-                    'full_name': user_object.full_name,
-                    'is_verified': user_object.is_verified,
-                    'is_private': user_object.is_private
+        for username in set_of_usernames:
+            user_info = redis_client.hget('Usernames and their Info', username)
+            if user_info is not None:
+                user_info = json.loads(user_info)
+                user_info_mappings[username] = {
+                    'full_name': user_info['full_name'],
+                    'is_verified': user_info['is_verified'],
+                    'is_private': user_info['is_private']
                 }
         
         return Response(user_info_mappings)
@@ -657,123 +758,87 @@ def get_relevant_user_info_of_multiple_users(request):
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username_including_contact_info(request, username):
-    #require user-authentication token
-    refresh_auth_token = False
-    user_id = -1
-    user_auth_token_cookie = 'authToken'+username
-    if user_auth_token_cookie in request.COOKIES:
-        user_auth_token_cookie_val = request.COOKIES[user_auth_token_cookie]
+    #validate anti-csrf-token
+    csrf_token_cookie_suffix = 'getRelevantInfoIncludingContactInfoFromUsername'+username
+    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
+    if csrf_token_cookie is not None:
+        csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
         try:
-            user_id = get_user_id_from_username(username)
-            correct_user_token = UserAuthToken.objects.get(user_id=user_id)
-        except UserAuthToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-        if correct_user_token.hashed_auth_token != hash_salted_token(user_auth_token_cookie_val,
-        correct_user_token.auth_token_salt):
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        
-        if correct_user_token.auth_token_expiry <= datetime.datetime.utcnow():
-            if correct_user_token.refresh_token_expiry > datetime.datetime.utcnow():
-                user_refresh_token_cookie = 'refreshToken'+username
-                if user_refresh_token_cookie in request.COOKIES:
-                    user_refresh_token_cookie_val = request.COOKIES[user_refresh_token_cookie]
-                    if correct_user_token.hashed_refresh_token == hash_salted_token(user_refresh_token_cookie_val,
-                    correct_user_token.refresh_token_salt):
-                        refresh_auth_token = True
-                    else:
-                        return Response(status=status.HTTP_403_FORBIDDEN)
-                else:
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            else:
+            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
+            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+            correct_csrf_token.csrf_token_salt):
                 return Response(status=status.HTTP_403_FORBIDDEN)
-
+        except CsrfToken.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
     else:
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-    try:
-        user = User.objects.get(username = username)
-    except User.DoesNotExist:
-        return Response(
-            {
-                'output': 'user does not exist'
-            },
-            status=status.HTTP_404_NOT_FOUND
-        )
+    user_info = redis_client.hget('Usernames and their Info', username)
+    user_info = json.loads(user_info)
     
-
     client = kms_v1.KeyManagementServiceClient()
  
-    encrypted_contact_info = user.contact_info
+    encrypted_contact_info = user_info['contact_info']
     decrypted_contact_info = decrypt_data(
         client,
         'megagram-428802',
         'global',
         'usersTableMySQL',
-        user.id,
-        base64.b64decode(user.contact_info)
+        user_info['id'],
+        base64.b64decode(user_info['contact_info'])
     )
     decrypted_account_based_in = ""
     decrypted_date_of_birth = ""
 
     if user.is_private:
-        encrypted_date_of_birth = user.date_of_birth
+        encrypted_date_of_birth = user_info['date_of_birth']
         decrypted_date_of_birth = decrypt_data(
             client,
             'megagram-428802',
             'global',
             'usersTableMySQL',
-            user.id,
-            base64.b64decode(user.date_of_birth)
+            user_info['id'],
+            base64.b64decode(user_info['date_of_birth'])
         )
 
-        encrypted_account_based_in = user.account_based_in
+        encrypted_account_based_in = user_info['account_based_in']
         decrypted_account_based_in = decrypt_data(
             client,
             'megagram-428802',
             'global',
             'usersTableMySQL',
-            user.id,
-            base64.b64decode(user.account_based_in)
+            user_info['id'],
+            base64.b64decode(user_info['account_based_in'])
         )
 
     else:
-        decrypted_account_based_in = user.account_based_in
-        decrypted_date_of_birth = user.date_of_birth
+        decrypted_account_based_in = user_info['account_based_in']
+        decrypted_date_of_birth = user_info['date_of_birth']
 
-    response = Response(
+    return Response(
         {
-            'username': user.username,
-            'full_name': user.full_name,
+            'username': user_info['username'],
+            'full_name': user_info['full_name'],
             'date_of_birth': decrypted_date_of_birth,
-            'created': user.created,
-            'is_verified': user.is_verified,
+            'created': user_info['created'],
+            'is_verified': user_info['is_verified'],
             'account_based_in': decrypted_account_based_in,
-            'is_private': user.is_private,
+            'is_private': user_info['is_private'],
             'contact_info': decrypted_contact_info
         }
     )
-
-    if refresh_auth_token:
-        new_auth_token = refresh_user_auth_token(user_id)
-        response.set_cookie(
-            key='authToken'+username,
-            value=new_auth_token,
-            httponly=True,
-            samesite='Strict',
-            max_age=60*45 #45 min
-        )
-    return response
 
 @api_view(['GET'])
 def getCSRFToken(request, purpose):  
     csrf_token = get_random_secret_key()
     csrf_token_salt = generate_token(32)
+    random_uuid = uuid.uuid4()
     new_csrf_token = {
         'expiration_date': datetime.datetime.utcnow() + datetime.timedelta(seconds=60),
         'hashed_csrf_token': hash_salted_token(csrf_token, csrf_token_salt),
         'csrf_token_salt': csrf_token_salt,
-        'purpose': purpose
+        'purpose': random_uuid+purpose
     }
 
     serializer = CsrfTokenSerializer(data=new_csrf_token)
@@ -782,43 +847,81 @@ def getCSRFToken(request, purpose):
 
     response = Response()
     response.set_cookie(
-        key=purpose,
+        key=random_uuid+purpose,
         value=csrf_token,
         httponly=True,
         samesite='Strict',
-        max_age=60
+        max_age=60 # 1 min
     )
 
     return response
 
 @api_view(['POST'])
-def translate_text_with_rapid_api(request):
-    if (request.data.get('input_text') and request.data.get('source_lang_shortened_code') and
+def translate_texts_with_rapid_api(request):
+    if (request.data.get('input_texts') and request.data.get('source_lang_shortened_code') and
     request.data.get('target_lang_shortened_code') and request.data.get('DEEP_TRANSLATE_API_KEY')):
+
+        if os.environ.get('DEEP_TRANSLATE_API_KEY') != request.data['DEEP_TRANSLATE_API_KEY']:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         data = {
-            'q': request.data['input_text'],
             'source': request.data['source_lang_shortened_code'],
             'target': request.data['target_lang_shortened_code']
         };
-
         headers: {
             'Content-Type': 'application/json',
             'x-rapidapi-host': 'deep-translate1.p.rapidapi.com',
             'x-rapidapi-key': request.data['DEEP_TRANSLATE_API_KEY']
         }
 
-        try: 
-            response = requests.post("https://deep-translate1.p.rapidapi.com/language/translate/v2", data=json.dumps(data),
-            headers=headers)
-            if response.ok:
-                return Response(response.json()['data']['translations']['translatedText'])
-            else:
-                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        proper_hash_name = f"Translations from {language_code_to_long_form_mappings[data['source']]} to {language_code_to_long_form_mappings[data['target']]}"
+        inverse_hash_name = f"Translations from {language_code_to_long_form_mappings[data['target']]} to {language_code_to_long_form_mappings[data['source']]}"
+        output =  []
+        for text in request.data['input_texts']:
+             try: 
+                data['q'] = text
+                response = requests.post("https://deep-translate1.p.rapidapi.com/language/translate/v2", data=json.dumps(data),
+                headers=headers)
+                if response.ok:
+                    translated_text = response.json()['data']['translations']['translatedText']
+                    output.append(translated_text)
+                    redis_client.hset(proper_hash_name, text, translated_text)
+                    redis_client.hset(inverse_hash_name, translated_text, text)
+                else:
+                    output.append(text)
 
-        except:
-            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            except:
+                output.append(text)
+        
+        return Response(output)
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_redis_cached_language_translations(request, source_lang, target_lang):
+    if source_lang not in languages_available_for_translation or target_lang not in languages_available_for_translation:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    proper_hash_name = f"Translations from {source_lang} to {target_lang}"
+    inverse_hash_name = f"Translations from {target_lang} to {source_lang}"
+
+    if redis_client.exists(proper_hash_name):
+        return Response(redis_client.hgetall(proper_hash_name)) 
+    else:
+        redis_client.hset(
+            proper_hash_name,
+            mapping={
+                'placeholder%Key': 'placeholder%Value'
+            },
+        )
+        redis_client.hset(
+            inverse_hash_name,
+            mapping={
+                'placeholder%Key': 'placeholder%Value'
+            },
+        )
+        return Response({})
 
 
 def create_encryption_key(client, project_id, location_id, key_ring_id, key_id, rotation_period_days):
@@ -869,20 +972,22 @@ def list_key_versions(client, project_id, location_id, key_ring_id, key_id):
     
 
 
-def contactInfoIsTaken(client, contact_info):
-    users = list(User.objects.values_list('id', 'contact_info'))
+def is_contact_info_taken(client, contact_info):
+    info_for_each_user = redis_client.hgetall('Usernames and their Info')
 
-    for user in users:
+    for username in info_for_each_user:
+        user_info = json.loads(info_for_each_user[username])
         decrypted_contact_info = decrypt_data(
             client,
             'megagram-428802',
             'global',
             'usersTableMySQL',
-            user[0],
-            base64.b64decode(user[1])
+            user_info['id'],
+            base64.b64decode(user_info['contact_info'])
         )
         if contact_info==decrypted_contact_info:
             return True
+
     return False
 
 
@@ -894,8 +999,8 @@ def hash_salted_token(token, salt):
     hash_object = hashlib.sha256()
     hash_object.update((token+salt).encode('utf-8'))
     hashed_bytes = hash_object.digest()
-    base64_encoded = base64.b64encode(hashed_bytes).decode('utf-8')
-    return base64_encoded
+    base64_string_output = base64.b64encode(hashed_bytes).decode('utf-8')
+    return base64_string_output
 
 
 def refresh_user_auth_token(user_id):
@@ -905,22 +1010,54 @@ def refresh_user_auth_token(user_id):
     updated_user_auth_token = {
         'auth_token_salt': new_auth_token_salt,
         'hashed_auth_token': hash_salted_token(new_auth_token, new_auth_token_salt),
-        'auth_token_expiry': datetime.datetime.utcnow() + datetime.timedelta(minutes=45),
+        'auth_token_expiry': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)
     }
 
     serializer = UserAuthTokenSerializer(user_auth_token_to_refresh, data=updated_user_auth_token, partial=True)
     if serializer.is_valid():
         serializer.save()
+        return new_auth_token
 
-    return new_auth_token
+    return None
 
 
 def get_user_id_from_username(username):
-    user_id = User.objects.get(username=username).id
-    return user_id
+    user_info = redis_client.hget('Usernames and their Info', username)
+    if user_info is None:
+        return -1
+    user_info = json.loads(user_info)
+    return user_info['id']
 
+def generate_tokens_for_new_user(user_id):
+    new_auth_token = generate_token(100)
+    new_auth_token_salt = generate_token(32)
+    new_hashed_auth_token = hash_salted_token(new_auth_token, new_auth_token_salt)
+    new_auth_token_expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=45)
+    
+    new_refresh_token = generate_token(100)
+    new_refresh_token_salt = generate_token(32)
+    new_hashed_refresh_token = hash_salted_token(new_refresh_token, new_refresh_token_salt)
+    new_refresh_token_expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=10080) #10,080 min = 1 week
 
-def get_username_from_user_id(user_id):
-    username = User.objects.get(id=user_id).username
-    return username
+    new_user_auth_token_data = {
+        'user_id': user_id,
+        'hashed_auth_token': new_hashed_auth_token,
+        'auth_token_salt': = new_auth_token_salt,
+        'hashed_refresh_token': = new_hashed_refresh_token
+        'refresh_token_salt' = new_refresh_token_salt
+        'auth_token_expiry' = new_auth_token_expiry
+        'refresh_token_expiry' = new_refresh_token_expiry
+    }
 
+    serializer = UserAuthTokenSerializer(data=new_user_auth_token_data)
+    if serializer.is_valid():
+        serializer.save()
+        return [new_auth_token, new_refresh_token]
+    
+    return []
+
+def csrf_token_suffix_in_cookies(request_cookies, csrf_token_suffix):
+    for cookie_name in request_cookies:
+        if cookie_name.endswith(csrf_token_suffix):
+            return cookie_name
+    return None

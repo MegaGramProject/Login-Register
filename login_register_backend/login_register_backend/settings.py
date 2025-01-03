@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('LOGIN_REGISTER_BACKEND_DJANGO_SECRET_KEY', 'dev-placeholder')
+SECRET_KEY = os.environ.get('LOGIN_REGISTER_BACKEND_DJANGO_SECRET_KEY')
 
 
 # DEBUG is a boolean which is True if Debug-mode is turned on, False otherwise. It is supposed to be False for production.
