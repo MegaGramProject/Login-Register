@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import User, CsrfToken, UserAuthToken
-from .serializers import UserSerializer, CsrfTokenSerializer, UserAuthTokenSerializer
+from .models import User, CsrfToken
+from .serializers import UserSerializer, CsrfTokenSerializer
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -11,7 +11,7 @@ import ssl
 import random
 import requests
 import os
-from google.cloud import kms_v1
+from google.cloud import kms_v1, spanner
 from google.protobuf import duration_pb2, timestamp_pb2
 import datetime
 import base64
@@ -20,6 +20,7 @@ import hashlib
 import json
 import redis
 import uuid
+from datetime import datetime as datetime2
 
 
 redis_client = redis.Redis(
@@ -29,6 +30,11 @@ redis_client = redis.Redis(
     username="rishavry",
     password=os.environ.get('AWS_REDIS_PASSWORD')
 )
+
+gcloud_mysql_spanner_client = spanner.Client()
+instance = gcloud_mysql_spanner_client.instance("mg-ms-sp")
+gcloud_mysql_spanner_database = instance.database("megagram")
+
 
 languages_available_for_translation = set([
     "English",
@@ -58,32 +64,20 @@ language_code_to_long_form_mappings = {
     'it': "Italiano",
     'ja': "日本語",
     'ru': "Русский"
-    };
-
+}
+        
 
 @api_view(['POST'])
 def create_user(request):
-    #validate anti-csrf-token
     if(request.data.get('username')):
-        csrf_token_cookie_suffix = 'createUser'+request.data['username']
-        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-        if csrf_token_cookie is not None:
-            csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-            try:
-                correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-                correct_csrf_token.csrf_token_salt):
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            except CsrfToken.DoesNotExist:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
+        anti_csrf_token_validation_result = validate_anti_csrf_token('createUser'+request.data['username'], request.COOKIES)
+        if anti_csrf_token_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
             
 
-    if(request.data.get('username') and request.data.get('full_name') and request.data.get('salt') and
+    if(request.data.get('full_name') and request.data.get('salt') and
     request.data.get('hashed_password') and request.data.get('contact_info') and request.data.get('date_of_birth')):
 
         client = kms_v1.KeyManagementServiceClient()
@@ -97,7 +91,7 @@ def create_user(request):
             'hashed_password': request.data['hashed_password'],
             'contact_info': 'TEMPORARY',
             'date_of_birth': 'TEMPORARY',
-            'account_based_in': 'TEMPORARY'
+            'account_based_in': 'TEMPORARY',
             'is_verified': False,
             'is_private': False,
         }
@@ -195,37 +189,12 @@ def create_user(request):
 
 @api_view(['PATCH'])
 def update_user(request, id):
-    #validate user-auth token
     refresh_auth_token = False
-    user_auth_token_cookie = 'authToken'+id
-    if user_auth_token_cookie in request.COOKIES:
-        user_auth_token_cookie_val = request.COOKIES[user_auth_token_cookie]
-        try:
-            correct_user_token = UserAuthToken.objects.get(user_id=id)
-        except UserAuthToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-        if correct_user_token.hashed_auth_token != hash_salted_token(user_auth_token_cookie_val,
-        correct_user_token.auth_token_salt):
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        
-        if correct_user_token.auth_token_expiry <= datetime.datetime.utcnow():
-            if correct_user_token.refresh_token_expiry > datetime.datetime.utcnow():
-                user_refresh_token_cookie = 'refreshToken'+id
-                if user_refresh_token_cookie in request.COOKIES:
-                    user_refresh_token_cookie_val = request.COOKIES[user_refresh_token_cookie]
-                    if correct_user_token.hashed_refresh_token == hash_salted_token(user_refresh_token_cookie_val,
-                    correct_user_token.refresh_token_salt):
-                        refresh_auth_token = True
-                    else:
-                        return Response(status=status.HTTP_403_FORBIDDEN)
-                else:
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            else:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-
-    else:
+    user_authorization_result = validate_user_auth_token(id, request.COOKIES)
+    if user_authorization_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
+    if user_authorization_result.endswith(', but Refresh Auth Token'):
+        refresh_auth_token = True
 
     try:
         user = User.objects.get(id = id)
@@ -343,52 +312,26 @@ def is_account_private(request, username):
 
 @api_view(['DELETE'])
 def remove_user(request, id):
-    #validate user-auth token
-    user_auth_token_cookie = 'authToken'+id
-    if user_auth_token_cookie in request.COOKIES:
-        user_auth_token_cookie_val = request.COOKIES[user_auth_token_cookie]
-        try:
-            correct_user_token = UserAuthToken.objects.get(user_id=id)
-        except UserAuthToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-        if correct_user_token.hashed_auth_token != hash_salted_token(user_auth_token_cookie_val,
-        correct_user_token.auth_token_salt):
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        
-        if correct_user_token.auth_token_expiry <= datetime.datetime.utcnow():
-            if correct_user_token.refresh_token_expiry > datetime.datetime.utcnow():
-                user_refresh_token_cookie = 'refreshToken'+id
-                if user_refresh_token_cookie in request.COOKIES:
-                    user_refresh_token_cookie_val = request.COOKIES[user_refresh_token_cookie]
-                    if correct_user_token.hashed_refresh_token == hash_salted_token(user_refresh_token_cookie_val,
-                    correct_user_token.refresh_token_salt):
-                        #do not refresh token here, since user is to be deleted
-                    else:
-                        return Response(status=status.HTTP_403_FORBIDDEN)
-                else:
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            else:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-
-    else:
+    user_authorization_result = validate_user_auth_token(id, request.COOKIES)
+    if user_authorization_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     try:
         user = User.objects.get(id = id)
     except User.DoesNotExist:
         #this code will not be reached because of user-authentication earlier in this function
+        pass
     
     user.delete()
 
     redis_client.hdel('Usernames and their Info', user.username)
 
-    try:
-        user_auth_token = UserAuthToken.objects.get(user_id = id)
-    except UserAuthToken.DoesNotExist:
-        #this code will not be reached because of user-authentication earlier in this function
-    
-    user_auth_token.delete()
+    with gcloud_mysql_spanner_database.batch() as batch:
+        batch.delete(
+            table="userAuthTokens",
+            keyset=spanner.KeySet(keys=[[id]])
+        )
+
     response = Response(True, status=status.HTTP_204_NO_CONTENT)
     response.set_cookie(
         key='authToken'+id,
@@ -409,21 +352,10 @@ def remove_user(request, id):
 
 @api_view(['POST'])
 def send_confirmation_code_email(request):
-    #validate anti-csrf-token
     if(request.data.get('email')):
-        csrf_token_cookie_suffix = 'sendConfirmationCodeEmail'+request.data['email']
-        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-        if csrf_token_cookie is not None:
-            csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-            try:
-                correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-                correct_csrf_token.csrf_token_salt):
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            except CsrfToken.DoesNotExist:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
+        anti_csrf_token_validation_result = validate_anti_csrf_token('sendConfirmationCodeEmail'+request.data['email'],
+        request.COOKIES)
+        if anti_csrf_token_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -475,20 +407,8 @@ def send_confirmation_code_email(request):
 
 @api_view(['POST'])
 def send_confirmation_code_text(request, number):
-    #validate anti-csrf-token
-    csrf_token_cookie_suffix = 'sendConfirmationCodeText'+number
-    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-    if csrf_token_cookie is not None:
-        csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-        try:
-            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-            correct_csrf_token.csrf_token_salt):
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        except CsrfToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
+    anti_csrf_token_validation_result = validate_anti_csrf_token('sendConfirmationCodeText'+number, request.COOKIES)
+    if anti_csrf_token_validation_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     confirmation_code = random.randint(100000, 999999)
@@ -517,22 +437,10 @@ def send_confirmation_code_text(request, number):
 @api_view(['POST'])
 def does_user_exist(request):
     if request.data.get('username'):
-        #validate anti-csrf-token
-        csrf_token_cookie_suffix = 'doesUsernameExist'+request.data['username']
-        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-        if csrf_token_cookie is not None:
-            csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-            try:
-                correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-                correct_csrf_token.csrf_token_salt):
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            except CsrfToken.DoesNotExist:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
+        anti_csrf_token_validation_result = validate_anti_csrf_token('doesUsernameExist'+request.data['username'], request.COOKIES)
+        if anti_csrf_token_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
-            
+
         try:
             user_info = redis_client.hget('Usernames and their Info', request.data['username'])
             user_info = json.loads(user_info)
@@ -550,20 +458,9 @@ def does_user_exist(request):
             )
 
     elif request.data.get('contact_info'):
-        #validate anti-csrf-token
-        csrf_token_cookie_suffix = 'doesUserContactInfoExist'+request.data['contact_info']
-        csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-        if csrf_token_cookie is not None:
-            csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-            try:
-                correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-                if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-                correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-                correct_csrf_token.csrf_token_salt):
-                    return Response(status=status.HTTP_403_FORBIDDEN)
-            except CsrfToken.DoesNotExist:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
+        anti_csrf_token_validation_result = validate_anti_csrf_token('doesUserContactInfoExist'+request.data['contact_info'],
+        request.COOKIES)
+        if anti_csrf_token_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         contact_info = request.data['contact_info']
@@ -659,20 +556,8 @@ def get_usernames_and_full_names_of_all(request):
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username(request, username):
-    #validate anti-csrf-token
-    csrf_token_cookie_suffix = 'getRelevantInfoFromUsername'+username
-    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-    if csrf_token_cookie is not None:
-        csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-        try:
-            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-            correct_csrf_token.csrf_token_salt):
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        except CsrfToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
+    anti_csrf_token_validation_result = validate_anti_csrf_token('getRelevantInfoFromUsername'+username, request.COOKIES)
+    if anti_csrf_token_validation_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     user_info = redis_client.hget('Usernames and their Info', username)
@@ -722,20 +607,8 @@ def get_relevant_user_info_from_username(request, username):
 
 @api_view(['POST'])
 def get_relevant_user_info_of_multiple_users(request):
-    #validate anti-csrf-token
-    csrf_token_cookie_suffix = 'getRelevantInfoFromMultipleUsers'
-    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-    if csrf_token_cookie is not None:
-        csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-        try:
-            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-            correct_csrf_token.csrf_token_salt):
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        except CsrfToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
+    anti_csrf_token_validation_result = validate_anti_csrf_token('getRelevantInfoOfMultipleUsers', request.COOKIES)
+    if anti_csrf_token_validation_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     if(request.data.get('list_of_usernames')):
@@ -758,20 +631,9 @@ def get_relevant_user_info_of_multiple_users(request):
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username_including_contact_info(request, username):
-    #validate anti-csrf-token
-    csrf_token_cookie_suffix = 'getRelevantInfoIncludingContactInfoFromUsername'+username
-    csrf_token_cookie = csrf_token_suffix_in_cookies(request.COOKIES, csrf_token_cookie_suffix):
-    if csrf_token_cookie is not None:
-        csrf_token_cookie_val = request.COOKIES[csrf_token_cookie]
-        try:
-            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-            if correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-            correct_csrf_token.csrf_token_salt):
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        except CsrfToken.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
+    anti_csrf_token_validation_result = validate_anti_csrf_token('getRelevantInfoIncludingContactInfoFromUsername'+username,
+    request.COOKIES)
+    if anti_csrf_token_validation_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     user_info = redis_client.hget('Usernames and their Info', username)
@@ -878,7 +740,7 @@ def translate_texts_with_rapid_api(request):
         inverse_hash_name = f"Translations from {language_code_to_long_form_mappings[data['target']]} to {language_code_to_long_form_mappings[data['source']]}"
         output =  []
         for text in request.data['input_texts']:
-             try: 
+            try: 
                 data['q'] = text
                 response = requests.post("https://deep-translate1.p.rapidapi.com/language/translate/v2", data=json.dumps(data),
                 headers=headers)
@@ -900,6 +762,11 @@ def translate_texts_with_rapid_api(request):
 
 @api_view(['GET'])
 def get_redis_cached_language_translations(request, source_lang, target_lang):
+    anti_csrf_token_validation_result = validate_anti_csrf_token('getRedisCachedLanguageTranslationsFrom' + source_lang + 'To'
+    + target_lang, request.COOKIES)
+    if anti_csrf_token_validation_result == 'Forbidden':
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     if source_lang not in languages_available_for_translation or target_lang not in languages_available_for_translation:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
@@ -1002,24 +869,30 @@ def hash_salted_token(token, salt):
     base64_string_output = base64.b64encode(hashed_bytes).decode('utf-8')
     return base64_string_output
 
-
 def refresh_user_auth_token(user_id):
     new_auth_token = generate_token(100)
-    new_auth_token_salt = generate_token(32)
-    user_auth_token_to_refresh = UserAuthToken.objects.get(user_id = user_id)
-    updated_user_auth_token = {
-        'auth_token_salt': new_auth_token_salt,
-        'hashed_auth_token': hash_salted_token(new_auth_token, new_auth_token_salt),
-        'auth_token_expiry': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)
-    }
+    new_auth_token_salt = generate_token(32)    
 
-    serializer = UserAuthTokenSerializer(user_auth_token_to_refresh, data=updated_user_auth_token, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return new_auth_token
+    refresh_user_auth_token_statement = """
+    UPDATE userAuthTokens
+    SET authTokenSalt = @newAuthTokenSalt,
+        hashedAuthToken = @newHashedAuthToken,
+        authTokenExpiry = @newAuthTokenExpiry
+    WHERE userId = @userId
+    """
 
-    return None
+    with gcloud_mysql_spanner_database.transaction() as transaction:
+        transaction.execute_update(
+            refresh_user_auth_token_statement,
+            parameters={
+                "newAuthTokenSalt": new_auth_token_salt,
+                "newHashedAuthToken": hash_salted_token(new_auth_token, new_auth_token_salt),
+                "newAuthTokenExpiry": datetime.datetime.utcnow() + datetime.timedelta(minutes=45),
+                "userId": user_id
+            }
+        )
 
+    return new_auth_token
 
 def get_user_id_from_username(username):
     user_info = redis_client.hget('Usernames and their Info', username)
@@ -1039,25 +912,117 @@ def generate_tokens_for_new_user(user_id):
     new_hashed_refresh_token = hash_salted_token(new_refresh_token, new_refresh_token_salt)
     new_refresh_token_expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=10080) #10,080 min = 1 week
 
-    new_user_auth_token_data = {
-        'user_id': user_id,
-        'hashed_auth_token': new_hashed_auth_token,
-        'auth_token_salt': = new_auth_token_salt,
-        'hashed_refresh_token': = new_hashed_refresh_token
-        'refresh_token_salt' = new_refresh_token_salt
-        'auth_token_expiry' = new_auth_token_expiry
-        'refresh_token_expiry' = new_refresh_token_expiry
-    }
+    insert_new_user_auth_token_statement = """
+        INSERT INTO userAuthTokens (
+            userId, 
+            hashedAuthToken, 
+            authTokenSalt, 
+            hashedRefreshToken, 
+            refreshTokenSalt, 
+            authTokenExpiry,
+            refreshTokenExpiry
+        ) VALUES (
+            @newUserId, 
+            @newHashedAuthToken, 
+            @newAuthTokenSalt, 
+            @newHashedRefreshToken, 
+            @newRefreshTokenSalt, 
+            @newAuthTokenExpiry,
+            @newRefreshTokenExpiry
+        )
+    """
 
-    serializer = UserAuthTokenSerializer(data=new_user_auth_token_data)
-    if serializer.is_valid():
-        serializer.save()
-        return [new_auth_token, new_refresh_token]
+
+
+    with gcloud_mysql_spanner_database.transaction() as transaction:
+        transaction.execute_update(
+            insert_new_user_auth_token_statement,
+            parameters={
+                "newUserId": user_id,
+                "newHashedAuthToken": new_hashed_auth_token,
+                "newAuthTokenSalt": new_auth_token_salt,
+                "newHashedRefreshToken": new_hashed_refresh_token,
+                "newRefreshTokenSalt": new_refresh_token_salt,
+                "newAuthTokenExpiry": new_auth_token_expiry,
+                "newRefreshTokenExpiry": new_refresh_token_expiry,
+            }
+        )
     
-    return []
+    return [new_auth_token, new_refresh_token]
 
 def csrf_token_suffix_in_cookies(request_cookies, csrf_token_suffix):
     for cookie_name in request_cookies:
         if cookie_name.endswith(csrf_token_suffix):
             return cookie_name
     return None
+
+def validate_user_auth_token(id, request_cookies):
+    user_auth_token_cookie = 'authToken'+id
+    if user_auth_token_cookie in request_cookies:
+        user_auth_token_cookie_val = request_cookies[user_auth_token_cookie]
+        with gcloud_mysql_spanner_database.snapshot() as snapshot:            
+            results = snapshot.execute_sql(
+                "SELECT * FROM userAuthTokens WHERE userId = @id",
+                params={"id": id},
+                param_types={"id": spanner.param_types.INTEGER},
+            )
+
+            column_names_in_correct_order = ["userId", "hashedAuthToken", "authTokenSalt", "hashedRefreshToken",
+            "refreshTokenSalt", "authTokenExpiry", "refreshTokenExpiry"]
+
+            rows = []
+            for row in results:
+                rows.append(row)
+
+            if len(rows) == 0:
+                return 'Forbidden'
+
+            correct_user_token = rows[0]
+            correct_user_token = dict(zip(column_names_in_correct_order, correct_user_token))
+            correct_user_token["authTokenExpiry"] = datetime2.fromisoformat(
+            correct_user_token["authTokenExpiry"].isoformat())
+            correct_user_token["refreshTokenExpiry"] = datetime2.fromisoformat(
+            correct_user_token["refreshTokenExpiry"].isoformat())
+        
+            if correct_user_token['authTokenExpiry'] <= datetime.datetime.utcnow():
+                if correct_user_token['refreshTokenExpiry'] > datetime.datetime.utcnow():
+                    user_refresh_token_cookie = 'refreshToken'+id
+                    if user_refresh_token_cookie in request_cookies:
+                        user_refresh_token_cookie_val = request_cookies[user_refresh_token_cookie]
+                        if correct_user_token['hashedRefreshToken'] == hash_salted_token(user_refresh_token_cookie_val,
+                        correct_user_token['refreshTokenSalt']):
+                            return 'Allowed, but Refresh Auth Token'
+                        else:
+                            return 'Forbidden'
+                    else:
+                        return 'Forbidden'
+                else:
+                    return 'Forbidden'
+            
+            if correct_user_token['hashedAuthToken'] != hash_salted_token(user_auth_token_cookie_val,
+            correct_user_token['authTokenSalt']):
+                return 'Forbidden'
+            
+        return 'Allowed'
+
+    else:
+        return 'Forbidden'
+
+def validate_anti_csrf_token(csrf_token_cookie_suffix, request_cookies):
+    csrf_token_cookie = csrf_token_suffix_in_cookies(request_cookies, csrf_token_cookie_suffix)
+    if csrf_token_cookie is not None:
+        csrf_token_cookie_val = request_cookies[csrf_token_cookie]
+        try:
+            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
+            if (correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
+            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
+            correct_csrf_token.csrf_token_salt)):
+                return 'Forbidden'
+            
+            return 'Allowed'
+
+        except CsrfToken.DoesNotExist:
+            return 'Forbidden'
+    else:
+        return 'Forbidden'
+
