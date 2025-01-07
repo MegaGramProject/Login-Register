@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
     <!--script src="https://accounts.google.com/gsi/client" async></script> <!--This is for Google O-Auth-->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script type="module" src="{% static 'scripts/loginScript.js' %}"></script>
+    <script src="{% static 'scripts/loginScript.js' %}"></script>
 </head>
 
 <body>
@@ -117,6 +117,12 @@
             <option value="中国人">中国人</option>
         </select>
     </div>
+
+    <p id="DEEP_TRANSLATE_API_KEY" style="display:none;">{{ DEEP_TRANSLATE_API_KEY }}</p>
+    <p id="GOOGLE_RECAPTCHA_SECRET" style="display:none;">{{ GOOGLE_RECAPTCHA_SECRET }}</p>
+    <p id="DOES_USERNAME_EXIST_API_KEY" style="display:none;">{{ DOES_USERNAME_EXIST_API_KEY }}</p>
+    <p id="DOES_USER_CONTACT_INFO_EXIST_API_KEY" style="display:none;">{{ DOES_USER_CONTACT_INFO_EXIST_API_KEY }}</p>
+
 </body>
 
 </html>

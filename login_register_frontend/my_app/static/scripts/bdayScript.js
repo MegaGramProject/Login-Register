@@ -1,5 +1,3 @@
-import { DEEP_TRANSLATE_API_KEY } from './config.js';
-
 $(document).ready(function() {
     /*
         at the bottom of this function will be a function
@@ -18,6 +16,7 @@ $(document).ready(function() {
     const loginText = $("#loginText");
     const errorMessage = $("#errorMessage");
     const darkScreen = $("#darkScreen");
+    const DEEP_TRANSLATE_API_KEY = $("DEEP_TRANSLATE_API_KEY").text();
     let currLanguage = "en";
     const languageCodeToLongFormMappings = {
         en: "English",
@@ -37,14 +36,14 @@ $(document).ready(function() {
     loginText.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            window.location.href = "http://localhost:8000/login";
+            window.location.href = "http://34.111.89.101/loginregister/login";
             return;
         }
         else {
             currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
-        window.location.href = `http://localhost:8000/login?language=${currentLanguageLongForm}`;
+        window.location.href = `http://34.111.89.101/loginregister/login?language=${currentLanguageLongForm}`;
     });
 
 
@@ -137,10 +136,10 @@ $(document).ready(function() {
         });
 
         if(newLanguage==='en') {
-            history.pushState(null, 'Age Check', 'http://localhost:8000/ageCheck');
+            history.pushState(null, 'Age Check', 'http://34.111.89.101/loginregister/ageCheck');
         }
         else {
-            history.pushState(null, 'Age Check', `http://localhost:8000/ageCheck?language=${languageCodeToLongFormMappings[newLanguage]}`);
+            history.pushState(null, 'Age Check', `http://34.111.89.101/loginregister/ageCheck?language=${languageCodeToLongFormMappings[newLanguage]}`);
         }
         currLanguage = newLanguage;
     }
@@ -149,14 +148,14 @@ $(document).ready(function() {
     goBackText.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            window.location.href = 'http://localhost:8000/signup';
+            window.location.href = 'http://34.111.89.101/loginregister/signup';
             return;
         }
         else {
             currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
-        window.location.href = `http://localhost:8000/signup?language=${currentLanguageLongForm}`;
+        window.location.href = `http://34.111.89.101/loginregister/signup?language=${currentLanguageLongForm}`;
     });
     
     whyBday.on('click', function() {
@@ -181,11 +180,11 @@ $(document).ready(function() {
         let currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         let confirmCodeUrl;
         if (sessionStorage.getItem("email")) {
-            confirmCodeUrl= "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&email=" +
+            confirmCodeUrl= "http://34.111.89.101/loginregister/confirmCode?language=" + currentLanguageLongForm + "&email=" +
             sessionStorage.getItem("email");
         }
         else {
-            confirmCodeUrl = "http://localhost:8000/confirmCode?language=" + currentLanguageLongForm + "&number=" +
+            confirmCodeUrl = "http://34.111.89.101/loginregister/confirmCode?language=" + currentLanguageLongForm + "&number=" +
             sessionStorage.getItem("number");
         }
         sessionStorage.setItem("dateOfBirth", birthMonth.val() + birthDay.val() + birthYear.val());

@@ -1,5 +1,3 @@
-import { DEEP_TRANSLATE_API_KEY, GOOGLE_RECAPTCHA_SECRET } from './config.js';
-
 $(document).ready(function() {
     /*
         at the bottom of this function will be a function
@@ -16,6 +14,11 @@ $(document).ready(function() {
     const signupLink = $('#signupLink');
     const errorMessage = $('#errorMessage');
     const recaptchaErrorMessage = $('#recaptchaErrorMessage');
+    const DEEP_TRANSLATE_API_KEY = $("DEEP_TRANSLATE_API_KEY").text();
+    const GOOGLE_RECAPTCHA_SECRET = $("#GOOGLE_RECAPTCHA_SECRET").text();
+    const DOES_USERNAME_EXIST_API_KEY = $("DOES_USERNAME_EXIST_API_KEY").text();
+    const DOES_USER_CONTACT_INFO_EXIST_API_KEY = $("#DOES_USER_CONTACT_INFO_EXIST_API_KEY").text();
+    const GET_REDIS_CACHED_LANGUAGE_TRANSLATIONS_API_KEY = $("#GET_REDIS_CACHED_LANGUAGE_TRANSLATIONS_API_KEY").text();
     const bcrypt = dcodeIO.bcrypt; //this is used for hashing the user-inputted password
     let recaptchaIsVerified = false;
     let slideIdx = 0;
@@ -48,15 +51,17 @@ $(document).ready(function() {
             postOptions.body = JSON.stringify({
                 "contact_info": numberNameEmail.val()
             });
+            postOptions.headers['Authorization'] = `Bearer ${DOES_USER_CONTACT_INFO_EXIST_API_KEY}`;
         }
         else {
             postOptions.body = JSON.stringify({
                 "username": numberNameEmail.val()
             });
+            postOptions.headers['Authorization'] = `Bearer ${DOES_USERNAME_EXIST_API_KEY}`;
         }
 
         try {
-            const response = await fetch("http://localhost:8001/doesUserExist", postOptions);
+            const response = await fetch("http://34.111.89.101/loginregister/api/doesUserExist", postOptions);
             const data = await response.json();
             const salt = data['salt'];
             
@@ -110,16 +115,16 @@ $(document).ready(function() {
     signupLink.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            window.location.href = "http://localhost:8000/signup";
+            window.location.href = "http://34.111.89.101/loginregister/signup";
             return;
         }
         else {
             currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
-        window.location.href = `http://localhost:8000/signup?language=${currentLanguageLongForm}`;
+        window.location.href = `http://localhost:34.111.89.101/loginregister/signup?language=${currentLanguageLongForm}`;
     });
 
-    const setLanguage = function (lang) {
+    const setLanguage = async function (lang) {
         let newLanguage = "";
         if (lang==="English"){
             newLanguage = "en";
@@ -164,23 +169,27 @@ $(document).ready(function() {
             return;
         }
 
-        const apiUrl = "https://deep-translate1.p.rapidapi.com/language/translate/v2";
-        const data = {
-            q: "",
-            source: "",
-            target: ""
-        };
-        data["source"] = currLanguage;
-        data["target"] = newLanguage;
-        const options = {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            'x-rapidapi-host': 'deep-translate1.p.rapidapi.com',
-            'x-rapidapi-key': DEEP_TRANSLATE_API_KEY
-            },
-            body: null
-        };
+        redisCachedLanguageTranslations = {}
+        try {
+            const response = await fetch(
+                `http://34.111.89.101/loginregister/api/getRedisCachedLanguageTranslations/
+                ${languageCodeToLongFormMappings[currLanguage]}/${languageCodeToLongFormMappings[newLanguage]}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${GET_REDIS_CACHED_LANGUAGE_TRANSLATIONS_API_KEY}`
+                    }
+                }
+            );
+            if(!response.ok) {
+                console.error("The server had trouble providing the Redis-cached language-translations");
+            }
+            redisCachedLanguageTranslations = await response.json();
+        }
+        catch {
+            console.error("There was trouble connecting to the server to get the Redis-cached language-translations");
+        }
+        
         const allElements = document.querySelectorAll('*');
         allElements.forEach(element => {
             const text = element.innerText.trim();
@@ -245,11 +254,12 @@ $(document).ready(function() {
         });
 
         if(newLanguage==='en') {
-            history.pushState(null, 'Login', 'http://localhost:8000/login');
+            history.pushState(null, 'Login', 'http://34.111.89.101/loginregister/login');
         }
         else {
-            history.pushState(null, 'Login', `http://localhost:8000/login?language=${languageCodeToLongFormMappings[newLanguage]}`);
+            history.pushState(null, 'Login', `http://34.111.89.101/loginregister/login?language=${languageCodeToLongFormMappings[newLanguage]}`);
         }
+
         currLanguage = newLanguage;
     }
 
@@ -405,7 +415,7 @@ $(document).ready(function() {
             })
         };
 
-        fetch("http://localhost:8001/verifyCaptcha", options)
+        fetch("http://34.111.89.101/loginregister/verifyCaptcha", options)
         .then(response => {
             if (!response.ok) {
                 recaptchaErrorMessage.css('display', 'inline-block');

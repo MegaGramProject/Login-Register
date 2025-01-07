@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'styles/bdayStyles.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script type="module" src = "{% static 'scripts/bdayScript.js' %}"></script>
+    <script src="{% static 'scripts/bdayScript.js' %}"></script>
 </head>
 
 <body>
@@ -241,6 +241,9 @@
             You can find your birthday in your personal information account settings.
         </p>
     </div>
+    
+    <p id="DEEP_TRANSLATE_API_KEY" style="display:none;">{{ DEEP_TRANSLATE_API_KEY }}</p>
+
 </body>
 
 </html>

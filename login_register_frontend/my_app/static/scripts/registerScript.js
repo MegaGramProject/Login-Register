@@ -1,5 +1,3 @@
-import { DEEP_TRANSLATE_API_KEY } from './config.js';
-
 $(document).ready(function() {
     /*
         at the bottom of this function will be a function
@@ -35,6 +33,9 @@ $(document).ready(function() {
     const passwordInvalidError = $("#passwordInvalidError");
     const fullNameInvalidError = $("#fullNameInvalidError");
     const otherError = $('#otherError');
+    const DEEP_TRANSLATE_API_KEY = $("DEEP_TRANSLATE_API_KEY").text();
+    const DOES_USERNAME_EXIST_API_KEY = $("DOES_USERNAME_EXIST_API_KEY").text();
+    const DOES_USER_CONTACT_INFO_EXIST_API_KEY = $("#DOES_USER_CONTACT_INFO_EXIST_API_KEY").text();
     const bcrypt = dcodeIO.bcrypt; //this is used for hashing the user-inputted password
     let currLanguage = "en";
     let numberEmailError;
@@ -69,13 +70,13 @@ $(document).ready(function() {
     loginText.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            window.location.href = "http://localhost:8000/login";
+            window.location.href = "http://34.111.89.101/loginregister/login";
             return;
         }
         else {
             currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
-        window.location.href = `http://localhost:8000/login?language=${currentLanguageLongForm}`;
+        window.location.href = `http://34.111.89.101/loginregister/login?language=${currentLanguageLongForm}`;
     });
 
     numberEmail.on("input", function() {
@@ -336,10 +337,10 @@ $(document).ready(function() {
         });
 
         if(newLanguage==='en') {
-            history.pushState(null, 'Register', 'http://localhost:8000/signup');
+            history.pushState(null, 'Register', 'http://34.111.89.101/loginregister/signup');
         }
         else {
-            history.pushState(null, 'Register', `http://localhost:8000/signup?language=${languageCodeToLongFormMappings[newLanguage]}`);
+            history.pushState(null, 'Register', `http://34.111.89.101/loginregister/signup?language=${languageCodeToLongFormMappings[newLanguage]}`);
         }
         currLanguage = newLanguage;
     }
@@ -407,10 +408,11 @@ $(document).ready(function() {
         }
 
         try {
-            const response = await fetch("http://localhost:8001/doesUserExist", {
+            const response = await fetch("http://34.111.89.101/loginregister/api/doesUserExist", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${DOES_USER_CONTACT_INFO_EXIST_API_KEY}`
                 },
                 body: JSON.stringify({
                     "contact_info": numberEmailInput
@@ -479,10 +481,11 @@ $(document).ready(function() {
         }
 
         try {
-            const response = await fetch("http://localhost:8001/doesUserExist", {
+            const response = await fetch("http://34.111.89.101/loginregister/api/doesUserExist", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${DOES_USERNAME_EXIST_API_KEY}`
                 },
                 body: JSON.stringify({
                     "username": usernameInput
@@ -580,7 +583,7 @@ $(document).ready(function() {
         const salt = getSalt();
         sessionStorage.setItem("salt", salt);
         sessionStorage.setItem("hashedPassword", getHashedPassword(password.val(), salt));
-        window.location.href = `http://localhost:8000/ageCheck?language=${currentLanguageLongForm}`;
+        window.location.href = `http://34.111.89.101/loginregister/ageCheck?language=${currentLanguageLongForm}`;
     }
         
 

@@ -10,13 +10,13 @@
 
     <link rel="stylesheet" href="{% static 'styles/confirmCodeStyles.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="module" src="{% static 'scripts/confirmCodeScript.js' %}"></script>
+    <script src="{% static 'scripts/confirmCodeScript.js' %}"></script>
 </head>
 
 <body>
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2em;">
         <div class="box" style="margin-top:6.5em; padding: 1.45em 1.45em;">
-            {% if email != "N/A" %}
+            {% if EMAIL != "N/A" %}
                 <img src="{% static 'images/emailIcon.webp' %}" style="height:10em; width: 10em; object-fit:contain;
                 pointer-events: none;">
             {% else %}
@@ -27,10 +27,10 @@
             <p style="font-size: 1.0625em; text-align: center; display: inline; margin-top:0.9375em; line-height: 1.5;
             max-width: 77%;">
                 Enter the confirmation code we sent to
-            {% if email != "N/A" %}
-                {{ email }}.
+            {% if EMAIL != "N/A" %}
+                {{ EMAIL }}.
             {% else %}
-                {{ number }}.
+                {{ NUMBER }}.
             {% endif %}
             
             <p id="resendCode" class="noUnderline" style="margin-top: 0em;">Resend Code</></p>
@@ -76,7 +76,11 @@
         </select>
 
             
-        <p id="correctCodeValue" style="display:none;">{{ correct_code_value }}</p>
+        <p id="CORRECT_CODE_VALUE" style="display:none;">{{ CORRECT_CODE_VALUE }}</p>
+        <p id="DEEP_TRANSLATE_API_KEY" style="display:none;">{{ DEEP_TRANSLATE_API_KEY }}</p>
+        <p id="EMAIL_CONFIRMATION_CODE_API_KEY" style="display:none;">{{ EMAIL_CONFIRMATION_CODE_API_KEY }}</p>
+        <p id="TEXT_CONFIRMATION_CODE_API_KEY" style="display:none;">{{ TEXT_CONFIRMATION_CODE_API_KEY }}</p>
+        <p id="CREATE_USER_API_KEY" style="display:none;">{{ CREATE_USER_API_KEY }}</p>
     </div>
 </body>
 

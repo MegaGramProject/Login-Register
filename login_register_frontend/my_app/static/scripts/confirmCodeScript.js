@@ -1,5 +1,3 @@
-import { DEEP_TRANSLATE_API_KEY } from './config.js';
-
 $(document).ready(function() {
     /*
         at the bottom of this function will be a function
@@ -14,6 +12,10 @@ $(document).ready(function() {
     const confirmCode = $("#confirmCode");
     const resendCode = $("#resendCode");
     const errorMessage = $("#errorMessage");
+    const DEEP_TRANSLATE_API_KEY = $("DEEP_TRANSLATE_API_KEY").text();
+    const EMAIL_CONFIRMATION_CODE_API_KEY = $("EMAIL_CONFIRMATION_CODE_API_KEY").text();
+    const TEXT_CONFIRMATION_CODE_API_KEY = $("#TEXT_CONFIRMATION_CODE_API_KEY").text();
+    const CREATE_USER_API_KEY = $("#CREATE_USER_API_KEY").text();
     const username = sessionStorage.getItem("username");
     const salt = sessionStorage.getItem("salt");
     const hashedPassword = sessionStorage.getItem("hashedPassword");
@@ -23,7 +25,7 @@ $(document).ready(function() {
     const params = new URLSearchParams(queryString);
     let currLanguage = "en";
     let timeRemainingValue = 59;
-    let correctCodeValue = $("#correctCodeValue").text();
+    let correctCodeValue = $("#CORRECT_CODE_VALUE").text();
     let intervalIdForTimeRemaining;
     const languageCodeToLongFormMappings = {
         en: "English",
@@ -55,10 +57,11 @@ $(document).ready(function() {
         errorMessage.css('display', 'none');
 
         if (params.get("email")) {
-            const emailURL = "http://localhost:8001/sendEmail";
+            const emailURL = "http://34.111.89.101/loginregister/api/sendConfirmationCodeEmail";
             const data = {"email": params.get("email")};
             const headers = new Headers({
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${EMAIL_CONFIRMATION_CODE_API_KEY}`
             });
 
             fetch(emailURL, {
@@ -88,8 +91,11 @@ $(document).ready(function() {
         }
 
         else {
-            const textURL = "http://localhost:8001/sendText"+params.get("number");
-            const headers = {'Accept': 'application/json'}
+            const textURL = "http://34.111.89.101/loginregister/api/sendConfirmationCodeText"+params.get("number");
+            const headers = {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${TEXT_CONFIRMATION_CODE_API_KEY}`
+            }
             fetch(textURL, {
                 method: 'POST',
                 headers: headers,
@@ -119,14 +125,14 @@ $(document).ready(function() {
     loginText.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            window.location.href = 'http://localhost:8000/login';
+            window.location.href = 'http://34.111.89.101/loginregister/login';
             return;
         }
         else {
             currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
-        window.location.href = `http://localhost:8000/login?language=${currentLanguageLongForm}`;
+        window.location.href = `http://34.111.89.101/loginregister/login?language=${currentLanguageLongForm}`;
     });
 
 
@@ -223,11 +229,11 @@ $(document).ready(function() {
         });
 
         if(newLanguage==='en') {
-            history.pushState(null, 'Confirm Code', 'http://localhost:8000/confirmCode');
+            history.pushState(null, 'Confirm Code', 'http://34.111.89.101/loginregister/confirmCode');
         }
         else {
             history.pushState(null, 'Confirm Code',
-            `http://localhost:8000/confirmCode?language=${languageCodeToLongFormMappings[newLanguage]}`);
+            `http://34.111.89.101/loginregister/confirmCode?language=${languageCodeToLongFormMappings[newLanguage]}`);
         }
         currLanguage = newLanguage;
     }
@@ -235,14 +241,14 @@ $(document).ready(function() {
     goBackButton.on("click", function() {
         let currentLanguageLongForm;
         if (currLanguage==="en") {
-            window.location.href = 'http://localhost:8000/ageCheck'
+            window.location.href = 'http://34.111.89.101/loginregister/ageCheck'
             return;
         }
         else {
             currentLanguageLongForm = languageCodeToLongFormMappings[currLanguage];
         }
 
-        window.location.href = `http://localhost:8000/ageCheck?language=${currentLanguageLongForm}`;
+        window.location.href = `http://34.111.89.101/loginregister/ageCheck?language=${currentLanguageLongForm}`;
     });
 
     confirmCode.on('input', function() {
@@ -254,7 +260,7 @@ $(document).ready(function() {
                 errorMessage.css('display', 'none');
                 nextButton.css('display', 'none');
                 if (correctCodeValue==parseInt(confirmCode.val()) && timeRemainingValue>0) {
-                    const createUserURL = "http://localhost:8001/createUser";
+                    const createUserURL = "http://34.111.89.101/loginregister/api/createUser";
                     const userData = {
                         "salt":salt,
                         "hashed_password":hashedPassword,
@@ -272,6 +278,7 @@ $(document).ready(function() {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${CREATE_USER_API_KEY}`
                         },
                         body: JSON.stringify(userData)
                     };
