@@ -19,7 +19,6 @@ urlpatterns = [
     path("getRelevantUserInfoFromUsernameIncludingContactInfo/<str:username>",
     views.get_relevant_user_info_from_username_including_contact_info,
     name="Get Relevant User-Info From Username(including Contact-Info)"),
-    path("getCSRFToken/<str:purpose>", views.getCSRFToken, name="Get CSRF Token"),
     path("translateTextsWithRapidApi", views.translate_texts_with_rapid_api, name="Translate Texts with RapidAPI"),
     path("getRedisCachedLanguageTranslations/<str:source_lang>/<str:target_lang>",
     views.get_redis_cached_language_translations, name="Get Redis-Cached Language Translations")

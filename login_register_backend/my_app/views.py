@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import User, CsrfToken
-from .serializers import UserSerializer, CsrfTokenSerializer
+from .models import User, APIKey
+from .serializers import UserSerializer
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -21,7 +21,6 @@ import json
 import redis
 import uuid
 from datetime import datetime as datetime2
-
 
 redis_client = redis.Redis(
     host='redis-14251.c261.us-east-1-4.ec2.redns.redis-cloud.com',
@@ -69,12 +68,15 @@ language_code_to_long_form_mappings = {
 
 @api_view(['POST'])
 def create_user(request):
-    if(request.data.get('username')):
-        anti_csrf_token_validation_result = validate_anti_csrf_token('createUser'+request.data['username'], request.COOKIES)
-        if anti_csrf_token_validation_result == 'Forbidden':
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
             return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        api_key_validation_result = validate_api_key('createUser', authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
             
 
     if(request.data.get('full_name') and request.data.get('salt') and
@@ -352,13 +354,14 @@ def remove_user(request, id):
 
 @api_view(['POST'])
 def send_confirmation_code_email(request):
-    if(request.data.get('email')):
-        anti_csrf_token_validation_result = validate_anti_csrf_token('sendConfirmationCodeEmail'+request.data['email'],
-        request.COOKIES)
-        if anti_csrf_token_validation_result == 'Forbidden':
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
             return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        api_key_validation_result = validate_api_key('sendConfirmationCodeEmail', authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     email = request.data["email"]
     confirmation_code = random.randint(100000, 999999)
@@ -407,9 +410,14 @@ def send_confirmation_code_email(request):
 
 @api_view(['POST'])
 def send_confirmation_code_text(request, number):
-    anti_csrf_token_validation_result = validate_anti_csrf_token('sendConfirmationCodeText'+number, request.COOKIES)
-    if anti_csrf_token_validation_result == 'Forbidden':
-        return Response(status=status.HTTP_403_FORBIDDEN)
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        api_key_validation_result = validate_api_key('sendConfirmationCodeText', authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     confirmation_code = random.randint(100000, 999999)
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
@@ -437,9 +445,14 @@ def send_confirmation_code_text(request, number):
 @api_view(['POST'])
 def does_user_exist(request):
     if request.data.get('username'):
-        anti_csrf_token_validation_result = validate_anti_csrf_token('doesUsernameExist'+request.data['username'], request.COOKIES)
-        if anti_csrf_token_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        authorization = request.META.get('HTTP_AUTHORIZATION')
+        if authorization is not None:
+            authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+            if len(authorization_parts) != 2:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            api_key_validation_result = validate_api_key('doesUsernameExist', authorization_parts[1])
+            if api_key_validation_result == 'Forbidden':
+                return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
             user_info = redis_client.hget('Usernames and their Info', request.data['username'])
@@ -458,10 +471,14 @@ def does_user_exist(request):
             )
 
     elif request.data.get('contact_info'):
-        anti_csrf_token_validation_result = validate_anti_csrf_token('doesUserContactInfoExist'+request.data['contact_info'],
-        request.COOKIES)
-        if anti_csrf_token_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        authorization = request.META.get('HTTP_AUTHORIZATION')
+        if authorization is not None:
+            authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+            if len(authorization_parts) != 2:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            api_key_validation_result = validate_api_key('doesUserContactInfoExist', authorization_parts[1])
+            if api_key_validation_result == 'Forbidden':
+                return Response(status=status.HTTP_403_FORBIDDEN)
 
         contact_info = request.data['contact_info']
         info_for_each_user = redis_client.hgetall('Usernames and their Info')
@@ -546,6 +563,15 @@ def verify_captcha(request):
 
 @api_view(['GET'])
 def get_usernames_and_full_names_of_all(request):
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        api_key_validation_result = validate_api_key('getUsernamesAndFullNamesOfAll', authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
+    
     info_for_each_user = redis_client.hgetall('Usernames and their Info')
     output = []
     for username in info_for_each_user:
@@ -556,9 +582,14 @@ def get_usernames_and_full_names_of_all(request):
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username(request, username):
-    anti_csrf_token_validation_result = validate_anti_csrf_token('getRelevantInfoFromUsername'+username, request.COOKIES)
-    if anti_csrf_token_validation_result == 'Forbidden':
-        return Response(status=status.HTTP_403_FORBIDDEN)
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        api_key_validation_result = validate_api_key('getRelevantUserInfoFromUsername', authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     user_info = redis_client.hget('Usernames and their Info', username)
     user_info = json.loads(user_info)
@@ -607,9 +638,14 @@ def get_relevant_user_info_from_username(request, username):
 
 @api_view(['POST'])
 def get_relevant_user_info_of_multiple_users(request):
-    anti_csrf_token_validation_result = validate_anti_csrf_token('getRelevantInfoOfMultipleUsers', request.COOKIES)
-    if anti_csrf_token_validation_result == 'Forbidden':
-        return Response(status=status.HTTP_403_FORBIDDEN)
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        api_key_validation_result = validate_api_key('getRelevantUserInfoOfMultipleUsers', authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     if(request.data.get('list_of_usernames')):
         set_of_usernames = set(request.data['list_of_usernames'])
@@ -631,10 +667,15 @@ def get_relevant_user_info_of_multiple_users(request):
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username_including_contact_info(request, username):
-    anti_csrf_token_validation_result = validate_anti_csrf_token('getRelevantInfoIncludingContactInfoFromUsername'+username,
-    request.COOKIES)
-    if anti_csrf_token_validation_result == 'Forbidden':
-        return Response(status=status.HTTP_403_FORBIDDEN)
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        api_key_validation_result = validate_api_key('getRelevantUserInfoFromUsernameIncludingContactInfo',
+        authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     user_info = redis_client.hget('Usernames and their Info', username)
     user_info = json.loads(user_info)
@@ -691,33 +732,6 @@ def get_relevant_user_info_from_username_including_contact_info(request, usernam
         }
     )
 
-@api_view(['GET'])
-def getCSRFToken(request, purpose):  
-    csrf_token = get_random_secret_key()
-    csrf_token_salt = generate_token(32)
-    random_uuid = uuid.uuid4()
-    new_csrf_token = {
-        'expiration_date': datetime.datetime.utcnow() + datetime.timedelta(seconds=60),
-        'hashed_csrf_token': hash_salted_token(csrf_token, csrf_token_salt),
-        'csrf_token_salt': csrf_token_salt,
-        'purpose': random_uuid+purpose
-    }
-
-    serializer = CsrfTokenSerializer(data=new_csrf_token)
-    if serializer.is_valid():
-        serializer.save()
-
-    response = Response()
-    response.set_cookie(
-        key=random_uuid+purpose,
-        value=csrf_token,
-        httponly=True,
-        samesite='Strict',
-        max_age=60 # 1 min
-    )
-
-    return response
-
 @api_view(['POST'])
 def translate_texts_with_rapid_api(request):
     if (request.data.get('input_texts') and request.data.get('source_lang_shortened_code') and
@@ -762,10 +776,14 @@ def translate_texts_with_rapid_api(request):
 
 @api_view(['GET'])
 def get_redis_cached_language_translations(request, source_lang, target_lang):
-    anti_csrf_token_validation_result = validate_anti_csrf_token('getRedisCachedLanguageTranslationsFrom' + source_lang + 'To'
-    + target_lang, request.COOKIES)
-    if anti_csrf_token_validation_result == 'Forbidden':
-        return Response(status=status.HTTP_403_FORBIDDEN)
+    authorization = request.META.get('HTTP_AUTHORIZATION')
+    if authorization is not None:
+        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
+        if len(authorization_parts) != 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        api_key_validation_result = validate_api_key('getRedisCachedLanguageTranslations', authorization_parts[1])
+        if api_key_validation_result == 'Forbidden':
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     if source_lang not in languages_available_for_translation or target_lang not in languages_available_for_translation:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -950,11 +968,6 @@ def generate_tokens_for_new_user(user_id):
     
     return [new_auth_token, new_refresh_token]
 
-def csrf_token_suffix_in_cookies(request_cookies, csrf_token_suffix):
-    for cookie_name in request_cookies:
-        if cookie_name.endswith(csrf_token_suffix):
-            return cookie_name
-    return None
 
 def validate_user_auth_token(id, request_cookies):
     user_auth_token_cookie = 'authToken'+id
@@ -1008,21 +1021,16 @@ def validate_user_auth_token(id, request_cookies):
     else:
         return 'Forbidden'
 
-def validate_anti_csrf_token(csrf_token_cookie_suffix, request_cookies):
-    csrf_token_cookie = csrf_token_suffix_in_cookies(request_cookies, csrf_token_cookie_suffix)
-    if csrf_token_cookie is not None:
-        csrf_token_cookie_val = request_cookies[csrf_token_cookie]
-        try:
-            correct_csrf_token = CsrfToken.objects.get(purpose=csrf_token_cookie)
-            if (correct_csrf_token.expiration_date <= datetime.datetime.utcnow() or
-            correct_csrf_token.hashed_csrf_token != hash_salted_token(csrf_token_cookie_val,
-            correct_csrf_token.csrf_token_salt)):
-                return 'Forbidden'
-            
-            return 'Allowed'
-
-        except CsrfToken.DoesNotExist:
-            return 'Forbidden'
-    else:
+def validate_api_key(api_endpoint, provided_api_key):
+    try:
+        correct_api_key = APIKey.objects.get(purpose=api_endpoint)
+    except APIKey.DoesNotExist:
         return 'Forbidden'
+        
+    if (correct_api_key.expiration <= datetime.datetime.utcnow() or
+    correct_api_key.hashed_api_key != hash_salted_token(provided_api_key,
+    correct_api_key.api_key_salt)):
+        return 'Forbidden'
+    
+    return 'Allowed'
 

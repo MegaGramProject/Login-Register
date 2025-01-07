@@ -22,8 +22,8 @@ spec:
             name: login-register-backend-env-secrets
         volumeMounts:
         - name: google-credentials-json-secret-volume
-          mountPath: /app/megagram-428802-9481f000861d.json
-          subPath: megagram-428802-9481f000861d.json
+          mountPath: /app/megagram-428802-d974cd9b0ed9.json
+          subPath: megagram-428802-d974cd9b0ed9.json
           readOnly: true
       volumes:
       - name: google-credentials-json-secret-volume
