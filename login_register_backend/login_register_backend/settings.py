@@ -10,16 +10,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('LOGIN_REGISTER_BACKEND_DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get('LOGIN_REGISTER_BACKEND_DJANGO_SECRET_KEY', 'as')
 
 
 # DEBUG is a boolean which is True if Debug-mode is turned on, False otherwise. It is supposed to be False for production.
-DEBUG = False
+DEBUG = True
 
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
-    os.environ.get('ALLOWED_HOST')
+    os.environ.get('ALLOWED_HOST'),
+    'localhost'
 ]
 
 
@@ -61,7 +62,7 @@ DATABASES = {
         'NAME': 'Megagram',
         'USER': os.environ.get('LOCAL_MYSQL_USER'),
         'PASSWORD': os.environ.get('LOCAL_MYSQL_PASSWORD'),
-        'HOST': os.environ.get('LOCAL_MYSQL_HOST'),
+        'HOST': os.environ.get('LOCAL_MYSQL_HOST', 'localhost'),
         'POST': 3306
     },
 
@@ -70,7 +71,7 @@ DATABASES = {
         'NAME': 'Megagram',
         'USER': os.environ.get('LOCAL_PSQL_USER'),
         'PASSWORD': os.environ.get('LOCAL_PSQL_PASSWORD'),
-        'HOST': os.environ.get('LOCAL_PSQL_HOST'),
+        'HOST': os.environ.get('LOCAL_PSQL_HOST', 'localhost'),
         'PORT': 5432,
     }
 }

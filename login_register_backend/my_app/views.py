@@ -68,6 +68,7 @@ language_code_to_long_form_mappings = {
 
 @api_view(['POST'])
 def create_user(request):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -76,9 +77,9 @@ def create_user(request):
         api_key_validation_result = validate_api_key('createUser', authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
-        
-            
-
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
     if(request.data.get('full_name') and request.data.get('salt') and
     request.data.get('hashed_password') and request.data.get('contact_info') and request.data.get('date_of_birth')):
 
@@ -296,6 +297,15 @@ def update_user(request, id):
 
 @api_view(['GET'])
 def get_full_name(request, username):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    
+    if x_forwarded_for:
+        #for proxies
+        return Response("A" + x_forwarded_for)
+    else:
+        #for non-proxies
+        return Response("B" + request.META.get('REMOTE_ADDR'))
+    
     user_info = redis_client.hget('Usernames and their Info', username)
     if user_info is None:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -354,6 +364,7 @@ def remove_user(request, id):
 
 @api_view(['POST'])
 def send_confirmation_code_email(request):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -362,6 +373,9 @@ def send_confirmation_code_email(request):
         api_key_validation_result = validate_api_key('sendConfirmationCodeEmail', authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
 
     email = request.data["email"]
     confirmation_code = random.randint(100000, 999999)
@@ -410,6 +424,7 @@ def send_confirmation_code_email(request):
 
 @api_view(['POST'])
 def send_confirmation_code_text(request, number):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -418,6 +433,9 @@ def send_confirmation_code_text(request, number):
         api_key_validation_result = validate_api_key('sendConfirmationCodeText', authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
 
     confirmation_code = random.randint(100000, 999999)
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
@@ -445,6 +463,7 @@ def send_confirmation_code_text(request, number):
 @api_view(['POST'])
 def does_user_exist(request):
     if request.data.get('username'):
+        '''
         authorization = request.META.get('HTTP_AUTHORIZATION')
         if authorization is not None:
             authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -453,7 +472,9 @@ def does_user_exist(request):
             api_key_validation_result = validate_api_key('doesUsernameExist', authorization_parts[1])
             if api_key_validation_result == 'Forbidden':
                 return Response(status=status.HTTP_403_FORBIDDEN)
-
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        '''
         try:
             user_info = redis_client.hget('Usernames and their Info', request.data['username'])
             user_info = json.loads(user_info)
@@ -471,6 +492,7 @@ def does_user_exist(request):
             )
 
     elif request.data.get('contact_info'):
+        '''
         authorization = request.META.get('HTTP_AUTHORIZATION')
         if authorization is not None:
             authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -479,12 +501,17 @@ def does_user_exist(request):
             api_key_validation_result = validate_api_key('doesUserContactInfoExist', authorization_parts[1])
             if api_key_validation_result == 'Forbidden':
                 return Response(status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        '''
 
         contact_info = request.data['contact_info']
         info_for_each_user = redis_client.hgetall('Usernames and their Info')
+        del info_for_each_user['placeholder%Key']
         client = kms_v1.KeyManagementServiceClient()
 
-        for user_info in info_for_each_user:
+        for username in info_for_each_user:
+            user_info = info_for_each_user[username]
             user_info = json.loads(user_info)
             decrypted_contact_info = decrypt_data(
                 client,
@@ -499,7 +526,7 @@ def does_user_exist(request):
                     {
                         "salt": user_info['salt'],
                         "hashed_password":user_info['hashed_password'],
-                        "username":user_info['username']
+                        "username": username
                     }
                 )
 
@@ -563,6 +590,7 @@ def verify_captcha(request):
 
 @api_view(['GET'])
 def get_usernames_and_full_names_of_all(request):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -571,17 +599,23 @@ def get_usernames_and_full_names_of_all(request):
         api_key_validation_result = validate_api_key('getUsernamesAndFullNamesOfAll', authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
     
     info_for_each_user = redis_client.hgetall('Usernames and their Info')
+    del info_for_each_user['placeholder%Key']
     output = []
     for username in info_for_each_user:
         user_info = json.loads(info_for_each_user[username])
         output.append([username, user_info['full_name']])
     return Response(output)
+
         
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username(request, username):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -590,6 +624,9 @@ def get_relevant_user_info_from_username(request, username):
         api_key_validation_result = validate_api_key('getRelevantUserInfoFromUsername', authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
 
     user_info = redis_client.hget('Usernames and their Info', username)
     user_info = json.loads(user_info)
@@ -626,7 +663,7 @@ def get_relevant_user_info_from_username(request, username):
     
     return Response(
         {
-            'username': user_info['username'],
+            'username': username,
             'full_name': user_info['full_name'],
             'date_of_birth': decrypted_date_of_birth,
             'created': user_info['created'],
@@ -638,6 +675,7 @@ def get_relevant_user_info_from_username(request, username):
 
 @api_view(['POST'])
 def get_relevant_user_info_of_multiple_users(request):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -646,6 +684,9 @@ def get_relevant_user_info_of_multiple_users(request):
         api_key_validation_result = validate_api_key('getRelevantUserInfoOfMultipleUsers', authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
 
     if(request.data.get('list_of_usernames')):
         set_of_usernames = set(request.data['list_of_usernames'])
@@ -667,6 +708,7 @@ def get_relevant_user_info_of_multiple_users(request):
 
 @api_view(['GET'])
 def get_relevant_user_info_from_username_including_contact_info(request, username):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -676,6 +718,9 @@ def get_relevant_user_info_from_username_including_contact_info(request, usernam
         authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
 
     user_info = redis_client.hget('Usernames and their Info', username)
     user_info = json.loads(user_info)
@@ -694,7 +739,7 @@ def get_relevant_user_info_from_username_including_contact_info(request, usernam
     decrypted_account_based_in = ""
     decrypted_date_of_birth = ""
 
-    if user.is_private:
+    if user_info['is_private']:
         encrypted_date_of_birth = user_info['date_of_birth']
         decrypted_date_of_birth = decrypt_data(
             client,
@@ -721,7 +766,7 @@ def get_relevant_user_info_from_username_including_contact_info(request, usernam
 
     return Response(
         {
-            'username': user_info['username'],
+            'username': username,
             'full_name': user_info['full_name'],
             'date_of_birth': decrypted_date_of_birth,
             'created': user_info['created'],
@@ -735,11 +780,7 @@ def get_relevant_user_info_from_username_including_contact_info(request, usernam
 @api_view(['POST'])
 def translate_texts_with_rapid_api(request):
     if (request.data.get('input_texts') and request.data.get('source_lang_shortened_code') and
-    request.data.get('target_lang_shortened_code') and request.data.get('DEEP_TRANSLATE_API_KEY')):
-
-        if os.environ.get('DEEP_TRANSLATE_API_KEY') != request.data['DEEP_TRANSLATE_API_KEY']:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
+    request.data.get('target_lang_shortened_code')):
         data = {
             'source': request.data['source_lang_shortened_code'],
             'target': request.data['target_lang_shortened_code']
@@ -747,7 +788,7 @@ def translate_texts_with_rapid_api(request):
         headers: {
             'Content-Type': 'application/json',
             'x-rapidapi-host': 'deep-translate1.p.rapidapi.com',
-            'x-rapidapi-key': request.data['DEEP_TRANSLATE_API_KEY']
+            'x-rapidapi-key': os.environ.get('DEEP_TRANSLATE_API_KEY')
         }
 
         proper_hash_name = f"Translations from {language_code_to_long_form_mappings[data['source']]} to {language_code_to_long_form_mappings[data['target']]}"
@@ -776,6 +817,7 @@ def translate_texts_with_rapid_api(request):
 
 @api_view(['GET'])
 def get_redis_cached_language_translations(request, source_lang, target_lang):
+    '''
     authorization = request.META.get('HTTP_AUTHORIZATION')
     if authorization is not None:
         authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
@@ -784,6 +826,9 @@ def get_redis_cached_language_translations(request, source_lang, target_lang):
         api_key_validation_result = validate_api_key('getRedisCachedLanguageTranslations', authorization_parts[1])
         if api_key_validation_result == 'Forbidden':
             return Response(status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    '''
 
     if source_lang not in languages_available_for_translation or target_lang not in languages_available_for_translation:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -792,6 +837,8 @@ def get_redis_cached_language_translations(request, source_lang, target_lang):
     inverse_hash_name = f"Translations from {target_lang} to {source_lang}"
 
     if redis_client.exists(proper_hash_name):
+        output = redis_client.hgetall(proper_hash_name)
+        del output['placeholder%Key']
         return Response(redis_client.hgetall(proper_hash_name)) 
     else:
         redis_client.hset(
@@ -859,6 +906,7 @@ def list_key_versions(client, project_id, location_id, key_ring_id, key_id):
 
 def is_contact_info_taken(client, contact_info):
     info_for_each_user = redis_client.hgetall('Usernames and their Info')
+    del info_for_each_user['placeholder%Key']
 
     for username in info_for_each_user:
         user_info = json.loads(info_for_each_user[username])
@@ -1033,4 +1081,5 @@ def validate_api_key(api_endpoint, provided_api_key):
         return 'Forbidden'
     
     return 'Allowed'
+
 
