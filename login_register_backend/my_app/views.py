@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import User, APIKey
+from .models import User
 from .serializers import UserSerializer
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -20,7 +20,14 @@ import hashlib
 import json
 import redis
 import uuid
-from datetime import datetime as datetime2
+from datetime import date, datetime as datetime2
+import bcrypt
+from django_ratelimit.decorators import ratelimit
+from django.core.cache import cache
+import re
+import us
+from country_list import countries_for_language
+
 
 redis_client = redis.Redis(
     host='redis-14251.c261.us-east-1-4.ec2.redns.redis-cloud.com',
@@ -64,34 +71,58 @@ language_code_to_long_form_mappings = {
     'ja': "日本語",
     'ru': "Русский"
 }
-        
 
+
+all_us_states = [str(state) for state in list(us.states.STATES)]
+all_countries = [country for country in  dict(countries_for_language('en')).values()]
+valid_account_based_in_options = ['TEMPORARY', 'N/A'] + all_us_states + all_countries
+
+
+@ratelimit(group='create_user_rl', key='ip', rate='3/m')
 @api_view(['POST'])
 def create_user(request):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('createUser', authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-    if(request.data.get('full_name') and request.data.get('salt') and
-    request.data.get('hashed_password') and request.data.get('contact_info') and request.data.get('date_of_birth')):
+    if(request.data.get('username') and request.data.get('full_name') and request.data.get('password') and
+    request.data.get('contact_info') and request.data.get('date_of_birth')):
+        
+        username = request.data['username']
+        full_name = request.data['full_name']
+        password = request.data['password']
+        contact_info = request.data['contact_info']
+        date_of_birth = request.data['date_of_birth']
+
+        if not username_is_valid(username):
+            return Response("Your username is invalid", status=status.HTTP_400_BAD_REQUEST)
+
+        if not full_name_is_valid(full_name):
+            return Response("Your full name is invalid", status=status.HTTP_400_BAD_REQUEST)
+
+        today = date.now()
+        ten_years_ago = today.replace(year=today.year - 10)
+        if not isinstance(date_of_birth, date) or date_of_birth > ten_years_ago:
+            return Response("You must be at-least 10 years old to have an account", status=status.HTTP_400_BAD_REQUEST)
+        date_of_birth = str(date_of_birth)
+
+        salt = ''
+        hashed_password = ''
+        if password_is_invalid(password):
+            return Response("Your password is invalid", status=status.HTTP_400_BAD_REQUEST)
+        salt = bcrypt.gensalt() #this is a binary-string
+        hashed_password = bcrypt.hashpw(password.encode('ascii') , salt) #this is a binary-string
+        salt = salt.decode('ascii') #this is a regular string
+        hashed_password = hashed_password.decode('ascii') #this is a regular string
+
+        if contact_info_is_invalid(contact_info):
+            return Response("Your contact-info is invalid", status=status.HTTP_400_BAD_REQUEST)
 
         client = kms_v1.KeyManagementServiceClient()
-        if is_contact_info_taken(client, request.data['contact_info']):
-            return Response(status=status.HTTP_409_CONFLICT)
+        if contact_info_is_taken(client, contact_info):
+            return Response("Your contact-info is taken", status=status.HTTP_409_CONFLICT)
 
         new_user_data = {
-            'username': request.data['username'],
-            'full_name': request.data['full_name'],
-            'salt': request.data['salt'],
-            'hashed_password': request.data['hashed_password'],
+            'username': username,
+            'full_name': full_name,
+            'salt': salt,
+            'hashed_password': hashed_password,
             'contact_info': 'TEMPORARY',
             'date_of_birth': 'TEMPORARY',
             'account_based_in': 'TEMPORARY',
@@ -110,48 +141,37 @@ def create_user(request):
             str(newly_saved_user_id))
 
             #Encrypt contact_info for both public and private users
-            contact_info_plaintext = request.data['contact_info']
-            response = client.encrypt(name=new_encryption_key_name, plaintext=contact_info_plaintext.encode("utf-8"))
-            contact_info_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
+            contact_info_encryption_response = client.encrypt(name=new_encryption_key_name, plaintext=contact_info.encode("utf-8"))
+            contact_info_encrypted_base64_string = base64.b64encode(contact_info_encryption_response.ciphertext).decode('utf-8')
             new_user_data['contact_info'] = contact_info_encrypted_base64_string
 
-            if(request.data.get('is_private')):
-                new_user_data['is_private'] = request.data['is_private']
-                is_private = request.data['is_private']
-                if(is_private is True):
-                    date_of_birth_plaintext = request.data['date_of_birth']
-                    response = client.encrypt(name=new_encryption_key_name, plaintext=date_of_birth_plaintext.encode("utf-8"))
-                    date_of_birth_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                    new_user_data['date_of_birth'] = date_of_birth_encrypted_base64_string
+            if(request.data.get('is_private') and request.data['is_private'] is True):
+                new_user_data['is_private'] = True
 
-                    account_based_in_plaintext = 'N/A'
-                    if(request.data.get('account_based_in')):
-                        account_based_in_plaintext = request.data['account_based_in']
+                date_of_birth_encryption_response = client.encrypt(name=new_encryption_key_name,
+                plaintext=date_of_birth.encode("utf-8"))
+                date_of_birth_encrypted_base64_string = base64.b64encode(date_of_birth_encryption_response.ciphertext).decode('utf-8')
+                new_user_data['date_of_birth'] = date_of_birth_encrypted_base64_string
 
-                    response = client.encrypt(name=new_encryption_key_name,
-                    plaintext=account_based_in_plaintext.encode("utf-8"))
-                    account_based_in_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                    new_user_data['account_based_in'] = account_based_in_encrypted_base64_string
-                else:
-                    new_user_data['date_of_birth'] = request.data['date_of_birth']
-                    if request.data.get('account_based_in'):
-                        new_user_data['account_based_in'] = request.data['account_based_in']
-                    else:
-                        new_user_data['account_based_in'] = 'N/A'
-
+                account_based_in = 'N/A'
+                if(request.data.get('account_based_in') and account_based_in_is_valid(request.data['account_based_in'])):
+                    account_based_in = request.data['account_based_in']
+                
+                account_based_in_encryption_response = client.encrypt(name=new_encryption_key_name,
+                plaintext=account_based_in.encode("utf-8"))
+                account_based_in_encrypted_base64_string = base64.b64encode(
+                    account_based_in_encryption_response.ciphertext
+                ).decode('utf-8')
+                new_user_data['account_based_in'] = account_based_in_encrypted_base64_string
             else:
                 new_user_data['is_private'] = False
-                new_user_data['date_of_birth'] = request.data['date_of_birth']
-                if request.data.get('account_based_in'):
+                new_user_data['date_of_birth'] = date_of_birth
+                if(request.data.get('account_based_in') and account_based_in_is_valid(request.data['account_based_in'])):
                     new_user_data['account_based_in'] = request.data['account_based_in']
                 else:
                     new_user_data['account_based_in'] = 'N/A'
             
-            if request.data.get('is_verified'):
-                new_user_data['is_verified'] = request.data['is_verified']
-            else:
-                new_user_data['is_verified'] = False
-            
+
             user = User.objects.get(id = newly_saved_user_id)
             serializer2 = UserSerializer(user, data=new_user_data, partial=True)
 
@@ -160,31 +180,29 @@ def create_user(request):
 
                 del new_user_data['username']
                 new_user_data['id'] = newly_saved_user_id
-                new_user_data['created'] = newly_saved_user.created
-                redis_client.hset('Usernames and their Info', new_user_data['username'], json.dumps(new_user_data))
+                new_user_data['created'] = str(newly_saved_user.created)
+                redis_client.hset('Usernames and their Info', username, json.dumps(new_user_data))
 
-                auth_and_refresh_token_for_new_user = generate_tokens_for_new_user(newly_saved_user_id)
+                auth_and_refresh_tokens_for_new_user = generate_tokens_for_new_user(newly_saved_user_id)
                 response = Response(newly_saved_user_id)
                 response.set_cookie(
                     key='authToken'+newly_saved_user_id,
-                    value=auth_and_refresh_token_for_new_user[0],
+                    value=auth_and_refresh_tokens_for_new_user[0],
                     httponly=True,
                     samesite='Strict',
                     max_age=60*45 #45 min
                 )
                 response.set_cookie(
                     key='refreshToken'+newly_saved_user_id,
-                    value=auth_and_refresh_token_for_new_user[1],
+                    value=auth_and_refresh_tokens_for_new_user[1],
                     httponly=True,
                     samesite='Strict',
                     max_age=60*10080 #10,080 min (1 week)
                 )
+
                 return response
 
             return Response(serializer2.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -192,120 +210,175 @@ def create_user(request):
 
 @api_view(['PATCH'])
 def update_user(request, id):
+    #first enforce rate-limiting (5/60m) based on id and ip_address
+    ip_address = request.META.get('REMOTE_ADDR')    
+    key = f'update_user_{id}_{ip_address}_rl'
+    request_count = cache.get(key, 0)
+    
+    if request_count >= 5:
+        return Response(status=status.HTTP_429_TOO_MANY_REQUESTS)
+    cache.set(key, request_count + 1, timeout=60 * 60)
+
     refresh_auth_token = False
     user_authorization_result = validate_user_auth_token(id, request.COOKIES)
     if user_authorization_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
-    if user_authorization_result.endswith(', but Refresh Auth Token'):
+    if user_authorization_result == 'Allowed, but Refresh Auth Token':
         refresh_auth_token = True
 
     try:
         user = User.objects.get(id = id)
-        original_username = user.username
-        client = kms_v1.KeyManagementServiceClient()
-        encryption_key_name = client.crypto_key_path('megagram-428802', 'global', 'usersTableMySQL',  str(id))
-
-        update_user_data = {}
-        for key in request.data:
-            if key=='contact_info':
-                contact_info_plaintext = request.data['contact_info']
-                response = client.encrypt(name=encryption_key_name, plaintext=contact_info_plaintext.encode("utf-8"))
-                contact_info_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                update_user_data['contact_info'] = contact_info_encrypted_base64_string
-            elif key=='date_of_birth':
-                if request.data['is_private'] is True or user.is_private is True:
-                    date_of_birth_plaintext = request.data['date_of_birth']
-                    response = client.encrypt(name=encryption_key_name, plaintext=date_of_birth_plaintext.encode("utf-8"))
-                    date_of_birth_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                    update_user_data['date_of_birth'] = date_of_birth_encrypted_base64_string
-                else:
-                    update_user_data['date_of_birth'] = request.data['date_of_birth']
-            elif key=='account_based_in':
-                if request.data['is_private'] is True or user.is_private is True:
-                    account_based_in_plaintext = request.data['account_based_in']
-                    response = client.encrypt(name=encryption_key_name, plaintext=account_based_in_plaintext.encode("utf-8"))
-                    account_based_in_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                    update_user_data['account_based_in'] = account_based_in_encrypted_base64_string
-                else:
-                    update_user_data['account_based_in'] = request.data['account_based_in']
-            else:
-                update_user_data[key] = request.data[key]
-
-        
-        current_is_private = user.is_private
-        update_is_private = request.data.get('is_private')
-        if(current_is_private != update_is_private):
-            if(update_is_private is True):
-                if 'date_of_birth' not in update_user_data:
-                    date_of_birth_plaintext = user.date_of_birth
-                    response = client.encrypt(name=encryption_key_name, plaintext=date_of_birth_plaintext.encode("utf-8"))
-                    date_of_birth_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                    update_user_data['date_of_birth'] = date_of_birth_encrypted_base64_string
-                if 'account_based_in' not in update_user_data:
-                    account_based_in_plaintext = user.account_based_in
-                    response = client.encrypt(name=encryption_key_name, plaintext=account_based_in_plaintext.encode("utf-8"))
-                    account_based_in_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
-                    update_user_data['account_based_in'] = account_based_in_encrypted_base64_string
-            else:
-                if 'date_of_birth' not in update_user_data:
-                    encrypted_date_of_birth = user.date_of_birth
-                    date_of_birth_plaintext = decrypt_data(client,
-                    'megagram-428802', 'global', 'usersTableMySQL', user.id, base64.b64decode(encrypted_date_of_birth))
-                    update_user_data['date_of_birth'] = date_of_birth_plaintext
-                if 'account_based_in' not in update_user_data:
-                    encrypted_account_based_in = user.account_based_in
-                    account_based_in_plaintext = decrypt_data(client,
-                    'megagram-428802', 'global', 'usersTableMySQL', user.id, base64.b64decode(encrypted_account_based_in))
-                    update_user_data['account_based_in'] = account_based_in_plaintext
-
-
-        serializer = UserSerializer(user, data=update_user_data, partial=True)
-        if serializer.is_valid():
-            updated_user = serializer.save()
-
-            updated_user_info = {
-                'id': updated_user.id,
-                'created': updated_user.created,
-                'full_name': updated_user.full_name,
-                'salt': updated_user.salt,
-                'hashed_password': updated_user.hashed_password,
-                'contact_info': updated_user.contact_info,
-                'date_of_birth': updated_user.date_of_birth,
-                'account_based_in': updated_user.account_based_in,
-                'is_verified': updated_user.is_verified,
-                'is_private': updated_user.is_private
-            }
-            if 'username' in request.data: #(if username was changed)
-                redis_client.hdel('Usernames and their Info', original_username)
-            redis_client.hset('Usernames and their Info', updated_user.username, json.dumps(updated_user_info))
-
-            response = Response(updated_user.id)
-            if refresh_auth_token:
-                 new_auth_token = refresh_user_auth_token(updated_user.id)
-                 response.set_cookie(
-                    key='authToken'+id,
-                    value=new_auth_token,
-                    httponly=True,
-                    samesite='Strict',
-                    max_age=60*45 #45 min
-                )
-            return response
-
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    original_username = user.username
+    client = kms_v1.KeyManagementServiceClient()
+    encryption_key_name = client.crypto_key_path('megagram-428802', 'global', 'usersTableMySQL',  str(id))
+    
+    update_user_data = {}
+    username_was_changed = False
+    for key in request.data:
+        if key=='contact_info':
+            contact_info = request.data['contact_info']
+            if contact_info_is_invalid(contact_info):
+                continue
+            client = kms_v1.KeyManagementServiceClient()
+            if contact_info_is_taken(client, contact_info):
+                continue
+
+            response = client.encrypt(name=encryption_key_name, plaintext=contact_info.encode("utf-8"))
+            contact_info_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
+            update_user_data['contact_info'] = contact_info_encrypted_base64_string
+
+        elif key=='date_of_birth':
+            date_of_birth = request.data['date_of_birth']
+            today = date.now()
+            ten_years_ago = today.replace(year=today.year - 10)
+            if not isinstance(date_of_birth, date) or date_of_birth > ten_years_ago:
+                continue
+            date_of_birth = str(date_of_birth)
+
+            if request.data.get('is_private') is True or user.is_private is True:
+                response = client.encrypt(name=encryption_key_name, plaintext=date_of_birth.encode("utf-8"))
+                date_of_birth_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
+                update_user_data['date_of_birth'] = date_of_birth_encrypted_base64_string
+            else:
+                update_user_data['date_of_birth'] = date_of_birth
+        
+        elif key=='account_based_in':
+            account_based_in = request.data['account_based_in']
+            if not account_based_in_is_valid(account_based_in):
+                continue
+
+            if request.data.get('is_private') is True or user.is_private is True:
+                response = client.encrypt(name=encryption_key_name, plaintext=account_based_in.encode("utf-8"))
+                account_based_in_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
+                update_user_data['account_based_in'] = account_based_in_encrypted_base64_string
+            else:
+                update_user_data['account_based_in'] = account_based_in
+        
+        elif key=='username':
+            username = request.data['username']
+            if not username_is_valid(username):
+                continue
+
+            if username != user.username:
+                username_was_changed = True
+                update_user_data['username'] = username
+
+        elif key=='full_name':
+            full_name = request.data['full_name']
+            if not full_name_is_valid(full_name):
+                continue
+
+            update_user_data['full_name'] = full_name
+
+        elif key=='password':
+            password = request.data['password']
+            if password_is_invalid(password):
+                continue
+            
+            salt = bcrypt.gensalt() #this is a binary-string
+            hashed_password = bcrypt.hashpw(password.encode('ascii') , salt) #this is a binary-string
+
+            update_user_data['salt'] = salt.decode('ascii')
+            update_user_data['hashed_password'] = hashed_password.decode('ascii')
+
+        elif key=='is_verified':
+            is_verified = request.data['is_verified']
+            if not isinstance(is_verified, bool):
+                continue
+
+            update_user_data['is_verified'] = is_verified
+        
+
+    
+    current_is_private = user.is_private
+    update_is_private = request.data.get('is_private')
+    if(isinstance(update_is_private, bool) and current_is_private != update_is_private):
+        update_user_data['is_private'] = update_is_private
+        if(update_is_private is True):
+            if 'date_of_birth' not in update_user_data:
+                date_of_birth_plaintext = user.date_of_birth
+                response = client.encrypt(name=encryption_key_name, plaintext=date_of_birth_plaintext.encode("utf-8"))
+                date_of_birth_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
+                update_user_data['date_of_birth'] = date_of_birth_encrypted_base64_string
+            if 'account_based_in' not in update_user_data:
+                account_based_in_plaintext = user.account_based_in
+                response = client.encrypt(name=encryption_key_name, plaintext=account_based_in_plaintext.encode("utf-8"))
+                account_based_in_encrypted_base64_string = base64.b64encode(response.ciphertext).decode('utf-8')
+                update_user_data['account_based_in'] = account_based_in_encrypted_base64_string
+        else:
+            if 'date_of_birth' not in update_user_data:
+                encrypted_date_of_birth = user.date_of_birth
+                date_of_birth_plaintext = decrypt_data(client,
+                'megagram-428802', 'global', 'usersTableMySQL', user.id, base64.b64decode(encrypted_date_of_birth))
+                update_user_data['date_of_birth'] = date_of_birth_plaintext
+            if 'account_based_in' not in update_user_data:
+                encrypted_account_based_in = user.account_based_in
+                account_based_in_plaintext = decrypt_data(client,
+                'megagram-428802', 'global', 'usersTableMySQL', user.id, base64.b64decode(encrypted_account_based_in))
+                update_user_data['account_based_in'] = account_based_in_plaintext
+
+
+    serializer = UserSerializer(user, data=update_user_data, partial=True)
+    if serializer.is_valid():
+        updated_user = serializer.save()
+
+        updated_user_info = {
+            'id': updated_user.id,
+            'created': updated_user.created,
+            'full_name': updated_user.full_name,
+            'salt': updated_user.salt,
+            'hashed_password': updated_user.hashed_password,
+            'contact_info': updated_user.contact_info,
+            'date_of_birth': updated_user.date_of_birth,
+            'account_based_in': updated_user.account_based_in,
+            'is_verified': updated_user.is_verified,
+            'is_private': updated_user.is_private
+        }
+        if username_was_changed:
+            redis_client.hdel('Usernames and their Info', original_username)
+        redis_client.hset('Usernames and their Info', updated_user.username, json.dumps(updated_user_info))
+
+        response = Response(updated_user.id)
+        if refresh_auth_token:
+                new_auth_token = refresh_user_auth_token(updated_user.id)
+                response.set_cookie(
+                key='authToken'+id,
+                value=new_auth_token,
+                httponly=True,
+                samesite='Strict',
+                max_age=60*45 #45 min
+            )
+        return response
+
+    return Response(status=status.HTTP_400_BAD_REQUEST)
     
 
+@ratelimit(group='get_full_name_rl', key='ip', rate='3/m')
 @api_view(['GET'])
 def get_full_name(request, username):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    
-    if x_forwarded_for:
-        #for proxies
-        return Response("A" + x_forwarded_for)
-    else:
-        #for non-proxies
-        return Response("B" + request.META.get('REMOTE_ADDR'))
-    
     user_info = redis_client.hget('Usernames and their Info', username)
     if user_info is None:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -313,6 +386,7 @@ def get_full_name(request, username):
     return Response(user_info['full_name'])
 
 
+@ratelimit(group='is_account_private_rl', key='ip', rate='3/m')
 @api_view(['GET'])
 def is_account_private(request, username):
     user_info = redis_client.hget('Usernames and their Info', username)
@@ -324,19 +398,31 @@ def is_account_private(request, username):
 
 @api_view(['DELETE'])
 def remove_user(request, id):
+    #first enforce rate-limiting (5/60m) based on id and ip_address
+    ip_address = request.META.get('REMOTE_ADDR')    
+    key = f'remove_user_{id}_{ip_address}_rl'
+    request_count = cache.get(key, 0)
+    
+    if request_count >= 5:
+        return Response(status=status.HTTP_429_TOO_MANY_REQUESTS)
+    cache.set(key, request_count + 1, timeout=60 * 60)
+
     user_authorization_result = validate_user_auth_token(id, request.COOKIES)
     if user_authorization_result == 'Forbidden':
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     try:
         user = User.objects.get(id = id)
+        username = user.username
     except User.DoesNotExist:
         #this code will not be reached because of user-authentication earlier in this function
         pass
     
     user.delete()
 
-    redis_client.hdel('Usernames and their Info', user.username)
+    redis_client.hdel('Usernames and their Info', username)
+
+    delete_encryption_key(kms_v1.KeyManagementServiceClient(), 'megagram-428802', 'global', 'usersTableMySQL', str(id))
 
     with gcloud_mysql_spanner_database.batch() as batch:
         batch.delete(
@@ -362,21 +448,9 @@ def remove_user(request, id):
     return response
 
 
+@ratelimit(group='send_confirmation_code_email_rl', key='ip', rate='1/m')
 @api_view(['POST'])
 def send_confirmation_code_email(request):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('sendConfirmationCodeEmail', authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-
     email = request.data["email"]
     confirmation_code = random.randint(100000, 999999)
     message = MIMEMultipart("alternative")
@@ -409,8 +483,8 @@ def send_confirmation_code_email(request):
 
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-            server.login(os.environ.get('EMAIL_SENDER_ADDRESS'), os.environ.get('EMAIL_SENDER_AUTH_TOKEN'))
-            server.sendmail(os.environ.get('EMAIL_SENDER_ADDRESS'), email, message.as_string())
+            server.login('megagram664@gmail.com', os.environ.get('EMAIL_SENDER_AUTH_TOKEN'))
+            server.sendmail('megagram664@gmail.com', email, message.as_string())
             return Response(
                 {
                     "confirmation_code": confirmation_code
@@ -422,21 +496,9 @@ def send_confirmation_code_email(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@ratelimit(group='send_confirmation_code_text_rl', key='ip', rate='1/m')
 @api_view(['POST'])
 def send_confirmation_code_text(request, number):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('sendConfirmationCodeText', authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-
     confirmation_code = random.randint(100000, 999999)
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
     auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -461,50 +523,113 @@ def send_confirmation_code_text(request, number):
 
 
 @api_view(['POST'])
+def login_user(request):
+    if request.data.get('username') and request.data.get('password'):
+        #first enforce rate-limiting (5/60m) based on username and ip_address
+        ip_address = request.META.get('REMOTE_ADDR')    
+        key = f'login_user_via_username_{request.data['username']}_{ip_address}_rl'
+        request_count = cache.get(key, 0)
+
+        if request_count >= 5:
+            return Response(status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+        cache.set(key, request_count + 1, timeout=60 * 60)
+
+        user_info = redis_client.hget('Usernames and their Info', request.data['username'])
+        if user_info is None:
+            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+
+        user_info = json.loads(user_info)
+        correct_hashed_password = user_info['hashed_password']
+        provided_hashed_password = hash_salted_user_password(request.data['password'], user_info['salt'])
+
+        if correct_hashed_password == provided_hashed_password:
+            auth_and_refresh_tokens_for_logged_in_user = refresh_user_tokens_for_login(user_info['id'])
+            response = Response(response.data['username'])
+            response.set_cookie(
+                key='authToken'+user_info['id'],
+                value=auth_and_refresh_token_for_logged_in_user[0],
+                httponly=True,
+                samesite='Strict',
+                max_age=60*45 #45 min
+            )
+            response.set_cookie(
+                key='refreshToken'+user_info['id'],
+                value=auth_and_refresh_token_for_logged_in_user[1],
+                httponly=True,
+                samesite='Strict',
+                max_age=60*10080 #10,080 min (1 week)
+            )
+            return response
+        
+        return Response("Incorrect password", status=status.HTTP_403_FORBIDDEN)
+
+    elif request.data.get('contact_info') and request.data.get('password'):
+        contact_info = request.data['contact_info']
+        #first enforce rate-limiting (5/60m) based on contact-info and ip_address
+        ip_address = request.META.get('REMOTE_ADDR')    
+        key = f'login_user_via_contact_info_{contact_info}_{ip_address}_rl'
+        request_count = cache.get(key, 0)
+
+        if request_count >= 5:
+            return Response(status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+        cache.set(key, request_count + 1, timeout=60 * 60)
+
+        info_for_each_user = redis_client.hgetall('Usernames and their Info')
+        del info_for_each_user['placeholder%Key']
+        client = kms_v1.KeyManagementServiceClient()
+
+        for username in info_for_each_user:
+            user_info = info_for_each_user[username]
+            user_info = json.loads(user_info)
+            decrypted_contact_info = decrypt_data(
+                client,
+                'megagram-428802',
+                'global',
+                'usersTableMySQL',
+                user_info['id'],
+                base64.b64decode(user_info['contact_info'])
+            )
+
+            if contact_info==decrypted_contact_info:
+                correct_hashed_password = user_info['hashed_password']
+                provided_hashed_password = hash_salted_user_password(request.data['password'], user_info['salt'])
+
+                if correct_hashed_password == provided_hashed_password:
+                    auth_and_refresh_tokens_for_logged_in_user = refresh_user_tokens_for_login(user_info['id'])
+                    response = Response(username)
+                    response.set_cookie(
+                        key='authToken'+user_info['id'],
+                        value=auth_and_refresh_token_for_logged_in_user[0],
+                        httponly=True,
+                        samesite='Strict',
+                        max_age=60*45 #45 min
+                    )
+                    response.set_cookie(
+                        key='refreshToken'+user_info['id'],
+                        value=auth_and_refresh_token_for_logged_in_user[1],
+                        httponly=True,
+                        samesite='Strict',
+                        max_age=60*10080 #10,080 min (1 week)
+                    )
+                    return response
+                
+                return Response("Incorrect password", status=status.HTTP_403_FORBIDDEN)
+
+        return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+    
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@ratelimit(group='does_user_exist_rl', key='ip', rate='25/m')
+@api_view(['POST'])
 def does_user_exist(request):
     if request.data.get('username'):
-        '''
-        authorization = request.META.get('HTTP_AUTHORIZATION')
-        if authorization is not None:
-            authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-            if len(authorization_parts) != 2:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-            api_key_validation_result = validate_api_key('doesUsernameExist', authorization_parts[1])
-            if api_key_validation_result == 'Forbidden':
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        '''
-        try:
-            user_info = redis_client.hget('Usernames and their Info', request.data['username'])
-            user_info = json.loads(user_info)
-            return Response(
-                {
-                    "salt": user_info['salt'],
-                    "hashed_password": user_info['hashed_password']
-                }
-            )
-        except:
-            return Response(
-                {
-                    "user_exists": False
-                }
-            )
+        user_info = redis_client.hget('Usernames and their Info', request.data['username'])
+        return Response(user_info is not None)
 
     elif request.data.get('contact_info'):
-        '''
-        authorization = request.META.get('HTTP_AUTHORIZATION')
-        if authorization is not None:
-            authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-            if len(authorization_parts) != 2:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-            api_key_validation_result = validate_api_key('doesUserContactInfoExist', authorization_parts[1])
-            if api_key_validation_result == 'Forbidden':
-                return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        '''
-
         contact_info = request.data['contact_info']
         info_for_each_user = redis_client.hgetall('Usernames and their Info')
         del info_for_each_user['placeholder%Key']
@@ -522,34 +647,16 @@ def does_user_exist(request):
                 base64.b64decode(user_info['contact_info'])
             )
             if contact_info==decrypted_contact_info:
-                return Response(
-                    {
-                        "salt": user_info['salt'],
-                        "hashed_password":user_info['hashed_password'],
-                        "username": username
-                    }
-                )
+                return Response(True)
 
-
-        return Response(
-            {
-                "user_exists": False
-            }
-        )
-    
-    else:
-        return Response(
-            {
-                "user_exists": False
-            }
-        )
+    return Response(False)
     
 
-
+@ratelimit(group='verify_captcha_rl', key='ip', rate='3/m')
 @api_view(['POST'])
 def verify_captcha(request):
     data = {
-        'secret': request.data['secret'],
+        'secret': os.environ.get('GOOGLE_RECAPTCHA_SECRET'),
         'response': request.data['response']
     }
     
@@ -588,21 +695,9 @@ def verify_captcha(request):
         )
     
 
+@ratelimit(group='get_usernames_and_full_names_of_all_rl', key='ip', rate='1/m')
 @api_view(['GET'])
 def get_usernames_and_full_names_of_all(request):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('getUsernamesAndFullNamesOfAll', authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-    
     info_for_each_user = redis_client.hgetall('Usernames and their Info')
     del info_for_each_user['placeholder%Key']
     output = []
@@ -613,81 +708,9 @@ def get_usernames_and_full_names_of_all(request):
 
         
 
-@api_view(['GET'])
-def get_relevant_user_info_from_username(request, username):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('getRelevantUserInfoFromUsername', authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-
-    user_info = redis_client.hget('Usernames and their Info', username)
-    user_info = json.loads(user_info)
-    
-    decrypted_date_of_birth = ""
-    decrypted_account_based_in = ""
-
-    if user_info['is_private']:
-        client = kms_v1.KeyManagementServiceClient()
-
-        encrypted_date_of_birth = user_info['date_of_birth']
-        decrypted_date_of_birth = decrypt_data(
-            client,
-            'megagram-428802',
-            'global',
-            'usersTableMySQL',
-            user_info['id'],
-            base64.b64decode(user_info['date_of_birth'])
-        )
-
-        encrypted_account_based_in = user_info['account_based_in']
-        decrypted_account_based_in = decrypt_data(
-            client,
-            'megagram-428802',
-            'global',
-            'usersTableMySQL',
-            user_info['id'],
-            base64.b64decode(user_info['account_based_in'])
-        )
-
-    else:
-        decrypted_date_of_birth = user_info['date_of_birth']
-        decrypted_account_based_in = user_info['account_based_in']
-    
-    return Response(
-        {
-            'username': username,
-            'full_name': user_info['full_name'],
-            'date_of_birth': decrypted_date_of_birth,
-            'created': user_info['created'],
-            'is_verified': user_info['is_verified'],
-            'account_based_in': decrypted_account_based_in,
-            'is_private': user_info['is_private']
-        }
-    )
-
+@ratelimit(group='get_relevant_user_info_of_multiple_users_rl', key='ip', rate='3/m')
 @api_view(['POST'])
 def get_relevant_user_info_of_multiple_users(request):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('getRelevantUserInfoOfMultipleUsers', authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-
     if(request.data.get('list_of_usernames')):
         set_of_usernames = set(request.data['list_of_usernames'])
         user_info_mappings = {}
@@ -704,81 +727,12 @@ def get_relevant_user_info_of_multiple_users(request):
         return Response(user_info_mappings)
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
+       
 
 
-@api_view(['GET'])
-def get_relevant_user_info_from_username_including_contact_info(request, username):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('getRelevantUserInfoFromUsernameIncludingContactInfo',
-        authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-
-    user_info = redis_client.hget('Usernames and their Info', username)
-    user_info = json.loads(user_info)
-    
-    client = kms_v1.KeyManagementServiceClient()
- 
-    encrypted_contact_info = user_info['contact_info']
-    decrypted_contact_info = decrypt_data(
-        client,
-        'megagram-428802',
-        'global',
-        'usersTableMySQL',
-        user_info['id'],
-        base64.b64decode(user_info['contact_info'])
-    )
-    decrypted_account_based_in = ""
-    decrypted_date_of_birth = ""
-
-    if user_info['is_private']:
-        encrypted_date_of_birth = user_info['date_of_birth']
-        decrypted_date_of_birth = decrypt_data(
-            client,
-            'megagram-428802',
-            'global',
-            'usersTableMySQL',
-            user_info['id'],
-            base64.b64decode(user_info['date_of_birth'])
-        )
-
-        encrypted_account_based_in = user_info['account_based_in']
-        decrypted_account_based_in = decrypt_data(
-            client,
-            'megagram-428802',
-            'global',
-            'usersTableMySQL',
-            user_info['id'],
-            base64.b64decode(user_info['account_based_in'])
-        )
-
-    else:
-        decrypted_account_based_in = user_info['account_based_in']
-        decrypted_date_of_birth = user_info['date_of_birth']
-
-    return Response(
-        {
-            'username': username,
-            'full_name': user_info['full_name'],
-            'date_of_birth': decrypted_date_of_birth,
-            'created': user_info['created'],
-            'is_verified': user_info['is_verified'],
-            'account_based_in': decrypted_account_based_in,
-            'is_private': user_info['is_private'],
-            'contact_info': decrypted_contact_info
-        }
-    )
-
+@ratelimit(group='translate_texts_with_rapid_api_deep_translate_rl', key='ip', rate='3/m')
 @api_view(['POST'])
-def translate_texts_with_rapid_api(request):
+def translate_texts_with_rapid_api_deep_translate(request):
     if (request.data.get('input_texts') and request.data.get('source_lang_shortened_code') and
     request.data.get('target_lang_shortened_code')):
         data = {
@@ -815,21 +769,10 @@ def translate_texts_with_rapid_api(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+
+@ratelimit(group='get_redis_cached_language_translations_rl', key='ip', rate='3/m')
 @api_view(['GET'])
 def get_redis_cached_language_translations(request, source_lang, target_lang):
-    '''
-    authorization = request.META.get('HTTP_AUTHORIZATION')
-    if authorization is not None:
-        authorization_parts = authorization.split(" ") # Split the authorization header (Bearer <api_token>)
-        if len(authorization_parts) != 2:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        api_key_validation_result = validate_api_key('getRedisCachedLanguageTranslations', authorization_parts[1])
-        if api_key_validation_result == 'Forbidden':
-            return Response(status=status.HTTP_403_FORBIDDEN)
-    else:
-        return Response(status=status.HTTP_403_FORBIDDEN)
-    '''
-
     if source_lang not in languages_available_for_translation or target_lang not in languages_available_for_translation:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
@@ -883,6 +826,9 @@ def create_encryption_key(client, project_id, location_id, key_ring_id, key_id, 
 
     return created_key
 
+def delete_encryption_key(client, project_id, location_id, key_ring_id, key_id):
+    key_name = client.crypto_key_path(project_id, location_id, key_ring_id, key_id)
+    client.delete_crypto_key(name=key_name)
 
 
 def decrypt_data(client, project_id, location_id, key_ring_id, key_id, encrypted_data):
@@ -892,21 +838,8 @@ def decrypt_data(client, project_id, location_id, key_ring_id, key_id, encrypted
     return decrypted_data
 
 
-#No need to store versions in database!
-def list_key_versions(client, project_id, location_id, key_ring_id, key_id):
-    key_name = client.crypto_key_path(project_id, location_id, key_ring_id, key_id)
-
-    versions = client.list_crypto_key_versions(parent=key_name)
-
-    print("Key Versions:")
-    for version in versions:
-        print(f"Version ID: {version.name}, State: {version.state}, Creation Time: {version.create_time}")
-    
-
-
-def is_contact_info_taken(client, contact_info):
+def contact_info_is_taken(client, contact_info):
     info_for_each_user = redis_client.hgetall('Usernames and their Info')
-    del info_for_each_user['placeholder%Key']
 
     for username in info_for_each_user:
         user_info = json.loads(info_for_each_user[username])
@@ -960,12 +893,6 @@ def refresh_user_auth_token(user_id):
 
     return new_auth_token
 
-def get_user_id_from_username(username):
-    user_info = redis_client.hget('Usernames and their Info', username)
-    if user_info is None:
-        return -1
-    user_info = json.loads(user_info)
-    return user_info['id']
 
 def generate_tokens_for_new_user(user_id):
     new_auth_token = generate_token(100)
@@ -997,8 +924,6 @@ def generate_tokens_for_new_user(user_id):
             @newRefreshTokenExpiry
         )
     """
-
-
 
     with gcloud_mysql_spanner_database.transaction() as transaction:
         transaction.execute_update(
@@ -1069,17 +994,145 @@ def validate_user_auth_token(id, request_cookies):
     else:
         return 'Forbidden'
 
-def validate_api_key(api_endpoint, provided_api_key):
-    try:
-        correct_api_key = APIKey.objects.get(purpose=api_endpoint)
-    except APIKey.DoesNotExist:
-        return 'Forbidden'
-        
-    if (correct_api_key.expiration <= datetime.datetime.utcnow() or
-    correct_api_key.hashed_api_key != hash_salted_token(provided_api_key,
-    correct_api_key.api_key_salt)):
-        return 'Forbidden'
+
+def hash_salted_user_password(password, salt):
+    hashed_password_bytes = bcrypt.hashpw(password.encode('ascii'), salt.encode('ascii'))
+    return hashed_password_bytes.decode('ascii') #returns hashed_password as regular-string instead of bytes
+
+def refresh_user_tokens_for_login(user_id):
+    updated_auth_token = generate_token(100)
+    updated_auth_token_salt = generate_token(32)
+    updated_hashed_auth_token = hash_salted_token(updated_auth_token, updated_auth_token_salt)
+    updated_auth_token_expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=45)
     
-    return 'Allowed'
+    updated_refresh_token = generate_token(100)
+    updated_refresh_token_salt = generate_token(32)
+    updated_hashed_refresh_token = hash_salted_token(updated_refresh_token, updated_refresh_token_salt)
+    updated_refresh_token_expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=10080) #10,080 min = 1 week
+
+    update_user_auth_token_statement = """
+        UPDATE userAuthTokens
+        SET hashedAuthToken=@updatedHashedAuthToken,
+            authTokenSalt=@updatedAuthTokenSalt,
+            hashedRefreshToken=@updatedHashedRefreshToken,
+            refreshTokenSalt=@updatedRefreshTokenSalt,
+            authTokenExpiry=@updatedAuthTokenExpiry,
+            refreshTokenExpiry=@updatedRefreshTokenExpiry
+        WHERE userId = @userId
+    """
+
+    with gcloud_mysql_spanner_database.transaction() as transaction:
+        transaction.execute_update(
+            update_user_auth_token_statement,
+            parameters={
+                "userId": user_id,
+                "updatedHashedAuthToken": updated_hashed_auth_token,
+                "updatedAuthTokenSalt": updated_auth_token_salt,
+                "updatedHashedRefreshToken": updated_hashed_refresh_token,
+                "updatedRefreshTokenSalt": updated_refresh_token_salt,
+                "updatedAuthTokenExpiry": updated_auth_token_expiry,
+                "updatedRefreshTokenExpiry": updated_refresh_token_expiry,
+            }
+        )
+    
+    return [updated_auth_token, updated_refresh_token]
 
 
+def password_is_invalid(password_input):
+    if not isinstance(password_input, str):
+        return False
+    if len(password_input) == 0:
+        return True
+    
+    length_weight = 0.6
+    variety_weight = 0.4
+
+    length_score = min(len(password_input) / 20, 1)
+
+    variety_score = 0
+    if re.search(r'[a-z]', password_input):
+        variety_score += 0.25
+    if re.search(r'[A-Z]', password_input):
+        variety_score += 0.25
+    if re.search(r'[0-9]', password_input):
+        variety_score += 0.25
+    if re.search(r'[^a-zA-Z0-9]', password_input):
+        variety_score += 0.25
+
+    strength_score = (length_weight * length_score) + (variety_weight * variety_score)
+
+    return strength_score < 0.65
+
+
+def contact_info_is_invalid(contact_info_input):
+    if not isinstance(contact_info_input, str):
+        return False
+
+    def is_valid_number(phone_number_input):
+        phone_regex = r'^\d{8,17}$'
+        return bool(re.match(phone_regex, phone_number_input))
+
+    def is_valid_email(email_input):
+        at_index = email_input.find('@')
+        if at_index < 1 or email_input.find('@', at_index + 1) != -1:
+            return False
+
+        local_part = email_input[:at_index]
+        domain_part = email_input[at_index + 1:]
+
+        if len(local_part) == 0 or len(local_part) > 64:
+            return False
+        if len(domain_part) == 0 or len(domain_part) > 255:
+            return False
+
+        dot_index = domain_part.find('.')
+        if dot_index < 1 or dot_index == len(domain_part) - 1:
+            return False
+
+        domain_labels = domain_part.split('.')
+        for label in domain_labels:
+            if len(label) == 0 or len(label) > 63:
+                return False
+
+        return True
+
+    return not (is_valid_number(contact_info_input) or is_valid_email(contact_info_input))
+
+
+def full_name_is_valid(full_name_input):
+    if not isinstance(full_name_input, str):
+        return False
+
+    if len(full_name_input) == 0 or full_name_input[0] == " ":
+        return False
+
+    if " " not in full_name_input:
+        return False
+
+    for char in full_name_input:
+        if char != " " and not (char.isalpha()):
+            return False
+
+    return True
+
+
+def username_is_valid(username_input):
+    if not isinstance(username_input, str):
+        return False
+
+    if len(username_input) < 1:
+        return False
+
+    for char in username_input:
+        if not (char.isalnum() or char in {'.', '_'}):
+            return False
+
+    username_error = ""
+    return True
+
+
+def account_based_in_is_valid(account_based_in_input):
+    if not isinstance(account_based_in_input, str):
+        return False
+
+    return account_based_in in valid_account_based_in_options 

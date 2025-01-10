@@ -10,17 +10,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('LOGIN_REGISTER_BACKEND_DJANGO_SECRET_KEY', 'as')
+SECRET_KEY = os.environ.get('LOGIN_REGISTER_BACKEND_DJANGO_SECRET_KEY')
 
 
 # DEBUG is a boolean which is True if Debug-mode is turned on, False otherwise. It is supposed to be False for production.
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
-    os.environ.get('ALLOWED_HOST'),
-    'localhost'
+    os.environ.get('ALLOWED_HOST')
 ]
 
 
@@ -32,10 +31,12 @@ INSTALLED_APPS = [
     'my_app',
     'rest_framework',
     'corsheaders',
+    'django_ratelimit',
 ]
 
 
 MIDDLEWARE = [
+    'django_ratelimit.middleware.RatelimitMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -55,30 +56,34 @@ ROOT_URLCONF = 'login_register_backend.urls'
 WSGI_APPLICATION = 'login_register_backend.wsgi.application'
 
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'Megagram',
         'USER': os.environ.get('LOCAL_MYSQL_USER'),
         'PASSWORD': os.environ.get('LOCAL_MYSQL_PASSWORD'),
-        'HOST': os.environ.get('LOCAL_MYSQL_HOST', 'localhost'),
+        'HOST': os.environ.get('LOCAL_MYSQL_HOST_VIA_NGROK'),
         'POST': 3306
-    },
-
-    'local-psql': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Megagram',
-        'USER': os.environ.get('LOCAL_PSQL_USER'),
-        'PASSWORD': os.environ.get('LOCAL_PSQL_PASSWORD'),
-        'HOST': os.environ.get('LOCAL_PSQL_HOST', 'localhost'),
-        'PORT': 5432,
     }
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://34.111.89.101:80"
+    "http://34.111.89.101:80",
 ]
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f"redis://rishavry:{os.environ.get('AWS_REDIS_PASSWORD')}@redis-14251.c261.us-east-1-4.ec2.redns.redis-cloud.com:14251",
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+
+RATELIMIT_USE_CACHE = 'default'
 
 
 TEMPLATES = [
@@ -97,4 +102,7 @@ TEMPLATES = [
     },
 ]
 
-DATABASE_ROUTERS = ['my_app.database_router.DatabaseRouter']
+# Security settings for production
+#SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
+#SECURE_HSTS_SECONDS = 31536000  # Set HTTP Strict Transport Security (HSTS) header to 1 year
+#SECURE_HSTS_PRELOAD = True  # Preload HSTS for browsers that support it

@@ -74,14 +74,13 @@
             <option value="Русский">Русский</option>
             <option value="中国人">中国人</option>
         </select>
-
-            
-        <p id="CORRECT_CODE_VALUE" style="display:none;">{{ CORRECT_CODE_VALUE }}</p>
-        <p id="DEEP_TRANSLATE_API_KEY" style="display:none;">{{ DEEP_TRANSLATE_API_KEY }}</p>
-        <p id="EMAIL_CONFIRMATION_CODE_API_KEY" style="display:none;">{{ EMAIL_CONFIRMATION_CODE_API_KEY }}</p>
-        <p id="TEXT_CONFIRMATION_CODE_API_KEY" style="display:none;">{{ TEXT_CONFIRMATION_CODE_API_KEY }}</p>
-        <p id="CREATE_USER_API_KEY" style="display:none;">{{ CREATE_USER_API_KEY }}</p>
     </div>
+
+    <!--DISCLAIMER! Yes, I am aware the correctCodeValue should not be exposed in frontend.
+    For the sake of convenience(& since this website is for the sake of portfolio and doesn't actually have customers),
+    I just left it as it is-->
+    <p id="CORRECT_CODE_VALUE" style="display:none;">{{ CORRECT_CODE_VALUE }}</p>
+
 </body>
 
 </html>

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: login-register-frontend-container
-        image: rishavry/login-register-frontend:v0
+        image: rishavry/login-register-frontend:v2
         ports:
         - containerPort: 8000
         envFrom:

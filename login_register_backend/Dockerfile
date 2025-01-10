@@ -5,7 +5,6 @@ WORKDIR /app
 COPY ./login_register_backend/ /app/login_register_backend/login_register_backend
 COPY ./my_app/ /app/login_register_backend/my_app
 COPY ./manage.py /app/login_register_backend
-
 COPY ./requirements.txt /app
 
 RUN pip3 install --no-cache-dir -r /app/requirements.txt

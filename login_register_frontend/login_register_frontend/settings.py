@@ -18,7 +18,6 @@ DEBUG = True
 # This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
     config('ALLOWED_HOST'),
-    'localhost'
 ]
 
 
@@ -29,8 +28,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'my_app',
-    'rest_framework',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -77,14 +74,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'my_app', 'static')
 # URL to use when referring to static files (where they will be served from)
 STATIC_URL = '/loginregister-static/'
 
-CORS_ALLOW_ALL_ORIGINS = True 
-
 # Security settings for production
 SECURE_SSL_REDIRECT = False  # Redirect all HTTP requests to HTTPS
-CSRF_COOKIE_SECURE = True  # Ensure the CSRF cookie is only sent over HTTPS
-SESSION_COOKIE_SECURE = True  # Ensure the session cookie is only sent over HTTPS
 SECURE_HSTS_SECONDS = 31536000  # Set HTTP Strict Transport Security (HSTS) header to 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
 SECURE_HSTS_PRELOAD = True  # Preload HSTS for browsers that support it
 SECURE_BROWSER_XSS_FILTER = True  # Enable the browser's XSS filter
 X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking by denying the page to be framed
