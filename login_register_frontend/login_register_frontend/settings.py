@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('LOGIN_REGISTER_FRONTEND_DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: Don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
@@ -75,9 +75,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'my_app', 'static')
 STATIC_URL = '/loginregister-static/'
 
 # Security settings for production
-SECURE_SSL_REDIRECT = False  # Redirect all HTTP requests to HTTPS
-SECURE_HSTS_SECONDS = 31536000  # Set HTTP Strict Transport Security (HSTS) header to 1 year
-SECURE_HSTS_PRELOAD = True  # Preload HSTS for browsers that support it
-SECURE_BROWSER_XSS_FILTER = True  # Enable the browser's XSS filter
-X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking by denying the page to be framed
-X_CONTENT_TYPE_OPTIONS = 'nosniff'  # Prevent browsers from interpreting files as a different MIME type
+#SECURE_SSL_REDIRECT = True  # Redirect all HTTP requests to HTTPS
+#SECURE_HSTS_SECONDS = 31536000  # Set HTTP Strict Transport Security (HSTS) header to 1 year
+#SECURE_HSTS_PRELOAD = True  # Preload HSTS for browsers that support it

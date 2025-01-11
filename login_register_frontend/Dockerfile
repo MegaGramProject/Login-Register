@@ -13,6 +13,6 @@ EXPOSE 8000
 
 CMD ["sh", "-c", \
      "cd /app/login_register_frontend && \
-      gunicorn --workers 4 --bind 0.0.0.0:8000 login_register_frontend.wsgi:application && \
-      sleep infinity"]
+     gunicorn --workers 4 --bind 0.0.0.0:8000 login_register_frontend.wsgi:application && \
+     sleep infinity"]
 

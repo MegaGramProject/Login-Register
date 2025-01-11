@@ -405,6 +405,9 @@ $(document).ready(function() {
             if (data["verified"]==true) {
                 recaptchaErrorMessage.css('display', 'none');
                 recaptchaIsVerified = true;
+                setTimeout(() => {
+                    recaptchaIsVerified = false;
+                }, 120000); //in 2 minutes, recaptchaVerification will have been expired
                 checkIfReadyToLogin();
             }
             else {

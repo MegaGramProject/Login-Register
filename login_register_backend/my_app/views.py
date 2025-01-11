@@ -29,13 +29,7 @@ import us
 from country_list import countries_for_language
 
 
-redis_client = redis.Redis(
-    host='redis-14251.c261.us-east-1-4.ec2.redns.redis-cloud.com',
-    port=14251,
-    decode_responses=True,
-    username="rishavry",
-    password=os.environ.get('AWS_REDIS_PASSWORD')
-)
+redis_client = cache._cache
 
 gcloud_mysql_spanner_client = spanner.Client()
 instance = gcloud_mysql_spanner_client.instance("mg-ms-sp")
@@ -451,7 +445,20 @@ def remove_user(request, id):
 @ratelimit(group='send_confirmation_code_email_rl', key='ip', rate='1/m')
 @api_view(['POST'])
 def send_confirmation_code_email(request):
-    email = request.data["email"]
+    email = None
+    if request.data.get('email'):
+        email = request.data["email"]
+        if contact_info_is_invalid(email):
+            return Response("Your email-address is invalid and hence cannot be used for your new account", 
+            status=status.HTTP_400_BAD_REQUEST)
+        client = kms_v1.KeyManagementServiceClient()
+        if contact_info_is_taken(client, email):
+            return Response("Your email-address is already taken and hence cannot be used for your new account",
+            status=status.HTTP_409_CONFLICT)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
     confirmation_code = random.randint(100000, 999999)
     message = MIMEMultipart("alternative")
     message["Subject"] = f"{confirmation_code} is your Megagram code"
@@ -499,6 +506,14 @@ def send_confirmation_code_email(request):
 @ratelimit(group='send_confirmation_code_text_rl', key='ip', rate='1/m')
 @api_view(['POST'])
 def send_confirmation_code_text(request, number):
+    if contact_info_is_invalid(number):
+        return Response("Your phone-number is invalid and hence cannot be used for your new account", 
+        status=status.HTTP_400_BAD_REQUEST)
+    client = kms_v1.KeyManagementServiceClient()
+    if contact_info_is_taken(client, number):
+        return Response("Your phone-number is already taken and hence cannot be used for your new account",
+        status=status.HTTP_409_CONFLICT)
+
     confirmation_code = random.randint(100000, 999999)
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
     auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -944,60 +959,59 @@ def generate_tokens_for_new_user(user_id):
 
 def validate_user_auth_token(id, request_cookies):
     user_auth_token_cookie = 'authToken'+id
+    user_refresh_token_cookie = 'refreshToken'+id
+
+    if user_auth_token_cookie not in request_cookies and user_refresh_token_cookie not in request_cookies:
+        return 'Forbidden'
+
+    rows = []
+    correct_user_token = None
+    with gcloud_mysql_spanner_database.snapshot() as snapshot:            
+        results = snapshot.execute_sql(
+            "SELECT * FROM userAuthTokens WHERE userId = @id",
+            params={"id": id},
+            param_types={"id": spanner.param_types.INTEGER},
+        )
+
+        column_names_in_correct_order = ["userId", "hashedAuthToken", "authTokenSalt", "hashedRefreshToken",
+        "refreshTokenSalt", "authTokenExpiry", "refreshTokenExpiry"]
+
+        for row in results:
+            rows.append(row)
+
+        if len(rows) == 0:
+            return 'Forbidden'
+            
+        correct_user_token = rows[0]
+        correct_user_token = dict(zip(column_names_in_correct_order, correct_user_token))
+        correct_user_token["authTokenExpiry"] = datetime2.fromisoformat(
+        correct_user_token["authTokenExpiry"].isoformat())
+        correct_user_token["refreshTokenExpiry"] = datetime2.fromisoformat(
+        correct_user_token["refreshTokenExpiry"].isoformat())
+
     if user_auth_token_cookie in request_cookies:
         user_auth_token_cookie_val = request_cookies[user_auth_token_cookie]
-        with gcloud_mysql_spanner_database.snapshot() as snapshot:            
-            results = snapshot.execute_sql(
-                "SELECT * FROM userAuthTokens WHERE userId = @id",
-                params={"id": id},
-                param_types={"id": spanner.param_types.INTEGER},
-            )
-
-            column_names_in_correct_order = ["userId", "hashedAuthToken", "authTokenSalt", "hashedRefreshToken",
-            "refreshTokenSalt", "authTokenExpiry", "refreshTokenExpiry"]
-
-            rows = []
-            for row in results:
-                rows.append(row)
-
-            if len(rows) == 0:
-                return 'Forbidden'
-
-            correct_user_token = rows[0]
-            correct_user_token = dict(zip(column_names_in_correct_order, correct_user_token))
-            correct_user_token["authTokenExpiry"] = datetime2.fromisoformat(
-            correct_user_token["authTokenExpiry"].isoformat())
-            correct_user_token["refreshTokenExpiry"] = datetime2.fromisoformat(
-            correct_user_token["refreshTokenExpiry"].isoformat())
-        
-            if correct_user_token['authTokenExpiry'] <= datetime.datetime.utcnow():
-                if correct_user_token['refreshTokenExpiry'] > datetime.datetime.utcnow():
-                    user_refresh_token_cookie = 'refreshToken'+id
-                    if user_refresh_token_cookie in request_cookies:
-                        user_refresh_token_cookie_val = request_cookies[user_refresh_token_cookie]
-                        if correct_user_token['hashedRefreshToken'] == hash_salted_token(user_refresh_token_cookie_val,
-                        correct_user_token['refreshTokenSalt']):
-                            return 'Allowed, but Refresh Auth Token'
-                        else:
-                            return 'Forbidden'
-                    else:
-                        return 'Forbidden'
-                else:
-                    return 'Forbidden'
-            
-            if correct_user_token['hashedAuthToken'] != hash_salted_token(user_auth_token_cookie_val,
-            correct_user_token['authTokenSalt']):
-                return 'Forbidden'
+    
+        if correct_user_token['hashedAuthToken'] != hash_salted_token(user_auth_token_cookie_val,
+        correct_user_token['authTokenSalt']) or correct_user_token['authTokenExpiry'] <= datetime.datetime.utcnow()::
+            return 'Forbidden'
             
         return 'Allowed'
 
     else:
-        return 'Forbidden'
+        user_refresh_token_cookie_val = request_cookies[user_refresh_token_cookie]
+    
+        if correct_user_token['hashedRefreshToken'] != hash_salted_token(user_refresh_token_cookie_val,
+        correct_user_token['refreshTokenSalt']) or correct_user_token['refreshTokenExpiry'] <= datetime.datetime.utcnow()::
+            return 'Forbidden'
+            
+        return 'Allowed, but Refresh Auth Token'
 
 
 def hash_salted_user_password(password, salt):
     hashed_password_bytes = bcrypt.hashpw(password.encode('ascii'), salt.encode('ascii'))
     return hashed_password_bytes.decode('ascii') #returns hashed_password as regular-string instead of bytes
+
 
 def refresh_user_tokens_for_login(user_id):
     updated_auth_token = generate_token(100)
