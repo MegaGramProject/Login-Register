@@ -62,14 +62,18 @@ DATABASES = {
         'NAME': 'Megagram',
         'USER': os.environ.get('LOCAL_MYSQL_USER'),
         'PASSWORD': os.environ.get('LOCAL_MYSQL_PASSWORD'),
-        'HOST': os.environ.get('LOCAL_MYSQL_HOST_VIA_NGROK'),
+        'HOST': 'localhost',
         'POST': 3306
     }
 }
 
+
 CORS_ALLOWED_ORIGINS = [
-    "http://34.111.89.101:80",
+    "http://34.111.89.101",
 ]
+
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 CACHES = {

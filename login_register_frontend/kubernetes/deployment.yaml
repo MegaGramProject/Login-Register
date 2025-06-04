@@ -16,7 +16,7 @@ spec:
       - name: login-register-frontend-container
         image: rishavry/login-register-frontend:v2
         ports:
-        - containerPort: 8000
+        - containerPort: 443
         envFrom:
         - secretRef:
             name: login-register-frontend-env-secrets

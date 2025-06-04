@@ -1,7 +1,10 @@
-from pathlib import Path
 import os
+
+from pathlib import Path
+
 from dotenv import load_dotenv
 from decouple import config
+
 
 load_dotenv()
 
@@ -12,12 +15,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('LOGIN_REGISTER_FRONTEND_DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: Don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # ALLOWED_HOSTS is a list of strings representing the host/domain names that this Django site can serve.
 # This is a security measure to prevent HTTP Host header attacks
 ALLOWED_HOSTS = [
-    config('ALLOWED_HOST'),
+    'localhost',
+    'megagram-rishavry.com'
 ]
 
 
@@ -63,8 +67,8 @@ WSGI_APPLICATION = 'login_register_frontend.wsgi.application'
 
 
 STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",  # Compress static-file sizes for efficiency
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',  # Compress static-file sizes for efficiency
     },
 }
 

@@ -69,7 +69,7 @@ language_code_to_long_form_mappings = {
 
 all_us_states = [str(state) for state in list(us.states.STATES)]
 all_countries = [country for country in  dict(countries_for_language('en')).values()]
-valid_account_based_in_options = ['TEMPORARY', 'N/A'] + all_us_states + all_countries
+valid_account_based_in_options = ['N/A'] + all_us_states + all_countries
 
 
 @ratelimit(group='create_user_rl', key='ip', rate='3/m')
@@ -326,12 +326,12 @@ def update_user(request, id):
             if 'date_of_birth' not in update_user_data:
                 encrypted_date_of_birth = user.date_of_birth
                 date_of_birth_plaintext = decrypt_data(client,
-                'megagram-428802', 'global', 'usersTableMySQL', user.id, base64.b64decode(encrypted_date_of_birth))
+                'megagram-428802', 'global', 'usersTableMySQL', str(user.id), base64.b64decode(encrypted_date_of_birth))
                 update_user_data['date_of_birth'] = date_of_birth_plaintext
             if 'account_based_in' not in update_user_data:
                 encrypted_account_based_in = user.account_based_in
                 account_based_in_plaintext = decrypt_data(client,
-                'megagram-428802', 'global', 'usersTableMySQL', user.id, base64.b64decode(encrypted_account_based_in))
+                'megagram-428802', 'global', 'usersTableMySQL', str(user.id), base64.b64decode(encrypted_account_based_in))
                 update_user_data['account_based_in'] = account_based_in_plaintext
 
 
@@ -961,7 +961,7 @@ def validate_user_auth_token(id, request_cookies):
     user_auth_token_cookie = 'authToken'+id
     user_refresh_token_cookie = 'refreshToken'+id
 
-    if user_auth_token_cookie not in request_cookies and user_refresh_token_cookie not in request_cookies:
+    if user_auth_token_cookie not in request_cookies:
         return 'Forbidden'
 
     rows = []
@@ -986,26 +986,28 @@ def validate_user_auth_token(id, request_cookies):
         correct_user_token = dict(zip(column_names_in_correct_order, correct_user_token))
         correct_user_token["authTokenExpiry"] = datetime2.fromisoformat(
         correct_user_token["authTokenExpiry"].isoformat())
-        correct_user_token["refreshTokenExpiry"] = datetime2.fromisoformat(
-        correct_user_token["refreshTokenExpiry"].isoformat())
 
-    if user_auth_token_cookie in request_cookies:
-        user_auth_token_cookie_val = request_cookies[user_auth_token_cookie]
+
+    user_auth_token_cookie_val = request_cookies[user_auth_token_cookie]
+
+    provided_hashed_salted_token = hash_salted_token(user_auth_token_cookie_val,
+    correct_user_token['authTokenSalt'])
     
-        if correct_user_token['hashedAuthToken'] != hash_salted_token(user_auth_token_cookie_val,
-        correct_user_token['authTokenSalt']) or correct_user_token['authTokenExpiry'] <= datetime.datetime.utcnow()::
-            return 'Forbidden'
-            
+    if correct_user_token['hashedAuthToken'] == provided_hashed_salted_token and correct_user_token['authTokenExpiry'] > datetime.datetime.utcnow():
         return 'Allowed'
+        
+    if correct_user_token['hashedAuthToken'] == provided_hashed_salted_token:
+        if user_refresh_token_cookie in request_cookies:
+            user_refresh_token_cookie_val = request_cookies[user_refresh_token_cookie]
 
-    else:
-        user_refresh_token_cookie_val = request_cookies[user_refresh_token_cookie]
+            correct_user_token["refreshTokenExpiry"] = datetime2.fromisoformat(
+            correct_user_token["refreshTokenExpiry"].isoformat())
     
-        if correct_user_token['hashedRefreshToken'] != hash_salted_token(user_refresh_token_cookie_val,
-        correct_user_token['refreshTokenSalt']) or correct_user_token['refreshTokenExpiry'] <= datetime.datetime.utcnow()::
-            return 'Forbidden'
-            
-        return 'Allowed, but Refresh Auth Token'
+            if correct_user_token['hashedRefreshToken'] == hash_salted_token(user_refresh_token_cookie_val,
+            correct_user_token['refreshTokenSalt']) and correct_user_token['refreshTokenExpiry'] > datetime.datetime.utcnow():
+                return 'Allowed, but Refresh Auth Token'
+
+    return 'Forbidden'
 
 
 def hash_salted_user_password(password, salt):

@@ -1,0 +1,92 @@
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #232424;
+        color: white;
+    }
+
+    .box {
+        border-color: rgb(52, 50, 50) !important;
+        background-color: #343333 !important;
+    }
+
+    .noUnderline {
+        color: #2499f2 !important;
+    }
+
+    .noUnderline:hover {
+        color: darkgreen !important;
+    }
+
+    .textInput {
+        background-color: lightgray !important;
+    }
+
+    select {
+        background-color: #232424 !important;
+        color: white !important;
+    }
+}
+
+body {
+    font-family: 'Arial';
+    text-align: center;
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 24.375em;
+    border-color: lightgray;
+    border-width: 0.0125em;
+    border-style: solid;
+}
+
+.textInput {
+    width: 17.9375em;
+    height: 3.5em;
+    margin-top: 0.5em;
+    background-color: #fafafa;
+    border-radius: 0.125em;
+    border-width: 0.0125em;
+    padding-left: 0.4375em;
+    padding-top: 0.375em;
+    padding-bottom: 0.375em;
+    font-size: 1.06em;
+}
+
+.textInput::placeholder {
+    color: #636364;
+    opacity: 1;
+    font-size: 0.84375em;
+}
+
+.blueButton {
+    background-color: #82bbf5;
+    color: white;
+    width: 21.8em;
+    border-radius: 0.4375em;
+    border: none;
+    font-weight: bold;
+    font-size: 0.78125em;
+    margin-top: 1.125em;
+    padding: 0.9em 0.95em;
+}
+
+.noUnderline {
+    text-decoration: none;
+    cursor: pointer;
+    color: #2499f2;
+    font-weight: bold;
+}
+
+.noUnderline:hover {
+    text-decoration: underline;
+    color: darkgreen !important;
+}
+
+.textInput:focus {
+    outline: none;
+    border: 0.0625em solid gray;
+}

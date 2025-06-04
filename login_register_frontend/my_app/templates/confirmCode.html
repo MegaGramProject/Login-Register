@@ -1,86 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="Rishav Ray">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Rishav Ray">
-    {% load static %}
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/megagramFavicon.png' %}">
-    <title>Confirm Code</title>
+        <title>Confirm Code</title>
 
-    <link rel="stylesheet" href="{% static 'styles/confirmCodeStyles.css' %}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{% static 'scripts/confirmCodeScript.js' %}"></script>
-</head>
+        {% load static %}
 
-<body>
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2em;">
-        <div class="box" style="margin-top:6.5em; padding: 1.45em 1.45em;">
-            {% if EMAIL != "N/A" %}
-                <img src="{% static 'images/emailIcon.webp' %}" style="height:10em; width: 10em; object-fit:contain;
-                pointer-events: none;">
-            {% else %}
-                <img src="{% static 'images/phoneIcon.jpg' %}" style="height:15em; width: 15em; object-fit:contain;
-                pointer-events: none;">
-            {% endif %}
-            <p style="font-weight: bold; font-size: 1.0625em; margin-top: 1.875em;">Enter Confirmation Code</p>
-            <p style="font-size: 1.0625em; text-align: center; display: inline; margin-top:0.9375em; line-height: 1.5;
-            max-width: 77%;">
-                Enter the confirmation code we sent to
-            {% if EMAIL != "N/A" %}
-                {{ EMAIL }}.
-            {% else %}
-                {{ NUMBER }}.
-            {% endif %}
-            
-            <p id="resendCode" class="noUnderline" style="margin-top: 0em;">Resend Code</></p>
-            <p id="timeRemaining" style="font-size:small; margin-bottom:1.2em;">60s</p>
-            <input id="confirmCode" type="text" class="textInput" placeholder="Confirmation Code" style="font-size: 1.0625em;
-            border-radius: 0.4375em; padding: 0.9375em 1.0625em;">
-            
-            <button type="button" id="nextButton" class="blueButton" style="font-size:0.875em; width: 23.5em;">Create Account</button>
-            <p id="errorMessage" style="margin-top: 1em;"></p>
-            <a id="goBackButton" class="noUnderline" style="margin-top: 1.25em; margin-bottom: 2.1875em;">
-                Go Back
-            <a/>
+        <link rel="icon" type="image/png" href="{% static 'images/megagramFavicon.png' %}">
+
+        <link rel="stylesheet" href="{% static 'styles/ConfirmCode.css' %}">
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script src="{% static 'scripts/ConfirmCode.js' %}"></script>
+    </head>
+
+    <body>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap:
+        0.2em;">
+            <div class="box" style="margin-top:6.5em; padding: 1.45em 1.45em;">
+                <img id="emailImg" src="{% static 'images/emailIcon.webp' %}" style="height:10em; width:
+                10em; object-fit: contain; pointer-events: none; display: none;">
+
+                <img id="phoneImg" src="{% static 'images/phoneIcon.jpg' %}" style="height:15em; width: 15em;
+                object-fit: contain; pointer-events: none; display: none;">
+
+                <p style="font-weight: bold; font-size: 1.0625em; margin-top: 1.875em;">
+                    Enter Confirmation Code
+                </p>
+
+                <p id="statusText" style="font-size: 1.0625em; text-align: center; display:
+                inline; margin-top:0.9375em; line-height: 1.5; max-width: 77%;"></p>
+                
+                <p id="resendCode" class="noUnderline" style="margin-top: 0em; display: none;">Resend Code</p>
+
+                <p id="timeRemaining" style="font-size:small; margin-bottom:1.2em;">60s</p>
+
+                <input id="confirmCode" type="text" class="textInput" placeholder="Confirmation Code"
+                style="border-radius: 0.4375em; padding: 0.9375em 1.0625em;">
+                
+                <button type="button" id="nextButton" class="blueButton" style="font-size:0.875em;">
+                    Create Account
+                </button>
+
+                <a id="goBackButton" class="noUnderline" style="margin-top: 1.25em; margin-bottom: 2.1875em;">
+                    Go Back
+                <a/>
+            </div>
+
+            <div class="box" style="padding: 1.45em 1.45em;">
+                <p style="font-size:small;">Have an account? <a id="loginText" class="noUnderline">
+                    Log in</a>
+                </p>
+                
+                <p style="font-size:small;">Browse without an account? <a
+                href="https://project-megagram.com/Anonymous%20Guest" class="noUnderline"> Click here</a>
+                </p>
+            </div>
+
+            <footer style="margin-top: 16em; text-align: center; color: gray; font-size: 0.88em;">
+                Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project
+                created by Rishav Ray.
+            </footer>
+        
+            <select style="margin-top: 1em; margin-bottom: 3em; padding: 0.8em 0.8em; outline: none;"
+            onchange="setLanguage(this.value)">
+                <option value="" disabled selected>Change Language</option>
+                <option value="العربية">العربية</option>
+                <option value="বাংলা">বাংলা</option>
+                <option value="Deutsch">Deutsch</option>
+                <option value="English">English</option>
+                <option value="Español">Español</option>
+                <option value="Français">Français</option>
+                <option value="हिंदी">हिंदी</option>
+                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                <option value="Italiano">Italiano</option>
+                <option value="日本語">日本語</option>
+                <option value="Русский">Русский</option>
+                <option value="中国人">中国人</option>
+            </select>
         </div>
-
-        <div class="box" style="padding: 1.45em 1.45em;">
-            <p style="font-size:small;">Have an account? <a id="loginText" class="noUnderline">
-                Log in</a>
-            </p>
-            <p style="font-size:small;">Browse without an account? <a href="https://www.google.com" class="noUnderline">
-                Click here</a>
-            </p>
-        </div>
-
-
-        <footer style="margin-top: 16em; text-align: center; color: gray; font-size: 0.88em;">
-            Megagram, a web-app that blends a bit of Instagram with a bit of Amazon, is a personal project created by Rishav Ray.
-        </footer>
-    
-        <select style="margin-top: 1em; margin-bottom: 3em; padding: 0.8em 0.8em; outline: none;" onchange="setLanguage(this.value)">
-            <option value="" disabled selected>Change Language</option>
-            <option value="العربية">العربية</option>
-            <option value="বাংলা">বাংলা</option>
-            <option value="Deutsch">Deutsch</option>
-            <option value="English">English</option>
-            <option value="Español">Español</option>
-            <option value="Français">Français</option>
-            <option value="हिंदी">हिंदी</option>
-            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-            <option value="Italiano">Italiano</option>
-            <option value="日本語">日本語</option>
-            <option value="Русский">Русский</option>
-            <option value="中国人">中国人</option>
-        </select>
-    </div>
-
-    <!--DISCLAIMER! Yes, I am aware the correctCodeValue should not be exposed in frontend.
-    For the sake of convenience(& since this website is for the sake of portfolio and doesn't actually have customers),
-    I just left it as it is-->
-    <p id="CORRECT_CODE_VALUE" style="display:none;">{{ CORRECT_CODE_VALUE }}</p>
-
-</body>
-
+    </body>
 </html>

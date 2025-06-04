@@ -7,7 +7,7 @@ spec:
     app: login-register-frontend
   ports:
   - protocol: TCP
-    port: 8000  # Port of this Load-Balancer Service
-    targetPort: 8000 # Maps to the container's port
+    port: 443  # Port of this Load-Balancer Service
+    targetPort: 443 # Maps to the container's port
   type: LoadBalancer
   loadBalancerIP: 34.172.22.111  # login-register-frontend-load-balancing-static-ip
