@@ -14,7 +14,7 @@
 
 ## Important Disclaimer because Honesty is the Best Policy
 
-During the first iteration of Project Megagram, I worked on all nine repositories. In the second iteration, I narrowed my focus to three of them, including this Home-Page repository. In the third and final iteration, I continued concentrating on these three repositories. However, I chose not to fully revise and polish all the frontend and backend files across them, as the work(which I was not paid at all for) felt repetitive and offered limited new learning and 'showing-skills-to-future-employer' opportunities. Furthermore, all the cloud-services that my project so heavily relies on were out of my budget.
+During the first iteration of Project Megagram, I worked on all nine repositories. In the second iteration, I narrowed my focus to three of them, including this Login-Register repository. In the third and final iteration, I continued concentrating on these three repositories. However, I chose not to fully revise and polish all the frontend and backend files across them, as the work(which I was not paid at all for) felt repetitive and offered limited new learning and 'showing-skills-to-future-employer' opportunities. Furthermore, all the cloud-services that my project so heavily relies on were out of my budget.
 
 To combat the issues above, I used the final iteration to create detailed wiki pages in my <a href="https://github.com/rishavry/WorksPresentation" style="font-weight: bold;" target="_blank" rel="noopener noreferrer">WorksPresentation Github repository</a>. These documents outline how I would approach various aspects of frontend, backend, cloud architecture, and more, if I were tasked with building them under real-world conditions.
 
